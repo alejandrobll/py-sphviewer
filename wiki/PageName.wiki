@@ -1,0 +1,12 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+With this project I would like to begin an useful tool for people that need to make nice smoothed particles plots in Python. In particular, I am interested in making nice renders of hydrodynamical SPH particles simulations of galaxy formation.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
