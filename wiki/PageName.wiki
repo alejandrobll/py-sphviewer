@@ -6,11 +6,7 @@ With this project I would like to begin an useful tool for people that need to m
 
 = The first plot with Py-SPHViwer= 
 
-Let's begin with an example. You can try it with Ipython. First of all, we have to import the sphviewer.py file:
-
-{{{
-In [2]: import sphviewer
-}}}
+Let's begin with an example. You can try it with Ipython:
 
 Our first example will be to define a cube made of 1000 uniform random placed particles:
 
@@ -29,8 +25,17 @@ In [7]: plt.show()
 
 http://py-sphviewer.googlecode.com/svn/wiki/1_small.png
 
-Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of the particles (ie, the scale-length at which the particle actually contributes to the density field), which can be computed by searching the n-th neighbor of each particle. There are several ways to define this smoothing length. Py-SPHViewer allows to use your proper smoothing length or it can be compute it for you.
+Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of the particles (ie, the scale-length at which particles actually contribute to the density field), which can be computed by searching the n-th neighbor of each particle. There are several ways to define this smoothing length. Py-SPHViewer allows to use your proper computed smoothing length or it can be compute it for you.
 In our first example, we have not the smoothing length of the particles, so, we will let Py-SPHViewer to compute it for us.
+
+First of all, we have to import the sphviewer.py file:
+
+{{{
+In [8]: import sphviewer
+}}}
+ 
+
+First, we have to instantiate the _scene class:
 
 
 
