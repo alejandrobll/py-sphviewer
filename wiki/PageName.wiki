@@ -19,6 +19,18 @@ In [3]: import numpy as np
 In [4]: pos = np.random.rand(3,1000)
 }}}
 
+If you plot the xy projection of these particles, you will look something like this:
+
+{{{
+In [5]: import matplotlib.pyplot as plt
+In [6]: plt.plot(pos[0,:], pos[1,:], 'k.')
+In [7]: plt.show()
+}}}
+
+http://py-sphviewer.googlecode.com/svn/wiki/1_small.png
+
+
+
 = Details =
 
 Add your content here.  Format your content with:
