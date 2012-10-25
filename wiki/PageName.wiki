@@ -2,7 +2,22 @@
 
 = Introduction =
 
-With this project I would like to begin an useful tool for people that need to make nice smoothed particles plots in Python. In particular, I am interested in making nice renders of hydrodynamical SPH particles simulations of galaxy formation.
+With this project I would like to begin an useful tool for people that need to make nice smoothed particles plots in Python. In particular, I am interested in making nice renders of hydrodynamical SPH particles simulations of galaxy formation. If you are interested in understanding the things, please, take a look at the code, if you are not, I think the best way to learn how the Py-SPHViewer works is with an example:
+
+= The first plot with Py-SPHViwer= 
+
+Let's begin with an example. You can try it with Ipython. First of all, we have to import the sphviewer.py file:
+
+{{{
+In [2]: import sphviewer
+}}}
+
+Our first example will be to define a cube made of 1000 uniform random placed particles:
+
+{{{
+In [3]: import numpy as np
+In [4]: pos = np.random.rand(3,1000)
+}}}
 
 = Details =
 
