@@ -39,7 +39,25 @@ First, we have to instantiate the _scene class:
 
 {{{
 In [12]: image = sphviewer.scene(pos=pos, nb=4)
+Building 3DTree...
+Searching the  4 neighbors of each particle...
 }}}
+
+Note that we have specified the number of neighbors to determine the smoothing length of each particle. If you have your own smoothing length, you can add the parameters _hsml and _rho within the arguments of the _scene class. The density _rho can be computed by dividing the number of neighbors by the volume of a sphere that contains them. 
+
+In our example, the smoothing length of particles was stored in image.hsml:
+
+{{{ 
+In [13]: print image.hsml
+[ 0.08034742  0.07268853  0.09088171  0.13775313  0.06260065  0.10747829
+  0.06289377  0.0796005   0.0685653   0.08242916  0.08881306  0.07933373
+  0.10008779  0.11405679  0.10700619  0.09568022  0.07362304  0.09125923
+  0.07645694  0.10395436  0.11061069  0.12284919  0.08033954  0.07882842
+  0.10757437  0.08115865  ...]
+}}}
+
+Now, we have to define the parameters of the camera to take a photo. The parameters of the camera define the point at which the camera should look at 
+
 
 
 = Details =
