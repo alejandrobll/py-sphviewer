@@ -29,7 +29,10 @@ In [7]: plt.show()
 
 http://py-sphviewer.googlecode.com/svn/wiki/1_small.png
 
-Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of each particle
+Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of the particles (ie, the scale-length at which the particle actually contributes to the density field), which can be computed by searching the n-th neighbor of each particle. There are several ways to define this smoothing length. Py-SPHViewer allows to use your proper smoothing length or it can be compute it for you.
+In our first example, we have not the smoothing length of the particles, so, we will let Py-SPHViewer to compute it for us.
+
+
 
 = Details =
 
