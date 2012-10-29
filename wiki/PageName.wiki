@@ -56,11 +56,29 @@ In [13]: print image.hsml
   0.10757437  0.08115865  ...]
 }}}
 
-Now, we have to define the parameters of the camera to take a photo. The parameters are:
+Now, we have to define the parameters of the camera to take a photo. Let us take a look at the help:
+
+{{{
+In [8]: image.camera_params?
+Type:       instancemethod
+String Form:<bound method scene.camera_params of <sphviewer.scene object at 0x4141290>>
+File:       /home/alejandro/Desktop/sphviewer.py
+Definition: image.camera_params(self, px=0.0, py=0.0, pz=0.0, r=100.0, theta=0.0, phi=0.0, zoom=1.0, res=1000)
+Docstring:
+Use camera_params to define the (px,py,pz) looking point of the camera,
+distance "r" of the observer, the angles "theta" and "phi" of camera, the 
+"zoom" and resolution of the image.
+
+}}}
+
+The parameters are to define are:
 
 || *Parameter* || *Function* ||
-||  px,py,pz   || fixed point at which camera points ||
-
+||  px,py,pz   || fixed point at which camera points. ||
+||  r          || distance of camera from (px,py,pz) fixed point. ||
+||  theta, phi || spherical angles to manage the position of the camera. ||
+||  zoom || Zoom of the camera. zoom = 1 by default and gives a Field of View (FOV) = 90º. Note that you can change FOV only by setting this parameter. ||
+|| res    || Number of pixels of the resulting image. With this paremeter you can set the "Mpx" of your camera. Note that the higher the resolution, the higher the processing time. ||
 
 = Details =
 
