@@ -71,7 +71,7 @@ distance "r" of the observer, the angles "theta" and "phi" of camera, the
 
 }}}
 
-The parameters are to define are:
+The parameters to define are:
 
 || *Parameter* || *Function* ||
 ||  px,py,pz   || fixed point at which camera points. ||
@@ -79,6 +79,51 @@ The parameters are to define are:
 ||  theta, phi || spherical angles to manage the position of the camera. ||
 ||  zoom || Zoom of the camera. zoom = 1 by default and gives a Field of View (FOV) = 90º. Note that you can change FOV only by setting this parameter. ||
 || res    || Number of pixels of the resulting image. With this paremeter you can set the "Mpx" of your camera. Note that the higher the resolution, the higher the processing time. ||
+
+http://py-sphviewer.googlecode.com/svn/wiki/sphere.png
+
+For our first example, we will set the camera parameters as follows:
+
+{{{
+In [11]: image.camera_params(px=0.5,py=0.5,pz=0.5,r=1.)
+===============================
+==== Parameters of camera: ====
+(px,py,pz)           =  0.5 , 0.5 , 0.5
+r                    =  1.0
+theta                =  0.0
+phi                  =  0.0
+zoom                 =  1.0
+res                  =  1000
+================================
+
+}}}
+
+It is to say, we are looking at the center of cube from a distance of 1.0. By default, the zoom and FOV of camera will be 1.0 and 90º respectively. The size of the resulting image will be 1000 x 1000 pixels. 
+
+Now, it is time to effectively render the scene and get its parameters ( like the image matrix and size):
+
+{{{
+In [18]: dens, bins = image.make_scene()
+===============================
+==== Parameters of camera: ====
+(px,py,pz)           =  0.5 , 0.5 , 0.5
+(xcam,ycam,zcam)     =  -0 , 0.0 , -1.0
+r                    =  1.0
+theta                =  0.0
+phi                  =  0.0
+zoom                 =  1.0
+FOV                  =  90.0
+res                  =  1000
+================================
+
+Nice. Let us take a look at the image:
+
+{{{
+In [23]: plt.imshow(np.log10(dens+1.))
+In [24]: plt.show()
+}}}
+
+http://py-sphviewer.googlecode.com/svn/wiki/2.png
 
 = Details =
 
