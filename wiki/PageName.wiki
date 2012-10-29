@@ -56,8 +56,10 @@ In [13]: print image.hsml
   0.10757437  0.08115865  ...]
 }}}
 
-Now, we have to define the parameters of the camera to take a photo. The parameters of the camera define the point at which the camera should look at 
+Now, we have to define the parameters of the camera to take a photo. The parameters are:
 
+|| *Parameter* || *Function* ||
+||  px,py,pz   || fixed point at which camera points ||
 
 
 = Details =
