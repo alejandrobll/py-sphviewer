@@ -5,6 +5,9 @@ from scipy.weave import converters
 from mpi4py import MPI
 
 class scene(object):
+	"""
+	Commit test
+	"""
 	def __init__(self, pos=None, hsml=None, rho=None, nb=32):
 #==========================
 # particle parameters
