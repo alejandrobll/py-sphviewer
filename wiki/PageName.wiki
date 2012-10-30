@@ -104,6 +104,8 @@ Now, it is time to effectively render the scene and get its parameters ( like th
 
 {{{
 In [18]: dens, bins = image.make_scene()
+}}}
+
 ===============================
 ==== Parameters of camera: ====
 (px,py,pz)           =  0.5 , 0.5 , 0.5
@@ -124,6 +126,10 @@ In [24]: plt.show()
 }}}
 
 http://py-sphviewer.googlecode.com/svn/wiki/2.png
+
+Congratulations! You have made a nice image! Now it is straight forward to make a nice Video like this: 
+
+<wiki:video url="http://www.youtube.com/watch?v=ifzMh8MXgZ8" />
 
 = Details =
 
