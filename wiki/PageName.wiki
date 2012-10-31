@@ -121,7 +121,7 @@ res                  =  1000
 Nice. Let us take a look at the image:
 
 {{{
-In [23]: plt.imshow(np.log10(dens+1.))
+In [23]: plt.imshow(np.log10(dens+1.), origin='lower')
 In [24]: plt.show()
 }}}
 
