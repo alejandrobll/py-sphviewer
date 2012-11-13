@@ -71,7 +71,8 @@ class scene(object):
 		print '================================'
 
 
-	def make_scene(self):
+	def make_scene(self, near=True):
+		#define near as False if you want to look at the scene from the infinity
 		#factor to convert angles
 		ac = np.pi/180.
 		FOV   = 2.*np.abs(np.arctan(1./(self.zoom)))
@@ -97,15 +98,26 @@ class scene(object):
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
 		# (px,py,pz) and (xcam,ycam,zcam) define the line of sight.
-		x = self.pos[0,:]-(self.px+self.xcam)
-		y = self.pos[1,:]-(self.py+self.ycam)
-		z = self.pos[2,:]-(self.pz+self.zcam)
+		if(near):
+			x = self.pos[0,:]-(self.px+self.xcam)
+			y = self.pos[1,:]-(self.py+self.ycam)
+			z = self.pos[2,:]-(self.pz+self.zcam)
 
-		#we need to take into account the real camera's FOV.
-		xmax = self.zoom * np.tan(FOV/2.)
-		ymax = self.zoom * np.tan(FOV/2.)
-		xmin = - xmax
-		ymin = - ymax
+			#we need to take into account the real camera's FOV.
+			xmax = self.zoom * np.tan(FOV/2.)
+			ymax = self.zoom * np.tan(FOV/2.)
+			xmin = - xmax
+			ymin = - ymax
+		else:
+			x = self.pos[0,:]-(self.px)
+			y = self.pos[1,:]-(self.py)
+			z = self.pos[2,:]-(self.pz)
+
+			xmax = np.max(x)
+			ymax = np.max(y)
+			xmin = -xmax
+			ymin = -ymax
+
 
 		if(self.phi   != 0.):				#we rotate around y axis
 			xx_temp       = x*np.cos(self.phi*ac)-z*np.sin(self.phi*ac)
@@ -121,13 +133,15 @@ class scene(object):
 
 		# now we consider only particles in the line of sight inside de FOV of 
       # camera	
-		kview = (np.where( (z > 0.) & (np.abs(x) <= 
-               (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
-               (np.abs(z)*np.tan(FOV/2.)) ) )[0])
+		if(near):
+			kview = (np.where( (z > 0.) & (np.abs(x) <= 
+		             (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
+		             (np.abs(z)*np.tan(FOV/2.)) ) )[0])
 
-		x = x[kview]
-		y = y[kview]
-		z = z[kview]
+			x = x[kview]
+			y = y[kview]
+			z = z[kview]
+			rho = self.rho[kview]
 
 		lbin = 2*xmax/self.res
 		binx = np.int(self.res)
@@ -142,11 +156,16 @@ class scene(object):
 		print 'binx =', binx
 		print 'biny =', biny
 
-		x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
-		y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
-		rho = self.rho[kview]
 
-		t = (self.hsml[kview]*self.zoom/z/lbin).astype(int)
+		if(near):	
+			x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
+			y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
+			t = (self.hsml[kview]*self.zoom/z/lbin).astype(int)
+		else:
+			x = ((x-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
+			y = ((y-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
+			t = (self.hsml/lbin).astype(int)
+			rho = self.rho
 
 		n=int(len(x))
 
