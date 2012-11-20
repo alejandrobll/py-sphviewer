@@ -2,7 +2,14 @@ from scipy.spatial import cKDTree
 import numpy as np
 from scipy import weave
 from scipy.weave import converters
-from mpi4py import MPI
+
+def import_code(filename):
+	#naive function to import the .c files into scipy.weave
+	string = ''
+	fi = open(filename, 'r').readlines()
+	for i in fi:
+		string += i
+	return string
 
 class scene(object):
 	"""
@@ -108,6 +115,8 @@ class scene(object):
 			ymax = self.zoom * np.tan(FOV/2.)
 			xmin = - xmax
 			ymin = - ymax
+			#when near is true we give the extent in angular units 
+			extent = np.array([-FOV/2./ac,FOV/2./ac,-FOV/2./ac,FOV/2./ac])
 		else:
 			x = self.pos[0,:]-(self.px)
 			y = self.pos[1,:]-(self.py)
@@ -117,6 +126,8 @@ class scene(object):
 			ymax = np.max(y)
 			xmin = -xmax
 			ymin = -ymax
+			#when near is False we give the projected coordinates 
+			extent = np.array([xmin,xmax,ymin,ymax])
 
 
 		if(self.phi   != 0.):				#we rotate around y axis
@@ -171,61 +182,14 @@ class scene(object):
 
 		dens = np.zeros([binx,biny],dtype=(np.float))
 
-		extent = np.array([xmin,xmax,ymin,ymax])
+		# interpolation kernel
+		extra_code = import_code('extra_code.c')
+		# C code for making the images
+		code       = import_code('c_code.c')
 
-		extra_code = """
-		 float cubic_kernel1(float r, float h)
-		 {
-		 float func;
-		 if((r/h) < 1.0)  func = 1.0-1.5*(r/h)*(r/h)+0.75*(r/h)*(r/h)*(r/h);
-		 if( ((r/h) < 2.0) && ((r/h) >= 1.0) )  func = 0.25*(2.0-(r/h))*(2.0-(r/h))*(2.0-(r/h));
-		 if((r/h) >= 2.0) func = 0.0;
-		 return func;
-		 }
-
-		 float cubic_kernel2(float r, float h)
-		 {
-		 float func;
-		 if((r/h) <= 0.5) func = 1.0-6.0*(r/h)*(r/h)+6.0*(r/h)*(r/h)*(r/h);
-		 if( ((r/h) > 0.5) && (r/h) <= 1.0) func = 2.*(1.0-(r/h))*(1.0-(r/h))*(1.0-(r/h));
-		 if((r/h) > 1.0)	func = 0.0;
-		return func;
-		 }
-		 """
-		code="""
-		 int i, j, k;
-		 int xx, yy;
-		 int tt; 
-		 float rho_c;
-		 int binx_c, biny_c;
-
-		 binx_c = binx;
-		 biny_c = biny;
-
-	#pragma omp parallel for private(i,xx,yy,tt,rho_c,j,k)
-	#pragma omp+ reduction(+:dens)
-	#pragma omp schedule(dynamic)
-		 for(i=0;i<n;i++)
-		 {
-	//		  printf("Queda %d\\n",n-i);
-		     xx = (int)x(i);
-		     yy = (int)y(i);
-		     tt = (int)t(i);
-		     rho_c = (float) rho(i);
-
-		     if(tt < 1) tt = 1;
-		     if(tt > binx_c) tt = binx_c;
-		     for(j=-tt; j<tt+1; j++){
-		        for(k=-tt; k<tt+1; k++){
-		  			  if( ( (xx+j) >= 0) && ( (xx+j) < binx_c) && ( (yy+k) >=0) && ( (yy+k) < biny_c))
-	 	    		  dens((xx+j),(yy+k)) += rho_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-		        }
-		      }
-			}
-		 """
 		weave.inline(code,['x','y', 'binx', 'biny', 't','lbin', 'n', 'rho', 'dens'], support_code=extra_code,type_converters=converters.blitz,compiler='gcc',  extra_compile_args=[' -O3 -fopenmp'],extra_link_args=['-lgomp'])
 
-		return dens, np.array([binx, biny])#, np.array([xmin,xmax,ymin,ymax])
+		return dens, np.array([binx, biny]), extent
 
 
 
