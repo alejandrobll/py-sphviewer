@@ -11,11 +11,17 @@ def import_code(filename):
 		string += i
 	return string
 
+def center_array(x):
+	xmax = np.max(x)
+	xmin = np.min(x)
+	xmed = 0.5*(xmax+xmin)
+	return (xmax-xmin),xmed
+
 class scene(object):
 	"""
 	Commit test
 	"""
-	def __init__(self, pos=None, hsml=None, rho=None, nb=32):
+	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True):
 #==========================
 # particle parameters
 		self.pos  = pos
@@ -37,8 +43,19 @@ class scene(object):
 
 		#If smoothing lenghts are not given we compute them.
 		if(hsml == None): self.det_hsml()
+		if ac == True: self.auto_camera()
 
-	def det_hsml(self):	
+	def auto_camera(self,distance_factor=0.65):
+		"""
+		Autocentering the camera params
+		"""
+		size_x, self.px = center_array(self.pos[0,:])
+		size_y, self.py = center_array(self.pos[1,:])
+		size_z, self.pz = center_array(self.pos[2,:])
+		self.r = (distance_factor * 
+			  np.sqrt(size_x**2+size_y**2+size_z**2))
+
+	def det_hsml(self):
 		"""
 		Use det_hsml to compute the smoothing lenght and the density of your 
 		particles. 
@@ -53,12 +70,12 @@ class scene(object):
 		return
 
 	def camera_params(self,px=0.,py=0.,pz=0.,
-                     r=100.,theta=0.,phi=0.,zoom=1.,res=1000):
+                     r=100.,theta=0.,phi=0.,zoom=1.,res=2000):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
 		"zoom" and resolution of the image.
-		""" 
+		"""
 		self.px      = px		
 		self.py      = py		
 		self.pz      = pz	
@@ -190,7 +207,3 @@ class scene(object):
 		weave.inline(code,['x','y', 'binx', 'biny', 't','lbin', 'n', 'rho', 'dens'], support_code=extra_code,type_converters=converters.blitz,compiler='gcc',  extra_compile_args=[' -O3 -fopenmp'],extra_link_args=['-lgomp'])
 
 		return dens, np.array([binx, biny]), extent
-
-
-
-
