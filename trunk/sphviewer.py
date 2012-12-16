@@ -21,7 +21,7 @@ class scene(object):
 	"""
 	Commit test
 	"""
-	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True):
+	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True, verb=False):
 #==========================
 # particle parameters
 		self.pos  = pos
@@ -40,7 +40,7 @@ class scene(object):
 		self.zoom    = 1.		# magnification of the camera.
 		self.res     = 1000	# resolution of the image (only squared images)
 #==========================
-
+		self.verb = verb
 		#If smoothing lenghts are not given we compute them.
 		if(hsml == None): self.det_hsml()
 		if ac == True: self.auto_camera()
@@ -70,7 +70,7 @@ class scene(object):
 		return
 
 	def camera_params(self,px=0.,py=0.,pz=0.,
-                     r=100.,theta=0.,phi=0.,zoom=1.,res=2000):
+                     r=100.,theta=0.,phi=0.,zoom=1.,res=1000):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
@@ -105,20 +105,20 @@ class scene(object):
 		self.xcam = -self.r*np.sin(self.phi*ac)*np.cos(self.theta*ac)
 		self.ycam = +self.r*np.sin(self.theta*ac)
 		self.zcam = -self.r*np.cos(self.phi*ac)*np.cos(self.theta*ac)
-
+		
+		if self.verb:
 		#we write the camera parameters for clarity
-		print '\n==============================='
-		print '==== Parameters of camera: ===='
-		print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
-		print '(xcam,ycam,zcam)     = ',     self.xcam,',',self.ycam,',',self.zcam
-		print 'r                    = ',     self.r
-		print 'theta                = ',     self.theta
-		print 'phi                  = ',     self.phi
-		print 'zoom                 = ',     self.zoom
-		print 'FOV                  = ',     FOV/ac
-		print 'res                  = ',     self.res
-		print '================================'
-
+			print '\n==============================='
+			print '==== Parameters of camera: ===='
+			print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
+			print '(xcam,ycam,zcam)     = ',     self.xcam,',',self.ycam,',',self.zcam
+			print 'r                    = ',     self.r
+			print 'theta                = ',     self.theta
+			print 'phi                  = ',     self.phi
+			print 'zoom                 = ',     self.zoom
+			print 'FOV                  = ',     FOV/ac
+			print 'res                  = ',     self.res
+			print '================================'
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
 		# (px,py,pz) and (xcam,ycam,zcam) define the line of sight.
@@ -175,14 +175,15 @@ class scene(object):
 		binx = np.int(self.res)
 		biny = np.int(self.res)
 
-		print '-------------------------------------------------'
-		print 'Making the smooth image'
-		print 'xmin =', xmin
-		print 'xmax =', xmax
-		print 'ymin =', ymin
-		print 'ymax =', ymax
-		print 'binx =', binx
-		print 'biny =', biny
+		if self.verb:
+			print '-------------------------------------------------'
+			print 'Making the smooth image'
+			print 'xmin =', xmin
+			print 'xmax =', xmax
+			print 'ymin =', ymin
+			print 'ymax =', ymax
+			print 'binx =', binx
+			print 'biny =', biny
 
 
 		if(near):	
