@@ -10,7 +10,7 @@ For a simple test: python plotter.py
 
 class graph(scene):
     def __init__(self, pos, hsml=None, rho=None, 
-                 nb=16, ac=True, cmap='gray',verb=False, res=100):
+                 nb=4, ac=True, cmap='gray',verb=False, res=200):
 
         scene.__init__(self,pos=pos, hsml=hsml, rho=rho, 
                        nb=nb, ac=ac,verb=verb)
@@ -20,6 +20,7 @@ class graph(scene):
             self.make_scene(near=True)
         self.cmap = cmap
         self.make_widget()
+        self.press = None
 
     def make_widget(self):
         def update_lim(val):
@@ -59,15 +60,44 @@ class graph(scene):
             self.image.set_array(self.dens)
             self.fig.show()
 
+        def on_press(event):
+            self.press = event.x, event.y
 
+        def on_release(event):
+            'on release we reset the press data'
+            self.press = None
+
+        def on_motion(event):
+            if self.press is None: return
+            x0, y0 = self.press
+            dthetadot = event.x - x0
+            dphidot   = event.y - y0
+            self.press = event.x, event.y
+            self.theta -= dthetadot
+            self.phi += dphidot
+#            self.s_theta.set_val(self.theta)
+#            self.s_phi.set_val(self.phi)
+            self.dens, self.bins, self.extent = \
+                self.make_scene(near=True)
+            self.image.set_array(self.dens)
+            self.fig.show()
+
+        def connect():
+            'connect to all the events we need'
+            self.cidpress = self.fig.canvas.mpl_connect(
+                'button_press_event', on_press)
+            self.cidrelease = self.fig.canvas.mpl_connect(
+                'button_release_event', on_release)
+            self.cidmotion = self.fig.canvas.mpl_connect(
+                'motion_notify_event', on_motion)
+            
         fig = plt.figure('SPH VIEWER FIGURE')
         self.fig = fig
         fig.add_subplot(111)
-        fig.subplots_adjust(bottom=0.35)
         self.ax = plt.gca()
 
         fig_opt = plt.figure("Options")
-
+        
         slide_vmin  = fig_opt.add_axes([0.25,0.1,0.55,0.02])
         slide_vmax  = fig_opt.add_axes([0.25,0.14,0.55,0.02])
         slide_theta = fig_opt.add_axes([0.25,0.18,0.55,0.02])
@@ -78,51 +108,54 @@ class graph(scene):
         vmin = self.dens.min()
         vmax = self.dens.max()
 
-        s_vmin = Slider(slide_vmin,
+        self.s_vmin = Slider(slide_vmin,
                         'Zmin',vmin,
                         vmax,
                         valinit=vmin)
-        s_vmax = Slider(slide_vmax,
+        self.s_vmax = Slider(slide_vmax,
                         'Zmax',
                         vmin,
                         vmax,
-                        valinit=vmax)        
-        s_theta = Slider(slide_theta,
+                        valinit=vmax)
+        self.s_theta = Slider(slide_theta,
                         r'$\Theta$',
                         0.0,
                         360.0,
                         valinit=self.theta)
-        s_phi = Slider(slide_phi,
+        self.s_phi = Slider(slide_phi,
                         r'$\Phi$',
                         0.0,
                         180.0,
                         valinit=self.phi)
-        s_r = Slider(slide_r,
+        self.s_r = Slider(slide_r,
                         r'$R$',
                         0.0,
                         self.r*10,
                         valinit=self.r)
-        s_zoom = Slider(slide_zoom,
+        self.s_zoom = Slider(slide_zoom,
                         'Zoom',
                         0.1,
                         3.0,
                         valinit=self.zoom)
 
-        s_vmin.on_changed(update_lim)
-        s_vmax.on_changed(update_lim)
-        s_theta.on_changed(update_theta)
-        s_phi.on_changed(update_phi)
-        s_r.on_changed(update_r)
-        s_zoom.on_changed(update_zoom)
+        self.s_vmin.on_changed(update_lim)
+        self.s_vmax.on_changed(update_lim)
+        self.s_theta.on_changed(update_theta)
+        self.s_phi.on_changed(update_phi)
+        self.s_r.on_changed(update_r)
+        self.s_zoom.on_changed(update_zoom)
+
+        connect()
 
         self.image = self.ax.imshow(self.dens,
                             origin='lower',
                             cmap=self.cmap,
-                            extent=self.extent
+                            extent=self.extent,
+                            interpolation='nearest'
                             )
 
         plt.show()
 
 if __name__ == '__main__':
-    pos = np.random.rand(3,10000)
+    pos = np.random.rand(3,1000)
     graph(pos)
