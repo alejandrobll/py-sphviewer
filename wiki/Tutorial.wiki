@@ -103,7 +103,7 @@ It is to say, we are looking at the center of cube from a distance of 1.0. By de
 Now, it is time to effectively render the scene and get its parameters ( like the image matrix and size):
 
 {{{
-In [18]: dens, bins = image.make_scene()
+In [18]: dens, bins, extent = image.make_scene()
 }}}
 
 ===============================
