@@ -24,8 +24,8 @@ class graph(scene):
 
     def make_widget(self):
         def update_lim(val):
-            vmin = s_vmin.val
-            vmax = s_vmax.val
+            vmin = self.s_vmin.val
+            vmax = self.s_vmax.val
             if vmin>vmax:
                 vmin = vmax*(1.0-0.01)
                 vmax = vmax
