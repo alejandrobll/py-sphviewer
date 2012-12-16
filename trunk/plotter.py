@@ -10,7 +10,7 @@ For a simple test: python plotter.py
 
 class graph(scene):
     def __init__(self, pos, hsml=None, rho=None, 
-                 nb=4, ac=True, cmap='gray',verb=False, res=200):
+                 nb=8, ac=True, cmap='gray',verb=False, res=500):
 
         scene.__init__(self,pos=pos, hsml=hsml, rho=rho, 
                        nb=nb, ac=ac,verb=verb)
@@ -19,8 +19,9 @@ class graph(scene):
         self.dens, self.bins, self.extent = \
             self.make_scene(near=True)
         self.cmap = cmap
-        self.make_widget()
         self.press = None
+        self.res_mov = 1
+        self.make_widget()
 
     def make_widget(self):
         def update_lim(val):
@@ -53,6 +54,7 @@ class graph(scene):
                 self.make_scene(near=True)
             self.image.set_array(self.dens)
             self.fig.show()
+
         def update_zoom(val):
             self.zoom = val
             self.dens, self.bins, self.extent = \
@@ -72,15 +74,17 @@ class graph(scene):
             x0, y0 = self.press
             dthetadot = event.x - x0
             dphidot   = event.y - y0
-            self.press = event.x, event.y
-            self.theta -= dthetadot
-            self.phi += dphidot
-#            self.s_theta.set_val(self.theta)
-#            self.s_phi.set_val(self.phi)
-            self.dens, self.bins, self.extent = \
-                self.make_scene(near=True)
-            self.image.set_array(self.dens)
-            self.fig.show()
+            if dthetadot**2+dphidot**2 > self.res_mov:
+                self.press = event.x, event.y
+                self.theta -= dthetadot
+                self.phi += dphidot
+                #            self.s_theta.set_val(self.theta)
+                #            self.s_phi.set_val(self.phi)
+                self.dens, self.bins, self.extent = \
+                    self.make_scene(near=True)
+                self.image.set_array(self.dens)
+                print "theta=", self.theta, "phi=", self.phi
+                self.fig.show()
 
         def connect():
             'connect to all the events we need'
@@ -103,7 +107,7 @@ class graph(scene):
         slide_theta = fig_opt.add_axes([0.25,0.18,0.55,0.02])
         slide_phi   = fig_opt.add_axes([0.25,0.22,0.55,0.02])
         slide_r     = fig_opt.add_axes([0.25,0.26,0.55,0.02])
-        slide_zoom   = fig_opt.add_axes([0.25,0.30,0.55,0.02])
+        slide_zoom  = fig_opt.add_axes([0.25,0.30,0.55,0.02])
 
         vmin = self.dens.min()
         vmax = self.dens.max()
@@ -157,5 +161,5 @@ class graph(scene):
         plt.show()
 
 if __name__ == '__main__':
-    pos = np.random.rand(3,1000)
+    pos = np.random.rand(3,10000)
     graph(pos)
