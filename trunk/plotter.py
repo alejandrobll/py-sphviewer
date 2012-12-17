@@ -10,7 +10,7 @@ For a simple test: python plotter.py
 
 class graph(scene):
     def __init__(self, pos, hsml=None, rho=None, 
-                 nb=8, ac=True, cmap='gray',verb=False, res=500):
+                 nb=8, ac=True, cmap='gray',verb=False, res=200):
 
         scene.__init__(self,pos=pos, hsml=hsml, rho=rho, 
                        nb=nb, ac=ac,verb=verb)
@@ -33,34 +33,34 @@ class graph(scene):
                 s_vmin.set_val(vmin)
                 s_vmax.set_val(vmax)
             self.image.set_clim(vmin,vmax)
-            self.fig.show()
+            self.image.figure.canvas.draw()
 
         def update_theta(val):
             self.theta = val
             self.dens, self.bins, self.extent = \
                 self.make_scene(near=True)
             self.image.set_array(self.dens)
-            self.fig.show()
+            self.image.figure.canvas.draw()
 
         def update_phi(val):
             self.phi = val
             self.dens, self.bins, self.extent = \
                 self.make_scene(near=True)
             self.image.set_array(self.dens)
-            self.fig.show()
+            self.image.figure.canvas.draw()
         def update_r(val):
             self.r = val
             self.dens, self.bins, self.extent = \
                 self.make_scene(near=True)
             self.image.set_array(self.dens)
-            self.fig.show()
+            self.image.figure.canvas.draw()
 
         def update_zoom(val):
             self.zoom = val
             self.dens, self.bins, self.extent = \
                 self.make_scene(near=True)
             self.image.set_array(self.dens)
-            self.fig.show()
+            self.image.figure.canvas.draw()
 
         def on_press(event):
             self.press = event.x, event.y
@@ -84,7 +84,7 @@ class graph(scene):
                     self.make_scene(near=True)
                 self.image.set_array(self.dens)
                 print "theta=", self.theta, "phi=", self.phi
-                self.fig.show()
+                self.image.figure.canvas.draw()
 
         def connect():
             'connect to all the events we need'
@@ -161,5 +161,5 @@ class graph(scene):
         plt.show()
 
 if __name__ == '__main__':
-    pos = np.random.rand(3,10000)
+    pos = np.random.rand(3,1000)
     graph(pos)
