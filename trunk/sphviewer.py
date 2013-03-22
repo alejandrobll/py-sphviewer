@@ -2,6 +2,7 @@ from scipy.spatial import cKDTree
 import numpy as np
 from scipy import weave
 from scipy.weave import converters
+import sys
 
 def import_code(filename):
 	#naive function to import the .c files into scipy.weave
@@ -19,7 +20,7 @@ def center_array(x):
 
 class scene(object):
 	"""
-	Commit test
+	Main Class to render the particles
 	"""
 	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True, verb=False):
 #==========================
@@ -95,8 +96,13 @@ class scene(object):
 		print '================================'
 
 
-	def make_scene(self, near=True):
+	def make_scene(self, near=True, lbox=None):
 		#define near as False if you want to look at the scene from the infinity
+		#lbox defines the physical lenght showed by the camera when near is False
+
+		if( (near == False) & (lbox == None) ):
+			print 'ERROR: If you selected near=False, you have to give some lbox value...'
+
 		#factor to convert angles
 		ac = np.pi/180.
 		FOV   = 2.*np.abs(np.arctan(1./(self.zoom)))
@@ -139,11 +145,11 @@ class scene(object):
 			y = self.pos[1,:]-(self.py)
 			z = self.pos[2,:]-(self.pz)
 
-			xmax = np.max(x)
-			ymax = np.max(y)
-			xmin = -xmax
-			ymin = -ymax
-			#when near is False we give the projected coordinates 
+			xmax =  lbox/2.
+			ymax =  lbox/2.
+			xmin = -lbox/2.
+			ymin = -lbox/2.
+			#when near is False we give the projected coordinates inside lbox 
 			extent = np.array([xmin,xmax,ymin,ymax])
 
 
@@ -162,14 +168,23 @@ class scene(object):
 		# now we consider only particles in the line of sight inside de FOV of 
       # camera	
 		if(near):
-			kview = (np.where( (z > 0.) & (np.abs(x) <= 
-		             (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
-		             (np.abs(z)*np.tan(FOV/2.)) ) )[0])
+			kview = ( np.where( (z > 0.) & (np.abs(x) <= 
+		                (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
+		                (np.abs(z)*np.tan(FOV/2.)) ) )[0])
 
 			x = x[kview]
 			y = y[kview]
 			z = z[kview]
 			rho = self.rho[kview]
+		else:
+			kview = np.where( (np.abs(x) < lbox/2) & 
+                                          (np.abs(y) < lbox/2) &
+                                          (np.abs(z) < lbox/2) )[0]
+			x = x[kview]
+			y = y[kview]
+			z = z[kview]
+			rho = self.rho[kview]
+
 
 		lbin = 2*xmax/self.res
 		binx = np.int(self.res)
@@ -194,8 +209,7 @@ class scene(object):
 			x = ((x-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
 			y = ((y-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
 			t = (self.hsml/lbin).astype(int)
-			rho = self.rho
-
+	
 		n=int(len(x))
 
 		dens = np.zeros([binx,biny],dtype=(np.float))
@@ -205,6 +219,19 @@ class scene(object):
 		# C code for making the images
 		code       = import_code('c_code.c')
 
-		weave.inline(code,['x','y', 'binx', 'biny', 't','lbin', 'n', 'rho', 'dens'], support_code=extra_code,type_converters=converters.blitz,compiler='gcc',  extra_compile_args=[' -O3 -fopenmp'],extra_link_args=['-lgomp'])
+		weave.inline(code,['x',
+                                   'y',
+                                   'binx',
+                                   'biny', 
+                                   't',
+                                   'lbin', 
+                                   'n',
+                                   'rho',
+                                   'dens'],
+                                   support_code=extra_code,
+                                   type_converters=converters.blitz,
+                                   compiler='gcc', 
+                                   extra_compile_args=[' -O3 -fopenmp'],
+                                   extra_link_args=['-lgomp'])
 
 		return dens, np.array([binx, biny]), extent
