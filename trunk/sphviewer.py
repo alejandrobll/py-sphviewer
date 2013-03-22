@@ -3,6 +3,7 @@ import numpy as np
 from scipy import weave
 from scipy.weave import converters
 import sys
+import time
 
 def import_code(filename):
 	#naive function to import the .c files into scipy.weave
@@ -22,7 +23,7 @@ class scene(object):
 	"""
 	Main Class to render the particles
 	"""
-	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True, verb=False):
+	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True, verbose=False):
 #==========================
 # particle parameters
 		self.pos  = pos
@@ -41,7 +42,7 @@ class scene(object):
 		self.zoom    = 1.		# magnification of the camera.
 		self.res     = 1000	# resolution of the image (only squared images)
 #==========================
-		self.verb = verb
+		self.verbose = verbose
 		#If smoothing lenghts are not given we compute them.
 		if(hsml == None): self.det_hsml()
 		if ac == True: self.auto_camera()
@@ -112,7 +113,7 @@ class scene(object):
 		self.ycam = +self.r*np.sin(self.theta*ac)
 		self.zcam = -self.r*np.cos(self.phi*ac)*np.cos(self.theta*ac)
 		
-		if self.verb:
+		if self.verbose:
 		#we write the camera parameters for clarity
 			print '\n==============================='
 			print '==== Parameters of camera: ===='
@@ -190,7 +191,7 @@ class scene(object):
 		binx = np.int(self.res)
 		biny = np.int(self.res)
 
-		if self.verb:
+		if self.verbose:
 			print '-------------------------------------------------'
 			print 'Making the smooth image'
 			print 'xmin =', xmin
@@ -219,6 +220,7 @@ class scene(object):
 		# C code for making the images
 		code       = import_code('c_code.c')
 
+		start = time.time()
 		weave.inline(code,['x',
                                    'y',
                                    'binx',
@@ -233,5 +235,7 @@ class scene(object):
                                    compiler='gcc', 
                                    extra_compile_args=[' -O3 -fopenmp'],
                                    extra_link_args=['-lgomp'])
+		stop = time.time()
 
+		if(self.verbose): print 'Elapsed time = ', stop-start
 		return dens, np.array([binx, biny]), extent

@@ -9,7 +9,7 @@ biny_c = biny;
 
 #pragma omp parallel for private(i,xx,yy,tt,rho_c,j,k)
 #pragma omp+ reduction(+:dens)
-#pragma omp schedule(dynamic)
+#pragma omp schedule(dynamic,1000)
 	for(i=0;i<n;i++)
 	{
 		//		  printf("Queda %d\\n",n-i);
