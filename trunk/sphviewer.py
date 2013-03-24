@@ -223,9 +223,9 @@ class scene(object):
 			z = z[kview]
 			rho = self.rho[kview]
 		else:
-			kview = np.where( (np.abs(x) < lbox/2) & 
-                                          (np.abs(y) < lbox/2) &
-                                          (np.abs(z) < lbox/2) )[0]
+			kview = np.where( (x >= xmin) & (x <= xmax) & 
+                                          (y >= ymin) & (y <= ymax) &
+                                          ( np.abs(z) <= lbox/2 ) )[0]
 			x = x[kview]
 			y = y[kview]
 			z = z[kview]
@@ -257,7 +257,7 @@ class scene(object):
 	
 		n=int(len(x))
 
-		dens = np.zeros([self.xsize,self.ysize],dtype=(np.float))
+		dens = np.zeros([self.ysize,self.xsize],dtype=(np.float))
 
 		# interpolation kernel
 		extra_code = import_code('extra_code.c')

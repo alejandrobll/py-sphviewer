@@ -30,7 +30,7 @@ biny_c = biny;
 			for(k=-tty; k<tty+1; k++)
 			{
 				if( ( (xx+j) >= 0) && ( (xx+j) < binx_c) && ( (yy+k) >=0) && ( (yy+k) < biny_c))
-				dens((xx+j),(yy+k)) += rho_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), 1.0/sqrt(2.0)*sqrt( (float)tty*(float)tty+(float)ttx*(float)ttx));
+				dens((yy+k),(xx+j)) += rho_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), 1.0/sqrt(2.0)*sqrt( (float)tty*(float)tty+(float)ttx*(float)ttx));
 			}
 		}
 	}
