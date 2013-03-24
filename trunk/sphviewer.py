@@ -72,7 +72,7 @@ class scene(object):
 		return
 
 	def camera_params(self,px=0.,py=0.,pz=0.,
-                     r=100.,theta=0.,phi=0.,zoom=1.,res=1000):
+                     r=100.,theta=0.,phi=0.,zoom=1.,xsize=1000,ysize=1000,par=0):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
@@ -85,7 +85,9 @@ class scene(object):
 		self.theta   = theta		
 		self.phi     = phi
 		self.zoom    = zoom	
-		self.res     = res
+		self.xsize   = xsize
+		self.ysize   = ysize
+		self.par     = par
 		print '\n==============================='
 		print '==== Parameters of camera: ===='
 		print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
@@ -93,7 +95,9 @@ class scene(object):
 		print 'theta                = ',     self.theta
 		print 'phi                  = ',     self.phi
 		print 'zoom                 = ',     self.zoom
-		print 'res                  = ',     self.res
+		print 'xsize                = ',     self.xsize
+		print 'ysize                = ',     self.ysize
+		print 'par                  = ',     self.par
 		print '================================'
 
 
@@ -114,17 +118,17 @@ class scene(object):
 		self.zcam = -self.r*np.cos(self.phi*ac)*np.cos(self.theta*ac)
 		
 		if self.verbose:
-		#we write the camera parameters for clarity
+			#we write the camera parameters for clarity
 			print '\n==============================='
 			print '==== Parameters of camera: ===='
 			print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
-			print '(xcam,ycam,zcam)     = ',     self.xcam,',',self.ycam,',',self.zcam
 			print 'r                    = ',     self.r
 			print 'theta                = ',     self.theta
 			print 'phi                  = ',     self.phi
 			print 'zoom                 = ',     self.zoom
-			print 'FOV                  = ',     FOV/ac
-			print 'res                  = ',     self.res
+			print 'xsize                = ',     self.xsize
+			print 'ysize                = ',     self.ysize
+			print 'par                  = ',     self.par
 			print '================================'
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
@@ -135,23 +139,48 @@ class scene(object):
 			z = self.pos[2,:]-(self.pz+self.zcam)
 
 			#we need to take into account the real camera's FOV.
-			xmax = self.zoom * np.tan(FOV/2.)
-			ymax = self.zoom * np.tan(FOV/2.)
-			xmin = - xmax
-			ymin = - ymax
-			#when near is true we give the extent in angular units 
-			extent = np.array([-FOV/2./ac,FOV/2./ac,-FOV/2./ac,FOV/2./ac])
-		else:
-			x = self.pos[0,:]-(self.px)
-			y = self.pos[1,:]-(self.py)
-			z = self.pos[2,:]-(self.pz)
 
-			xmax =  lbox/2.
-			ymax =  lbox/2.
-			xmin = -lbox/2.
-			ymin = -lbox/2.
-			#when near is False we give the projected coordinates inside lbox 
-			extent = np.array([xmin,xmax,ymin,ymax])
+			if(self.par == 0): #par equal 0 means pixes aspect ratio (par) square
+				xmax = self.zoom * np.tan(FOV/2.)
+				xmin = - xmax
+				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+				ymin = - ymax
+				#when near is true we give the extent in angular units
+				xfovmax =  FOV/2./ac
+				xfovmin =  -FOV/2./ac
+				yfovmax = 0.5*(xfovmax-xfovmin)*self.ysize/self.xsize
+				yfovmin = -yfovmax
+				extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
+			else:
+				xmax = self.zoom * np.tan(FOV/2.)
+				ymax = self.zoom * np.tan(FOV/2.)
+				xmin = - xmax
+				ymin = - ymax
+				#when near is true we give the extent in angular units 
+				extent = np.array([-FOV/2./ac,FOV/2./ac,-FOV/2./ac,FOV/2./ac])
+		else:
+			if(self.par == 0):
+				x = self.pos[0,:]-(self.px)
+				y = self.pos[1,:]-(self.py)
+				z = self.pos[2,:]-(self.pz)
+
+				xmax =  lbox/2.
+				xmin = -lbox/2.
+				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+				ymin = - ymax
+				#when near is False we give the projected coordinates inside lbox 
+				extent = np.array([xmin,xmax,ymin,ymax])
+			else:
+				x = self.pos[0,:]-(self.px)
+				y = self.pos[1,:]-(self.py)
+				z = self.pos[2,:]-(self.pz)
+
+				xmax =  lbox/2.
+				ymax =  lbox/2.
+				xmin = -lbox/2.
+				ymin = -lbox/2.
+				#when near is False we give the projected coordinates inside lbox 
+				extent = np.array([xmin,xmax,ymin,ymax])
 
 
 		if(self.phi   != 0.):				#we rotate around y axis
@@ -186,47 +215,51 @@ class scene(object):
 			z = z[kview]
 			rho = self.rho[kview]
 
-
-		lbin = 2*xmax/self.res
-		binx = np.int(self.res)
-		biny = np.int(self.res)
+		lbinx = 2*xmax/self.xsize
+		lbiny = 2*ymax/self.ysize
 
 		if self.verbose:
 			print '-------------------------------------------------'
 			print 'Making the smooth image'
-			print 'xmin =', xmin
-			print 'xmax =', xmax
-			print 'ymin =', ymin
-			print 'ymax =', ymax
-			print 'binx =', binx
-			print 'biny =', biny
-
+			print 'xmin  =', xmin
+			print 'xmax  =', xmax
+			print 'ymin  =', ymin
+			print 'ymax  =', ymax
+			print 'xsize =', self.xsize
+			print 'ysize =', self.ysize
 
 		if(near):	
-			x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
-			y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
-			t = (self.hsml[kview]*self.zoom/z/lbin).astype(int)
+			x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
+			y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
+			tx = (self.hsml[kview]*self.zoom/z/lbinx).astype(int)
+			ty = (self.hsml[kview]*self.zoom/z/lbiny).astype(int)
 		else:
-			x = ((x-xmin)/(xmax-xmin)*(binx-1.)).astype(int)
-			y = ((y-ymin)/(ymax-ymin)*(biny-1.)).astype(int)
-			t = (self.hsml/lbin).astype(int)
+			x = ((x-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
+			y = ((y-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
+			tx = (self.hsml[kview]/lbinx).astype(int)
+			ty = (self.hsml[kview]/lbiny).astype(int)
 	
 		n=int(len(x))
 
-		dens = np.zeros([binx,biny],dtype=(np.float))
+		dens = np.zeros([self.xsize,self.ysize],dtype=(np.float))
 
 		# interpolation kernel
 		extra_code = import_code('extra_code.c')
 		# C code for making the images
 		code       = import_code('c_code.c')
 
+		binx = self.xsize
+		biny = self.ysize
+
 		start = time.time()
 		weave.inline(code,['x',
                                    'y',
                                    'binx',
                                    'biny', 
-                                   't',
-                                   'lbin', 
+                                   'tx',
+                                   'ty',
+                                   'lbinx',
+                                   'lbiny', 
                                    'n',
                                    'rho',
                                    'dens'],
@@ -238,4 +271,4 @@ class scene(object):
 		stop = time.time()
 
 		if(self.verbose): print 'Elapsed time = ', stop-start
-		return dens, np.array([binx, biny]), extent
+		return dens, np.array([self.xsize, self.ysize]), extent
