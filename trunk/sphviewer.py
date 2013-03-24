@@ -23,7 +23,12 @@ class scene(object):
 	"""
 	Main Class to render the particles
 	"""
-	def __init__(self, pos=None, hsml=None, rho=None, nb=32, ac=True, verbose=False):
+	def __init__(self, pos     = None, 
+                           hsml    = None, 
+                           rho     = None, 
+                           nb      = 32, 
+                           ac      = True, 
+                           verbose = False):
 #==========================
 # particle parameters
 		self.pos  = pos
@@ -40,7 +45,9 @@ class scene(object):
 		self.theta   = 0.		# you can rotate the scene using theta and phi
 		self.phi     = 0.		
 		self.zoom    = 1.		# magnification of the camera.
-		self.res     = 1000	# resolution of the image (only squared images)
+		self.xsize   = 1000	        # x size of the image
+		self.ysize   = 1000         	# y size of the image
+		self.par     = 0
 #==========================
 		self.verbose = verbose
 		#If smoothing lenghts are not given we compute them.
@@ -71,8 +78,16 @@ class scene(object):
 			self.rho  = self.nb/(4./3.*np.pi*self.hsml**3)
 		return
 
-	def camera_params(self,px=0.,py=0.,pz=0.,
-                     r=100.,theta=0.,phi=0.,zoom=1.,xsize=1000,ysize=1000,par=0):
+	def camera_params(self, px    = 0.,
+                                py    = 0.,
+                                pz    = 0., 
+                                r     = 100.,
+                                theta = 0.,
+                                phi   = 0.,
+                                zoom  = 1.,
+                                xsize = 1000,
+                                ysize = 1000,
+                                par   = 0):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
@@ -101,7 +116,8 @@ class scene(object):
 		print '================================'
 
 
-	def make_scene(self, near=True, lbox=None):
+	def make_scene(self, near = True,
+                             lbox = None):
 		#define near as False if you want to look at the scene from the infinity
 		#lbox defines the physical lenght showed by the camera when near is False
 
