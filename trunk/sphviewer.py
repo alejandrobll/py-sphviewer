@@ -47,7 +47,6 @@ class scene(object):
 		self.zoom    = 1.		# magnification of the camera.
 		self.xsize   = 1000	        # x size of the image
 		self.ysize   = 1000         	# y size of the image
-		self.par     = 0
 #==========================
 		self.verbose = verbose
 		#If smoothing lenghts are not given we compute them.
@@ -102,7 +101,6 @@ class scene(object):
 		self.zoom    = zoom	
 		self.xsize   = xsize
 		self.ysize   = ysize
-		self.par     = par
 		print '\n==============================='
 		print '==== Parameters of camera: ===='
 		print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
@@ -112,7 +110,6 @@ class scene(object):
 		print 'zoom                 = ',     self.zoom
 		print 'xsize                = ',     self.xsize
 		print 'ysize                = ',     self.ysize
-		print 'par                  = ',     self.par
 		print '================================'
 
 
@@ -144,7 +141,6 @@ class scene(object):
 			print 'zoom                 = ',     self.zoom
 			print 'xsize                = ',     self.xsize
 			print 'ysize                = ',     self.ysize
-			print 'par                  = ',     self.par
 			print '================================'
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
@@ -154,50 +150,28 @@ class scene(object):
 			y = self.pos[1,:]-(self.py+self.ycam)
 			z = self.pos[2,:]-(self.pz+self.zcam)
 
-			#we need to take into account the real camera's FOV.
-
-			if(self.par == 0): #par equal 0 means pixes aspect ratio (par) square
-				xmax = self.zoom * np.tan(FOV/2.)
-				xmin = - xmax
-				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
-				ymin = - ymax
-				#when near is true we give the extent in angular units
-				xfovmax =  FOV/2./ac
-				xfovmin =  -FOV/2./ac
-				yfovmax = 0.5*(xfovmax-xfovmin)*self.ysize/self.xsize
-				yfovmin = -yfovmax
-				extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
-			else:
-				xmax = self.zoom * np.tan(FOV/2.)
-				ymax = self.zoom * np.tan(FOV/2.)
-				xmin = - xmax
-				ymin = - ymax
-				#when near is true we give the extent in angular units 
-				extent = np.array([-FOV/2./ac,FOV/2./ac,-FOV/2./ac,FOV/2./ac])
+		#we need to take into account the real camera's FOV.
+			xmax = self.zoom * np.tan(FOV/2.)
+			xmin = - xmax
+			ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+			ymin = - ymax
+			#when near is true we give the extent in angular units
+			xfovmax =  FOV/2./ac
+			xfovmin =  -FOV/2./ac
+			yfovmax = 0.5*(xfovmax-xfovmin)*self.ysize/self.xsize
+			yfovmin = -yfovmax
+			extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
 		else:
-			if(self.par == 0):
-				x = self.pos[0,:]-(self.px)
-				y = self.pos[1,:]-(self.py)
-				z = self.pos[2,:]-(self.pz)
+			x = self.pos[0,:]-(self.px)
+			y = self.pos[1,:]-(self.py)
+			z = self.pos[2,:]-(self.pz)
 
-				xmax =  lbox/2.
-				xmin = -lbox/2.
-				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
-				ymin = - ymax
-				#when near is False we give the projected coordinates inside lbox 
-				extent = np.array([xmin,xmax,ymin,ymax])
-			else:
-				x = self.pos[0,:]-(self.px)
-				y = self.pos[1,:]-(self.py)
-				z = self.pos[2,:]-(self.pz)
-
-				xmax =  lbox/2.
-				ymax =  lbox/2.
-				xmin = -lbox/2.
-				ymin = -lbox/2.
-				#when near is False we give the projected coordinates inside lbox 
-				extent = np.array([xmin,xmax,ymin,ymax])
-
+			xmax =  lbox/2.
+			xmin = -lbox/2.
+			ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+			ymin = - ymax
+			#when near is False we give the projected coordinates inside lbox 
+			extent = np.array([xmin,xmax,ymin,ymax])
 
 		if(self.phi   != 0.):				#we rotate around y axis
 			xx_temp       = x*np.cos(self.phi*ac)-z*np.sin(self.phi*ac)
@@ -231,8 +205,7 @@ class scene(object):
 			z = z[kview]
 			rho = self.rho[kview]
 
-		lbinx = 2*xmax/self.xsize
-		lbiny = 2*ymax/self.ysize
+		lbin = 2*xmax/self.xsize
 
 		if self.verbose:
 			print '-------------------------------------------------'
@@ -247,13 +220,11 @@ class scene(object):
 		if(near):	
 			x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
 			y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
-			tx = (self.hsml[kview]*self.zoom/z/lbinx).astype(int)
-			ty = (self.hsml[kview]*self.zoom/z/lbiny).astype(int)
+			t = (self.hsml[kview]*self.zoom/z/lbin).astype(int)
 		else:
 			x = ((x-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
 			y = ((y-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
-			tx = (self.hsml[kview]/lbinx).astype(int)
-			ty = (self.hsml[kview]/lbiny).astype(int)
+			t = (self.hsml[kview]/lbin).astype(int)
 	
 		n=int(len(x))
 
@@ -272,10 +243,8 @@ class scene(object):
                                    'y',
                                    'binx',
                                    'biny', 
-                                   'tx',
-                                   'ty',
-                                   'lbinx',
-                                   'lbiny', 
+                                   't',
+                                   'lbin',
                                    'n',
                                    'rho',
                                    'dens'],

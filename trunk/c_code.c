@@ -1,13 +1,17 @@
 int i, j, k;
 int xx, yy;
-int ttx, tty; 
+int tt; 
 float rho_c;
 int binx_c, biny_c;
+int bin_lim;
 
 binx_c = binx;
 biny_c = biny;
 
-#pragma omp parallel for private(i,xx,yy,ttx,tty,rho_c,j,k)
+if(binx_c >= biny_c) bin_lim = binx_c;
+if(binx_c < biny_c) bin_lim = biny_c;
+
+#pragma omp parallel for private(i,xx,yy,tt,rho_c,j,k)
 #pragma omp+ reduction(+:dens)
 #pragma omp schedule(dynamic,1000)
 	for(i=0;i<n;i++)
@@ -15,22 +19,18 @@ biny_c = biny;
 		//		  printf("Queda %d\\n",n-i);
 		xx = (int)x(i);
 		yy = (int)y(i);
-		ttx = (int)tx(i);
-		tty = (int)ty(i);
+		tt = (int)t(i);
 		rho_c = (float) rho(i);
 
-		if(ttx < 1) ttx = 1;
-		if(ttx > binx_c) ttx = binx_c;
+		if(tt < 1) tt = 1;
+		if(tt > bin_lim) tt = bin_lim;
 
-		if(tty < 1) tty = 1;
-		if(tty > biny_c) tty = biny_c;
-
-		for(j=-ttx; j<ttx+1; j++)
+		for(j=-tt; j<tt+1; j++)
 		{
-			for(k=-tty; k<tty+1; k++)
+			for(k=-tt; k<tt+1; k++)
 			{
 				if( ( (xx+j) >= 0) && ( (xx+j) < binx_c) && ( (yy+k) >=0) && ( (yy+k) < biny_c))
-				dens((yy+k),(xx+j)) += rho_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), 1.0/sqrt(2.0)*sqrt( (float)tty*(float)tty+(float)ttx*(float)ttx));
+				dens((yy+k),(xx+j)) += rho_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 			}
 		}
 	}
