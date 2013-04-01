@@ -173,17 +173,17 @@ class scene(object):
 			#when near is False we give the projected coordinates inside lbox 
 			extent = np.array([xmin,xmax,ymin,ymax])
 
-		if(self.phi   != 0.):				#we rotate around y axis
-			xx_temp       = x*np.cos(self.phi*ac)-z*np.sin(self.phi*ac)
-			z             = x*np.sin(self.phi*ac)+z*np.cos(self.phi*ac)
-			x             = xx_temp
-			xx_temp       = 0
-
 		if(self.theta != 0.):			#we rotate around x axis
 			yy_temp       = y*np.cos(self.theta*ac)+z*np.sin(self.theta*ac)
 			z             = -y*np.sin(self.theta*ac)+z*np.cos(self.theta*ac)
 			y             = yy_temp
 			yy_temp       = 0
+
+		if(self.phi   != 0.):				#we rotate around y axis
+			xx_temp       = x*np.cos(self.phi*ac)-z*np.sin(self.phi*ac)
+			z             = x*np.sin(self.phi*ac)+z*np.cos(self.phi*ac)
+			x             = xx_temp
+			xx_temp       = 0
 
 		# now we consider only particles in the line of sight inside de FOV of 
       # camera	
