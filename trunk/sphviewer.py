@@ -4,6 +4,8 @@ from scipy import weave
 from scipy.weave import converters
 import sys
 import time
+import multiprocessing
+from multiprocessing import Manager
 
 def import_code(filename):
 	#naive function to import the .c files into scipy.weave
@@ -50,7 +52,7 @@ class scene(object):
 #==========================
 		self.verbose = verbose
 		#If smoothing lenghts are not given we compute them.
-		if(hsml == None): self.det_hsml()
+		if(hsml == None): self.hsml, self.rho = self.det_hsml()
 		if ac == True: self.auto_camera()
 
 	def auto_camera(self,distance_factor=0.65):
@@ -63,19 +65,64 @@ class scene(object):
 		self.r = (distance_factor * 
 			  np.sqrt(size_x**2+size_y**2+size_z**2))
 
-	def det_hsml(self):
+
+	def __make_kdtree(self,pos):
+		return cKDTree(pos.T)
+
+	def __nbsearch(self, pos, nb, tree, out_hsml, index):
+		d, idx = tree.query(pos.T, k=nb)
+		out_hsml.put( (index, d[:,nb-1]) )
+
+	def det_hsml(self,pos=None,nb=None):
 		"""
-		Use det_hsml to compute the smoothing lenght and the density of your 
-		particles. 
-		"""	
-		print 'Building 3DTree...'
-		tree = cKDTree(self.pos.T)
-		print 'Searching the ', self.nb, 'neighbors of each particle...'
-		d, idx = tree.query(self.pos.T, k=self.nb)
-		self.hsml = d[:,self.nb-1]
-		if(self.rho == None):
-			self.rho  = self.nb/(4./3.*np.pi*self.hsml**3)
-		return
+		Use this function to find out the smoothing length and density (in some units) of your particles.
+		hsml, rho = det_hsml(pos=pos, nb=nb)
+		"""
+		if(pos == None):
+			pos = self.pos
+		if(nb == None):
+			nb = self.nb
+
+		manager = Manager()
+		out_hsml  = manager.Queue()
+		size  = multiprocessing.cpu_count()	
+
+		print 'Building a KDTree...'
+		tree = self.__make_kdtree(pos)
+
+		index  = np.arange(np.shape(pos)[1])
+		#I split the job among the number of available processors
+		pos   = np.array_split(pos, size, axis=1)			
+		index = np.array_split(index, size)
+			
+		procs = []
+
+		#We distribute the tasks among different processes
+		print 'Searching the ', nb, 'closer neighbors to each particle...'
+		for rank in xrange(size):
+			task = multiprocessing.Process( 
+		                target=self.__nbsearch, 
+		                args=(pos[rank],
+		                      nb, tree, out_hsml, 
+		                      index[rank]))
+			procs.append(task) 
+			task.start()
+		
+		#Wait until all processes finish
+		for p in procs:
+			p.join()
+
+		index = np.array([])
+		hsml  = np.array([])
+		for i in xrange(size):
+			a, b = out_hsml.get()
+			index = np.append(index,a)
+			hsml  = np.append(hsml,b)
+
+		#I have to order the data before return it
+		k = np.argsort(index)
+		print 'Done...'
+		return hsml[k], nb/(4./3.*np.pi*hsml[k]**3)
 
 	def camera_params(self, px    = 0.,
                                 py    = 0.,
