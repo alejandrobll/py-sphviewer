@@ -92,8 +92,7 @@ class scene(object):
 
 		index  = np.arange(np.shape(pos)[1])
 		#I split the job among the number of available processors
-		pos   = np.array_split(pos, size, axis=1)			
-		index = np.array_split(index, size)
+		pos   = np.array_split(pos, size, axis=1)	
 			
 		procs = []
 
@@ -104,7 +103,7 @@ class scene(object):
 		                target=self.__nbsearch, 
 		                args=(pos[rank],
 		                      nb, tree, out_hsml, 
-		                      index[rank]))
+		                      rank))
 			procs.append(task) 
 			task.start()
 		
@@ -112,17 +111,21 @@ class scene(object):
 		for p in procs:
 			p.join()
 
-		index = np.array([])
-		hsml  = np.array([])
+		index = []
+		hsml  = []
 		for i in xrange(size):
 			a, b = out_hsml.get()
-			index = np.append(index,a)
-			hsml  = np.append(hsml,b)
+			index.append(a)
+			hsml.append(b)
+			if(a == 0): print b[0]			
 
 		#I have to order the data before return it
 		k = np.argsort(index)
+		hsml1 = np.array([])
+		for i in k:
+			hsml1 = np.append(hsml1,hsml[i])
 		print 'Done...'
-		return hsml[k], nb/(4./3.*np.pi*hsml[k]**3)
+		return hsml1, nb/(4./3.*np.pi*hsml1**3)
 
 	def camera_params(self, px    = 0.,
                                 py    = 0.,
