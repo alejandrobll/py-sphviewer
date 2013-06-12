@@ -2,20 +2,20 @@
 
 = Introduction =
 
-With this project I would like to begin an useful tool for people that need to make nice smoothed particles plots in Python. In particular, I am interested in making nice renders of hydrodynamical SPH particles simulations of galaxy formation. If you are interested in understanding the things, please, take a look at the code, if you are not, I think the best way to learn how the Py-SPHViewer works is with an example:
+With this project I would like to start an useful tool for people that need to make nice smoothed particles plots on Python. In particular, I am interested in making nice renders of SPH simulations of galaxy formation. If you are interested in understanding how the code works, please take a look at the code itself, if you are not, I think the best way to learn how Py-SPHViewer works is with an example:
 
 = The first plot with Py-SPHViwer= 
 
-Let's begin with an example. You can try it with Ipython:
+Let's start with an example. You can test it with Ipython:
 
-Our first example will be to define a cube made of 1000 uniform random placed particles:
+First, we will define a cube made of 1000 uniform random placed particles:
 
 {{{
 In [3]: import numpy as np
 In [4]: pos = np.random.rand(3,1000)
 }}}
 
-If you plot the xy projection of these particles, you will look something like this:
+If you plot the xy projection of these particles, you will see something like this:
 
 {{{
 In [5]: import matplotlib.pyplot as plt
@@ -25,17 +25,17 @@ In [7]: plt.show()
 
 http://py-sphviewer.googlecode.com/svn/wiki/1_small.png
 
-Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of the particles (ie, the scale-length at which particles actually contribute to the density field), which can be computed by searching the n-th neighbor of each particle. There are several ways to define this smoothing length. Py-SPHViewer allows to use your proper computed smoothing length or it can be compute it for you.
-In our first example, we have not the smoothing length of the particles, so, we will let Py-SPHViewer to compute it for us.
+Py-SPHViewer allows to make a nice rendered scene from the same set of particles by smoothing them. We use a kernel interpolation approach to compute the density in all space. It depends on the smoothing length of the particles (ie, the scale-length at which particles actually contribute to the density field), which can be computed by searching the n-th neighbor of each particle. There are several ways to define this smoothing length. Py-SPHViewer allows the use of your proper computed smoothing length or it can compute them for you.
+In our first example, we have not the smoothing length of the particles, so, we will let Py-SPHViewer to compute them for us.
 
-First of all, we have to import the Py-SPHViewer:
+First, we have to import the Py-SPHViewer:
 
 {{{
 In [8]: import sphviewer
 }}}
  
 
-First, we have to instantiate the _scene class:
+and then we have to instantiate the _scene class:
 
 {{{
 In [12]: image = sphviewer.scene(pos=pos, nb=4)
@@ -45,7 +45,7 @@ Searching the  4 neighbors of each particle...
 
 Note that we have specified the number of neighbors to determine the smoothing length of each particle. If you have your own smoothing length, you can add the parameters _hsml and _rho within the arguments of the _scene class. The density _rho can be computed by dividing the number of neighbors by the volume of a sphere that contains them. 
 
-In our example, the smoothing length of particles was stored in image.hsml:
+In our example, the smoothing length of the particles was stored in image.hsml:
 
 {{{ 
 In [13]: print image.hsml
@@ -71,7 +71,7 @@ distance "r" of the observer, the angles "theta" and "phi" of camera, the
 
 }}}
 
-The parameters to define are:
+The parameters to be defined are:
 
 || *Parameter* || *Function* ||
 ||  px,py,pz   || fixed point at which camera points. ||
@@ -98,9 +98,9 @@ res                  =  1000
 
 }}}
 
-It is to say, we are looking at the center of cube from a distance of 1.0. By default, the zoom and FOV of camera will be 1.0 and 90º respectively. The size of the resulting image will be 1000 x 1000 pixels. 
+It is to say, we are looking at the center of the cube from a distance of 1.0. By default, the zoom and FOV of camera will be 1.0 and 90º respectively. The size of the resulting image will be 1000 x 1000 pixels. 
 
-Now, it is time to effectively render the scene and get its parameters ( like the image matrix and size):
+Now, it is time for rendering the scene and getting its parameters ( like the matrix of the image and its size):
 
 {{{
 In [18]: dens, bins, extent = image.make_scene()
@@ -118,7 +118,7 @@ FOV                  =  90.0
 res                  =  1000
 ================================
 
-Nice. Let us take a look at the image:
+Nice. Let's take a look at the image:
 
 {{{
 In [23]: plt.imshow(np.log10(dens+1.), origin='lower')
