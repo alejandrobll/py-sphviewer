@@ -2,7 +2,7 @@
 
 = Introduction =
 
-With this project I would like to start an useful tool for people that need to make nice smoothed particles plots on Python. In particular, I am interested in making nice renders of SPH simulations of galaxy formation. If you are interested in understanding how the code works, please take a look at the code itself, if you are not, I think the best way to learn how Py-SPHViewer works is with an example:
+With this project I would like to start an useful tool for people that need to make nice smoothed particles plots on Python. In particular, I am interested in making nice renders of SPH simulations of galaxy formation. If you are interested in understanding how the code works, please take a look at the code itself. If you are not, I think the best way to learn how Py-SPHViewer works is by looking at an example:
 
 = The first plot with Py-SPHViwer= 
 
