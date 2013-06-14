@@ -8,6 +8,11 @@ import multiprocessing
 from multiprocessing import Manager
 
 def import_code(filename):
+	'''
+	This function reads a file that contains the C code that
+	will be interpreted by scipy weave and returns it in a 
+	string variable. This string must be given to scipy.weave
+	'''
 	#naive function to import the .c files into scipy.weave
 	string = ''
 	fi = open(filename, 'r').readlines()
@@ -23,7 +28,17 @@ def center_array(x):
 
 class scene(object):
 	"""
-	Main Class to render the particles
+	Main Class to render the particles. This class must be instantiated by
+	specifying at least the position of the particles in an array of
+	dimension [3,n], where n in the number of particles. If you do not
+	specify the smoothing lenght nither the density, the class will compute
+	them by itself. By default, this class compute a variable smoothing lenght
+	according to the distance to the nb (nb = 32 by default) closer neighbor. 
+	By default, sphviewer re-center the scene (see center_array function). If 
+	it does'n work well, you should set ac=False, and re-center the scene 
+	manually after, in the camera_params. 
+
+	Please, report any problem o bug to alejandrobll@oac.uncor.edu
 	"""
 	def __init__(self, pos     = None, 
                            hsml    = None, 
@@ -135,8 +150,7 @@ class scene(object):
                                 phi   = 0.,
                                 zoom  = 1.,
                                 xsize = 1000,
-                                ysize = 1000,
-                                par   = 0):
+                                ysize = 1000):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
@@ -168,18 +182,13 @@ class scene(object):
 		#define near as False if you want to look at the scene from the infinity
 		#lbox defines the physical lenght showed by the camera when near is False
 
-		if( (near == False) & (lbox == None) ):
-			print 'ERROR: If you selected near=False, you have to give some lbox value...'
+#		if( (near == False) & (lbox == None) ):
+#			print 'ERROR: If you selected near=False, you have to give some lbox value...'
 
 		#factor to convert angles
 		ac = np.pi/180.
 		FOV   = 2.*np.abs(np.arctan(1./(self.zoom)))
 
-		#camera watching from negative values
-		self.xcam = -self.r*np.sin(self.phi*ac)*np.cos(self.theta*ac)
-		self.ycam = +self.r*np.sin(self.theta*ac)
-		self.zcam = -self.r*np.cos(self.phi*ac)*np.cos(self.theta*ac)
-		
 		if self.verbose:
 			#we write the camera parameters for clarity
 			print '\n==============================='
@@ -195,11 +204,12 @@ class scene(object):
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
 		# (px,py,pz) and (xcam,ycam,zcam) define the line of sight.
-		if(near):
-			x = self.pos[0,:]-(self.px+self.xcam)
-			y = self.pos[1,:]-(self.py+self.ycam)
-			z = self.pos[2,:]-(self.pz+self.zcam)
 
+		x = self.pos[0,:]-(self.px)
+		y = self.pos[1,:]-(self.py)
+		z = self.pos[2,:]-(self.pz)
+
+		if(near):
 		#we need to take into account the real camera's FOV.
 			xmax = self.zoom * np.tan(FOV/2.)
 			xmin = - xmax
@@ -212,16 +222,20 @@ class scene(object):
 			yfovmin = -yfovmax
 			extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
 		else:
-			x = self.pos[0,:]-(self.px)
-			y = self.pos[1,:]-(self.py)
-			z = self.pos[2,:]-(self.pz)
-
-			xmax =  lbox/2.
-			xmin = -lbox/2.
-			ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
-			ymin = - ymax
-			#when near is False we give the projected coordinates inside lbox 
-			extent = np.array([xmin,xmax,ymin,ymax])
+			if(lbox == None):
+				xmax = np.max(x)
+				xmin = np.min(x)
+				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize
+				ymin = -ymax
+				#when near is False we give the projected coordinates inside lbox 
+				extent = np.array([xmin,xmax,ymin,ymax])				
+			else:
+				xmax =  lbox/2.
+				xmin = -lbox/2.
+				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+				ymin = - ymax
+				#when near is False we give the projected coordinates inside lbox 
+				extent = np.array([xmin,xmax,ymin,ymax])
 
 		if(self.theta != 0.):			#we rotate around x axis
 			yy_temp       = y*np.cos(self.theta*ac)+z*np.sin(self.theta*ac)
@@ -235,9 +249,10 @@ class scene(object):
 			x             = xx_temp
 			xx_temp       = 0
 
-		# now we consider only particles in the line of sight inside de FOV of 
-      # camera	
+		# we now consider only particles in the line of sight inside de FOV of the
+                # camera	
 		if(near):
+			z -= (-1.0*self.r)	# in order to move the camera far away from the object
 			kview = ( np.where( (z > 0.) & (np.abs(x) <= 
 		                (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
 		                (np.abs(z)*np.tan(FOV/2.)) ) )[0])
@@ -247,12 +262,18 @@ class scene(object):
 			z = z[kview]
 			rho = self.rho[kview]
 		else:
-			kview = np.where( (x >= xmin) & (x <= xmax) & 
-                                          (y >= ymin) & (y <= ymax) &
-                                          ( np.abs(z) <= lbox/2 ) )[0]
+			if(lbox == None):
+				kview = np.where( (x >= xmin) & (x <= xmax) & 
+		                                  (y >= ymin) & (y <= ymax) )[0]
+			else:
+				kview = np.where( (x >= xmin) & (x <= xmax) & 
+		                                  (y >= ymin) & (y <= ymax) &
+		                                  ( np.abs(z) <= lbox/2 ) )[0]
+				print np.min(np.abs(z)), np.max(np.abs(z))
 			x = x[kview]
 			y = y[kview]
 			z = z[kview]
+
 			rho = self.rho[kview]
 
 		lbin = 2*xmax/self.xsize
