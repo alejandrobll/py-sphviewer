@@ -1,32 +1,15 @@
-from scipy.spatial import cKDTree
 import numpy as np
-from scipy import weave
-from scipy.weave import converters
 import sys
 import time
 import multiprocessing
+import matplotlib.pyplot as plt
+from scipy.spatial import cKDTree
+from scipy import weave
+from scipy.weave import converters
 from multiprocessing import Manager
 
-def import_code(filename):
-	'''
-	This function reads a file that contains the C code that
-	will be interpreted by scipy weave and returns it in a 
-	string variable. This string must be given to scipy.weave
-	'''
-	#naive function to import the .c files into scipy.weave
-	string = ''
-	fi = open(filename, 'r').readlines()
-	for i in fi:
-		string += i
-	return string
 
-def center_array(x):
-	xmax = np.max(x)
-	xmin = np.min(x)
-	xmed = 0.5*(xmax+xmin)
-	return (xmax-xmin),xmed
-
-class scene(object):
+class init(object):
 	"""
 	Main Class to render the particles. This class must be instantiated by
 	specifying at least the position of the particles in an array of
@@ -41,16 +24,15 @@ class scene(object):
 	Please, report any problem o bug to alejandrobll@oac.uncor.edu
 	"""
 	def __init__(self, pos     = None, 
+                           mass    = None, 
                            hsml    = None, 
-                           rho     = None, 
                            nb      = 32, 
-                           ac      = True, 
                            verbose = False):
 #==========================
 # particle parameters
 		self.pos  = pos
+		self.mass = mass
 		self.hsml = hsml
-		self.rho  = rho
 		self.nb   = nb
 #==========================
 #==========================
@@ -67,18 +49,22 @@ class scene(object):
 #==========================
 		self.verbose = verbose
 		#If smoothing lenghts are not given we compute them.
-		if(hsml == None): self.hsml, self.rho = self.det_hsml()
-		if ac == True: self.auto_camera()
+		if(mass == None):
+			if(self.verbose):
+				print "You didn't give me any mass; I will supose unity mass particles"
+			self.mass = np.ones(np.shape(pos)[1])
+		if(hsml == None): self.hsml = self.__det_hsml(self.pos, self.nb)
+		#before to make the render, there is nothing to plot, so:
+		self.__is_plot_available = False
 
-	def auto_camera(self,distance_factor=0.65):
-		"""
-		Autocentering the camera params
-		"""
-		size_x, self.px = center_array(self.pos[0,:])
-		size_y, self.py = center_array(self.pos[1,:])
-		size_z, self.pz = center_array(self.pos[2,:])
-		self.r = (distance_factor * 
-			  np.sqrt(size_x**2+size_y**2+size_z**2))
+
+	def __import_code(self,filename):
+		#naive function to import c code
+		string = ''
+		fi = open(filename, 'r').readlines()
+		for i in fi:
+			string += i
+		return string
 
 
 	def __make_kdtree(self,pos):
@@ -88,21 +74,17 @@ class scene(object):
 		d, idx = tree.query(pos.T, k=nb)
 		out_hsml.put( (index, d[:,nb-1]) )
 
-	def det_hsml(self,pos=None,nb=None):
+	def __det_hsml(self, pos, nb):
 		"""
-		Use this function to find out the smoothing length and density (in some units) of your particles.
-		hsml, rho = det_hsml(pos=pos, nb=nb)
+		Use this function to find out the smoothing length of your particles.
+		hsml = det_hsml(pos, nb)
 		"""
-		if(pos == None):
-			pos = self.pos
-		if(nb == None):
-			nb = self.nb
 
 		manager = Manager()
 		out_hsml  = manager.Queue()
 		size  = multiprocessing.cpu_count()	
 
-		print 'Building a KDTree...'
+		if(self.verbose): print 'Building a KDTree...'
 		tree = self.__make_kdtree(pos)
 
 		index  = np.arange(np.shape(pos)[1])
@@ -112,7 +94,7 @@ class scene(object):
 		procs = []
 
 		#We distribute the tasks among different processes
-		print 'Searching the ', nb, 'closer neighbors to each particle...'
+		if(self.verbose): print 'Searching the ', nb, 'closer neighbors to each particle...'
 		for rank in xrange(size):
 			task = multiprocessing.Process( 
 		                target=self.__nbsearch, 
@@ -132,25 +114,56 @@ class scene(object):
 			a, b = out_hsml.get()
 			index.append(a)
 			hsml.append(b)
-			if(a == 0): print b[0]			
+#			if(a == 0): print b[0]			
 
 		#I have to order the data before return it
 		k = np.argsort(index)
 		hsml1 = np.array([])
 		for i in k:
 			hsml1 = np.append(hsml1,hsml[i])
-		print 'Done...'
-		return hsml1, nb/(4./3.*np.pi*hsml1**3)
+		if(self.verbose): print 'Done...'
+		return hsml1#, nb/(4./3.*np.pi*hsml1**3)
 
-	def camera_params(self, px    = 0.,
-                                py    = 0.,
-                                pz    = 0., 
-                                r     = 100.,
-                                theta = 0.,
-                                phi   = 0.,
-                                zoom  = 1.,
-                                xsize = 1000,
-                                ysize = 1000):
+	def plot(self, logscale=False, **kargs):
+		if(self.__is_plot_available==False):
+			print 'There is nothing to plot yet... You should make a render first.'
+			return
+
+		if(logscale):
+			dd = np.log10(self.dens+1)
+		else:
+			dd = self.dens
+
+		plt.imshow(dd, origin='lower', extent=self.extent, **kargs)
+		plt.show()
+
+	def get_min(self):
+		if(self.__is_plot_available):
+			return np.min(self.dens)
+		else:
+			print 'There is nothing to show...'
+			return
+
+	def get_max(self):
+		if(self.__is_plot_available):
+			return np.max(self.dens)
+		else:
+			print 'There is nothing to show...'
+			return
+
+	def save(self, fname, **kargs):
+		plt.imsave(fname,self.dens,**kargs)
+
+	
+	def set_camera_params(self, px    = 0.,
+                                    py    = 0.,
+                                    pz    = 0., 
+                                    r     = 100.,
+                                    theta = 0.,
+                                    phi   = 0.,
+                                    zoom  = 1.,
+                                    xsize = 1000,
+                                    ysize = 1000):
 		"""
 		Use camera_params to define the (px,py,pz) looking point of the camera,
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
@@ -165,25 +178,30 @@ class scene(object):
 		self.zoom    = zoom	
 		self.xsize   = xsize
 		self.ysize   = ysize
-		print '\n==============================='
-		print '==== Parameters of camera: ===='
-		print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
-		print 'r                    = ',     self.r
-		print 'theta                = ',     self.theta
-		print 'phi                  = ',     self.phi
-		print 'zoom                 = ',     self.zoom
-		print 'xsize                = ',     self.xsize
-		print 'ysize                = ',     self.ysize
-		print '================================'
+
+		if(self.verbose):
+			print '\n==============================='
+			print '==== Parameters of camera: ======'
+			print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
+			print 'r                    = ',     self.r
+			print 'theta                = ',     self.theta
+			print 'phi                  = ',     self.phi
+			print 'zoom                 = ',     self.zoom
+			print 'xsize                = ',     self.xsize
+			print 'ysize                = ',     self.ysize
+			print '================================'
 
 
-	def make_scene(self, near = True,
-                             lbox = None):
+	def render(self, near = True,
+                         lbox = None):
 		#define near as False if you want to look at the scene from the infinity
 		#lbox defines the physical lenght showed by the camera when near is False
 
 #		if( (near == False) & (lbox == None) ):
 #			print 'ERROR: If you selected near=False, you have to give some lbox value...'
+
+		#is there anything to plot?
+		self.__is_plot_available = True
 
 		#factor to convert angles
 		ac = np.pi/180.
@@ -220,7 +238,7 @@ class scene(object):
 			xfovmin =  -FOV/2./ac
 			yfovmax = 0.5*(xfovmax-xfovmin)*self.ysize/self.xsize
 			yfovmin = -yfovmax
-			extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
+			self.extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
 		else:
 			if(lbox == None):
 				xmax = np.max(x)
@@ -228,14 +246,20 @@ class scene(object):
 				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize
 				ymin = -ymax
 				#when near is False we give the projected coordinates inside lbox 
-				extent = np.array([xmin,xmax,ymin,ymax])				
+				self.extent = np.array([xmin+self.px,
+                                                        xmax+self.px,
+                                                        ymin+self.py,
+                                                        ymax+self.py])				
 			else:
 				xmax =  lbox/2.
 				xmin = -lbox/2.
 				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
 				ymin = - ymax
 				#when near is False we give the projected coordinates inside lbox 
-				extent = np.array([xmin,xmax,ymin,ymax])
+				self.extent = np.array([xmin+self.px,
+                                                        xmax+self.px,
+                                                        ymin+self.py,
+                                                        ymax+self.py])				
 
 		if(self.theta != 0.):			#we rotate around x axis
 			yy_temp       = y*np.cos(self.theta*ac)+z*np.sin(self.theta*ac)
@@ -260,7 +284,7 @@ class scene(object):
 			x = x[kview]
 			y = y[kview]
 			z = z[kview]
-			rho = self.rho[kview]
+			mass = self.mass[kview]
 		else:
 			if(lbox == None):
 				kview = np.where( (x >= xmin) & (x <= xmax) & 
@@ -274,7 +298,7 @@ class scene(object):
 			y = y[kview]
 			z = z[kview]
 
-			rho = self.rho[kview]
+			mass = self.mass[kview]
 
 		lbin = 2*xmax/self.xsize
 
@@ -302,9 +326,9 @@ class scene(object):
 		dens = np.zeros([self.ysize,self.xsize],dtype=(np.float))
 
 		# interpolation kernel
-		extra_code = import_code('extra_code.c')
+		extra_code = self.__import_code('extra_code.c')
 		# C code for making the images
-		code       = import_code('c_code.c')
+		code       = self.__import_code('c_code.c')
 
 		binx = self.xsize
 		biny = self.ysize
@@ -317,7 +341,7 @@ class scene(object):
                                    't',
                                    'lbin',
                                    'n',
-                                   'rho',
+                                   'mass',
                                    'dens'],
                                    support_code=extra_code,
                                    type_converters=converters.blitz,
@@ -325,6 +349,6 @@ class scene(object):
                                    extra_compile_args=[' -O3 -fopenmp'],
                                    extra_link_args=['-lgomp'])
 		stop = time.time()
-
+		self.dens = dens
 		if(self.verbose): print 'Elapsed time = ', stop-start
-		return dens, np.array([self.xsize, self.ysize]), extent
+		return 
