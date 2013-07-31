@@ -56,6 +56,23 @@ class init(object):
 		if(hsml == None): self.hsml = self.__det_hsml(self.pos, self.nb)
 		#before to make the render, there is nothing to plot, so:
 		self.__is_plot_available = False
+		self.__auto_camera()
+
+	def __center_array(self,x):
+		xmax = np.max(x)
+		xmin = np.min(x)
+		xmed = 0.5*(xmax+xmin)
+		return (xmax-xmin),xmed
+
+	def __auto_camera(self,distance_factor=0.65):
+                """
+                Autocentering the camera params
+                """
+                size_x, self.__px = self.__center_array(self.pos[0,:])
+                size_y, self.__py = self.__center_array(self.pos[1,:])
+                size_z, self.__pz = self.__center_array(self.pos[2,:])
+                self.__r = (distance_factor * 
+                          np.sqrt(size_x**2+size_y**2+size_z**2))
 
 
 	def __import_code(self,filename):
