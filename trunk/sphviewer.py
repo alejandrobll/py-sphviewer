@@ -37,20 +37,20 @@ class init(object):
 #==========================
 #==========================
 # Camera default parameters
-		self.px      = 0.		# the camera is looking at (px,py,pz)
-		self.py      = 0.		
-		self.pz      = 0.	
-		self.r       = 100.		# the camera is at distance r from (px,py,pz)
-		self.theta   = 0.		# you can rotate the scene using theta and phi
-		self.phi     = 0.		
-		self.zoom    = 1.		# magnification of the camera.
-		self.xsize   = 1000	        # x size of the image
-		self.ysize   = 1000         	# y size of the image
+		self.__px      = 0.		# the camera is looking at (px,py,pz)
+		self.__py      = 0.		
+		self.__pz      = 0.	
+		self.__r       = 100.		# the camera is at distance r from (px,py,pz)
+		self.__theta   = 0.		# you can rotate the scene using theta and phi
+		self.__phi     = 0.		
+		self.__zoom    = 1.		# magnification of the camera.
+		self.__xsize   = 1000	        # x size of the image
+		self.__ysize   = 1000         	# y size of the image
 #==========================
-		self.verbose = verbose
+		self.__verbose = verbose
 		#If smoothing lenghts are not given we compute them.
 		if(mass == None):
-			if(self.verbose):
+			if(self.__verbose):
 				print "You didn't give me any mass; I will supose unity mass particles"
 			self.mass = np.ones(np.shape(pos)[1])
 		if(hsml == None): self.hsml = self.__det_hsml(self.pos, self.nb)
@@ -84,7 +84,7 @@ class init(object):
 		out_hsml  = manager.Queue()
 		size  = multiprocessing.cpu_count()	
 
-		if(self.verbose): print 'Building a KDTree...'
+		if(self.__verbose): print 'Building a KDTree...'
 		tree = self.__make_kdtree(pos)
 
 		index  = np.arange(np.shape(pos)[1])
@@ -94,7 +94,7 @@ class init(object):
 		procs = []
 
 		#We distribute the tasks among different processes
-		if(self.verbose): print 'Searching the ', nb, 'closer neighbors to each particle...'
+		if(self.__verbose): print 'Searching the ', nb, 'closer neighbors to each particle...'
 		for rank in xrange(size):
 			task = multiprocessing.Process( 
 		                target=self.__nbsearch, 
@@ -121,8 +121,8 @@ class init(object):
 		hsml1 = np.array([])
 		for i in k:
 			hsml1 = np.append(hsml1,hsml[i])
-		if(self.verbose): print 'Done...'
-		return hsml1#, nb/(4./3.*np.pi*hsml1**3)
+		if(self.__verbose): print 'Done...'
+		return hsml1
 
 	def plot(self, logscale=False, **kargs):
 		if(self.__is_plot_available==False):
@@ -151,9 +151,12 @@ class init(object):
 			print 'There is nothing to show...'
 			return
 
+	def get_camera_params():
+		return(self.__px,self.__py,self.__pz,self.__r,self.__theta,
+		       self.__phi,self.__zoom,self.__xsize,self.__ysize)
+
 	def save(self, fname, **kargs):
 		plt.imsave(fname,self.dens,**kargs)
-
 	
 	def set_camera_params(self, px    = 0.,
                                     py    = 0.,
@@ -169,28 +172,15 @@ class init(object):
 		distance "r" of the observer, the angles "theta" and "phi" of camera, the 
 		"zoom" and resolution of the image.
 		"""
-		self.px      = px		
-		self.py      = py		
-		self.pz      = pz	
-		self.r       = r
-		self.theta   = theta		
-		self.phi     = phi
-		self.zoom    = zoom	
-		self.xsize   = xsize
-		self.ysize   = ysize
-
-		if(self.verbose):
-			print '\n==============================='
-			print '==== Parameters of camera: ======'
-			print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
-			print 'r                    = ',     self.r
-			print 'theta                = ',     self.theta
-			print 'phi                  = ',     self.phi
-			print 'zoom                 = ',     self.zoom
-			print 'xsize                = ',     self.xsize
-			print 'ysize                = ',     self.ysize
-			print '================================'
-
+		self.__px      = px		
+		self.__py      = py		
+		self.__pz      = pz	
+		self.__r       = r
+		self.__theta   = theta		
+		self.__phi     = phi
+		self.__zoom    = zoom	
+		self.__xsize   = xsize
+		self.__ysize   = ysize
 
 	def render(self, near = True,
                          lbox = None):
@@ -205,78 +195,66 @@ class init(object):
 
 		#factor to convert angles
 		ac = np.pi/180.
-		FOV   = 2.*np.abs(np.arctan(1./(self.zoom)))
+		FOV   = 2.*np.abs(np.arctan(1./(self.__zoom)))
 
-		if self.verbose:
-			#we write the camera parameters for clarity
-			print '\n==============================='
-			print '==== Parameters of camera: ===='
-			print '(px,py,pz)           = ',     self.px,',',self.py,',',self.pz
-			print 'r                    = ',     self.r
-			print 'theta                = ',     self.theta
-			print 'phi                  = ',     self.phi
-			print 'zoom                 = ',     self.zoom
-			print 'xsize                = ',     self.xsize
-			print 'ysize                = ',     self.ysize
-			print '================================'
 		# we first refer the positions to the camera point of view (px,py,pz) and 
 		#then to its physic position (xcam, ycam, zcam). The stright line between
 		# (px,py,pz) and (xcam,ycam,zcam) define the line of sight.
 
-		x = self.pos[0,:]-(self.px)
-		y = self.pos[1,:]-(self.py)
-		z = self.pos[2,:]-(self.pz)
+		x = self.pos[0,:]-(self.__px)
+		y = self.pos[1,:]-(self.__py)
+		z = self.pos[2,:]-(self.__pz)
 
 		if(near):
 		#we need to take into account the real camera's FOV.
-			xmax = self.zoom * np.tan(FOV/2.)
+			xmax = self.__zoom * np.tan(FOV/2.)
 			xmin = - xmax
-			ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+			ymax = 0.5*(xmax-xmin)*self.__ysize/self.__xsize	# in order to have symmetric y limits
 			ymin = - ymax
 			#when near is true we give the extent in angular units
 			xfovmax =  FOV/2./ac
 			xfovmin =  -FOV/2./ac
-			yfovmax = 0.5*(xfovmax-xfovmin)*self.ysize/self.xsize
+			yfovmax = 0.5*(xfovmax-xfovmin)*self.__ysize/self.__xsize
 			yfovmin = -yfovmax
 			self.extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])				
 		else:
 			if(lbox == None):
 				xmax = np.max(x)
 				xmin = np.min(x)
-				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize
+				ymax = 0.5*(xmax-xmin)*self.__ysize/self.__xsize
 				ymin = -ymax
 				#when near is False we give the projected coordinates inside lbox 
-				self.extent = np.array([xmin+self.px,
-                                                        xmax+self.px,
-                                                        ymin+self.py,
-                                                        ymax+self.py])				
+				self.extent = np.array([xmin+self.__px,
+                                                        xmax+self.__px,
+                                                        ymin+self.__py,
+                                                        ymax+self.__py])				
 			else:
 				xmax =  lbox/2.
 				xmin = -lbox/2.
-				ymax = 0.5*(xmax-xmin)*self.ysize/self.xsize	# in order to have symmetric y limits
+				ymax = 0.5*(xmax-xmin)*self.__ysize/self.__xsize	# in order to have symmetric y limits
 				ymin = - ymax
 				#when near is False we give the projected coordinates inside lbox 
-				self.extent = np.array([xmin+self.px,
-                                                        xmax+self.px,
-                                                        ymin+self.py,
-                                                        ymax+self.py])				
+				self.extent = np.array([xmin+self.__px,
+                                                        xmax+self.__px,
+                                                        ymin+self.__py,
+                                                        ymax+self.__py])				
 
-		if(self.theta != 0.):			#we rotate around x axis
-			yy_temp       = y*np.cos(self.theta*ac)+z*np.sin(self.theta*ac)
-			z             = -y*np.sin(self.theta*ac)+z*np.cos(self.theta*ac)
+		if(self.__theta != 0.):			#we rotate around x axis
+			yy_temp       = y*np.cos(self.__theta*ac)+z*np.sin(self.__theta*ac)
+			z             = -y*np.sin(self.__theta*ac)+z*np.cos(self.__theta*ac)
 			y             = yy_temp
 			yy_temp       = 0
 
-		if(self.phi   != 0.):				#we rotate around y axis
-			xx_temp       = x*np.cos(self.phi*ac)-z*np.sin(self.phi*ac)
-			z             = x*np.sin(self.phi*ac)+z*np.cos(self.phi*ac)
+		if(self.__phi   != 0.):				#we rotate around y axis
+			xx_temp       = x*np.cos(self.__phi*ac)-z*np.sin(self.__phi*ac)
+			z             = x*np.sin(self.__phi*ac)+z*np.cos(self.__phi*ac)
 			x             = xx_temp
 			xx_temp       = 0
 
 		# we now consider only particles in the line of sight inside de FOV of the
                 # camera	
 		if(near):
-			z -= (-1.0*self.r)	# in order to move the camera far away from the object
+			z -= (-1.0*self.__r)	# in order to move the camera far away from the object
 			kview = ( np.where( (z > 0.) & (np.abs(x) <= 
 		                (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
 		                (np.abs(z)*np.tan(FOV/2.)) ) )[0])
@@ -300,38 +278,38 @@ class init(object):
 
 			mass = self.mass[kview]
 
-		lbin = 2*xmax/self.xsize
+		lbin = 2*xmax/self.__xsize
 
-		if self.verbose:
+		if self.__verbose:
 			print '-------------------------------------------------'
 			print 'Making the smooth image'
 			print 'xmin  =', xmin
 			print 'xmax  =', xmax
 			print 'ymin  =', ymin
 			print 'ymax  =', ymax
-			print 'xsize =', self.xsize
-			print 'ysize =', self.ysize
+			print 'xsize =', self.__xsize
+			print 'ysize =', self.__ysize
 
 		if(near):	
-			x = ((x*self.zoom/z-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
-			y = ((y*self.zoom/z-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
-			t = (self.hsml[kview]*self.zoom/z/lbin).astype(int)
+			x = ((x*self.__zoom/z-xmin)/(xmax-xmin)*(self.__xsize-1.)).astype(int)
+			y = ((y*self.__zoom/z-ymin)/(ymax-ymin)*(self.__ysize-1.)).astype(int)
+			t = (self.hsml[kview]*self.__zoom/z/lbin).astype(int)
 		else:
-			x = ((x-xmin)/(xmax-xmin)*(self.xsize-1.)).astype(int)
-			y = ((y-ymin)/(ymax-ymin)*(self.ysize-1.)).astype(int)
+			x = ((x-xmin)/(xmax-xmin)*(self.__xsize-1.)).astype(int)
+			y = ((y-ymin)/(ymax-ymin)*(self.__ysize-1.)).astype(int)
 			t = (self.hsml[kview]/lbin).astype(int)
 	
 		n=int(len(x))
 
-		dens = np.zeros([self.ysize,self.xsize],dtype=(np.float))
+		dens = np.zeros([self.__ysize,self.__xsize],dtype=(np.float))
 
 		# interpolation kernel
 		extra_code = self.__import_code('extra_code.c')
 		# C code for making the images
 		code       = self.__import_code('c_code.c')
 
-		binx = self.xsize
-		biny = self.ysize
+		binx = self.__xsize
+		biny = self.__ysize
 
 		start = time.time()
 		weave.inline(code,['x',
@@ -350,5 +328,5 @@ class init(object):
                                    extra_link_args=['-lgomp'])
 		stop = time.time()
 		self.dens = dens
-		if(self.verbose): print 'Elapsed time = ', stop-start
+		if(self.__verbose): print 'Elapsed time = ', stop-start
 		return 
