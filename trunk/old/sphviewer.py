@@ -25,7 +25,9 @@ class init(object):
 	"""
 	def __init__(self, pos     = None, 
                            mass    = None, 
-                           hsml    = None, 
+                           hsml    = None,
+		           hue     = None,
+                           sat     = None,
                            nb      = 32, 
                            verbose = False):
 #==========================
@@ -33,6 +35,8 @@ class init(object):
 		self.pos  = pos
 		self.mass = mass
 		self.hsml = hsml
+		self.hue  = hue
+		self.sat  = sat
 		self.nb   = nb
 #==========================
 #==========================
@@ -141,15 +145,16 @@ class init(object):
 		if(self.__verbose): print 'Done...'
 		return hsml1
 
-	def plot(self, logscale=False, **kargs):
+	def plot(self, logscale=False, square=False, **kargs):
 		if(self.__is_plot_available==False):
 			print 'There is nothing to plot yet... You should make a render first.'
 			return
+		dd = self.dens
 
+		if(square):
+			dd = self.dens**2
 		if(logscale):
-			dd = np.log10(self.dens+1)
-		else:
-			dd = self.dens
+			dd = np.log10(dd+1)
 
 		plt.imshow(dd, origin='lower', extent=self.extent, **kargs)
 		plt.show()
@@ -276,10 +281,6 @@ class init(object):
 		                (np.abs(z)*np.tan(FOV/2.)) ) & (np.abs(y) <= 
 		                (np.abs(z)*np.tan(FOV/2.)) ) )[0])
 
-			x = x[kview]
-			y = y[kview]
-			z = z[kview]
-			mass = self.mass[kview]
 		else:
 			if(lbox == None):
 				kview = np.where( (x >= xmin) & (x <= xmax) & 
@@ -289,12 +290,17 @@ class init(object):
 		                                  (y >= ymin) & (y <= ymax) &
 		                                  ( np.abs(z) <= lbox/2 ) )[0]
 				print np.min(np.abs(z)), np.max(np.abs(z))
-			x = x[kview]
-			y = y[kview]
-			z = z[kview]
 
-			mass = self.mass[kview]
+		x = x[kview]
+		y = y[kview]
+		z = z[kview]
+		mass = self.mass[kview]
+		t    = self.hsml[kview]
+		if(self.hue != None):
+			hue = self.hue[kview]
+			sat = self.sat[kview]
 
+		
 		lbin = 2*xmax/self.__xsize
 
 		if self.__verbose:
@@ -310,34 +316,37 @@ class init(object):
 		if(near):	
 			x = ((x*self.__zoom/z-xmin)/(xmax-xmin)*(self.__xsize-1.)).astype(int)
 			y = ((y*self.__zoom/z-ymin)/(ymax-ymin)*(self.__ysize-1.)).astype(int)
-			t = (self.hsml[kview]*self.__zoom/z/lbin).astype(int)
+			t = (t*self.__zoom/z/lbin).astype(int)
 		else:
 			x = ((x-xmin)/(xmax-xmin)*(self.__xsize-1.)).astype(int)
 			y = ((y-ymin)/(ymax-ymin)*(self.__ysize-1.)).astype(int)
-			t = (self.hsml[kview]/lbin).astype(int)
+			t = (t/lbin).astype(int)
 	
 		n=int(len(x))
 
-		dens = np.zeros([self.__ysize,self.__xsize],dtype=(np.float))
+		if(self.hue == None):
+			dens = np.zeros([self.__ysize,self.__xsize],dtype=(np.float))
+			# C code for making the images
+			code       = self.__import_code('c_code.c')
+			shared     = (['x','y', 'binx', 'biny',  't', 
+                                      'lbin', 'n', 'mass', 'dens'])
+		else:
+			dens = np.zeros([self.__ysize,self.__xsize,4],dtype=(np.float))
+			dens[:,:,3] = 1.
+			# C code for making the images
+			code       = self.__import_code('c_code_hsv.c')
+			shared     = (['x','y', 'binx', 'biny',  't', 
+                                      'lbin', 'n', 'mass','hue','sat', 'dens'])
+
 
 		# interpolation kernel
 		extra_code = self.__import_code('extra_code.c')
-		# C code for making the images
-		code       = self.__import_code('c_code.c')
 
 		binx = self.__xsize
 		biny = self.__ysize
 
 		start = time.time()
-		weave.inline(code,['x',
-                                   'y',
-                                   'binx',
-                                   'biny', 
-                                   't',
-                                   'lbin',
-                                   'n',
-                                   'mass',
-                                   'dens'],
+		weave.inline(code,shared,
                                    support_code=extra_code,
                                    type_converters=converters.blitz,
                                    compiler='gcc', 

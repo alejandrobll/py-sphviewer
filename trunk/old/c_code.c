@@ -4,9 +4,11 @@ int tt;
 float mass_c;
 int binx_c, biny_c;
 int bin_lim;
+float lbin_c;
 
 binx_c = binx;
 biny_c = biny;
+lbin_c = lbin;
 
 if(binx_c >= biny_c) bin_lim = binx_c;
 if(binx_c < biny_c) bin_lim = biny_c;
@@ -29,7 +31,9 @@ if(binx_c < biny_c) bin_lim = biny_c;
 			for(k=-tt; k<tt+1; k++)
 			{
 				if( ( (xx+j) >= 0) && ( (xx+j) < binx_c) && ( (yy+k) >=0) && ( (yy+k) < biny_c))
-				dens((yy+k),(xx+j)) += mass_c*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+				  {
+				    dens((yy+k),(xx+j)) += mass_c/(lbin_c*lbin_c)*cubic_kernel2(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+				  }
 			}
 		}
 	}
