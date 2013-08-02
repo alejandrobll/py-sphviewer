@@ -2,6 +2,9 @@ from scipy import weave
 from scipy.weave import converters
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 def import_code(filename):
     #naive function to import c code
@@ -24,13 +27,13 @@ class Render():
         n=int(len(x))
         image = np.zeros([xsize,ysize],dtype=(np.float32))
             # C code for making the images
-        code       = import_code('/home/alejandro/new_sphviewer/c_code.c')
+        code = import_code(os.path.join(PROJECT_ROOT, '.','c_code.c'))
         shared     = (['x','y', 'xsize', 'ysize',  
                        't','n', 'mass','image'])
         
         # interpolation kernel
-        extra_code = import_code('/home/alejandro/new_sphviewer/extra_code.c')
-            
+
+        extra_code = import_code(os.path.join(PROJECT_ROOT, '.','extra_code.c'))            
         weave.inline(code,shared,
                      support_code=extra_code,
                      type_converters=converters.blitz,
