@@ -5,34 +5,34 @@ from Render import Render
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 if __name__ == '__main__':
-    x = np.random.rand(10000)
-    y = np.random.rand(10000)
-    z = np.random.rand(10000)
+    x = np.random.rand(1000)
+    y = np.random.rand(1000)
+    z = np.random.rand(1000)
 
-    hsml = np.random.rand(10000)
-    mass = np.random.rand(10000)
+    hsml = np.random.rand(1000)
+    mass = np.random.rand(1000)
 
     P = Particles(x,y,z,mass,verbose=True)
 
     S = Scene(P)
     
-#    plt.ion()
+    plt.ion()
     fig = plt.figure(1)
     ax1 = fig.add_subplot(111)
 
-    S.update_camera(r=10,zoom=1)
-    I = Render(S)
-    ax1.imshow(I.get_image(), extent=I.Scene.get_extent())
-    plt.show()
-#   for i in xrange(200):
-#       S.update_camera(p=360.0*i/199, r=5-(5-0.5)*i/199.,xsize=1000,ysize=1000)
-#       image = Render(S)
-#       print i
-#       ax1.imshow(np.log10(image.get_image()+1))
-#       plt.draw()
-#       ax1.cla()
+#   S.update_camera(r=10,zoom=1)
+#   I = Render(S)
+#   ax1.imshow(I.get_image(), extent=I.Scene.get_extent())
+#   plt.show()
+    for i in xrange(1000):
+        S.update_camera(p=360.0*i/999, r=5-(5-0.5)*i/999.,xsize=300,ysize=300)
+        image = Render(S)
+        print i
+        image.save('output/'+str('%04d'% i)+'.png')
+#        ax1.imshow(np.log10(image.get_image()+1))
+#        plt.draw()
+#        ax1.cla()
 
 #    ax1  = fig.add_subplot(221)
 #    ax2  = fig.add_subplot(222)

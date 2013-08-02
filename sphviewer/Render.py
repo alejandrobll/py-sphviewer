@@ -25,7 +25,7 @@ class Render():
 
     def __make_render(self,x,y,t,mass,xsize,ysize):
         n=int(len(x))
-        image = np.zeros([xsize,ysize],dtype=(np.float32))
+        image = np.zeros([ysize,xsize],dtype=(np.float32))
             # C code for making the images
         code = import_code(os.path.join(PROJECT_ROOT, '.','c_code.c'))
         shared     = (['x','y', 'xsize', 'ysize',  
