@@ -16,12 +16,20 @@ def import_code(filename):
 
 class Render():
     def __init__(self,Scene):    
+        try:
+            class_name = Scene._name
+        except AttributeError:
+            print "You must use a valid class..."
+            return
+        if(class_name != 'SCENE'):
+            print "You must use a valid class..."
+            return
+
         self.Scene = Scene
         x,y,t,mass = Scene.get_scene()
         xsize = Scene.Camera.get_params()['xsize']
         ysize = Scene.Camera.get_params()['ysize']
         self.__image = self.__make_render(x,y,t,mass,xsize,ysize)
-
 
     def __make_render(self,x,y,t,mass,xsize,ysize):
         n=int(len(x))

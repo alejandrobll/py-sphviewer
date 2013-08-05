@@ -28,7 +28,8 @@ class Scene():
         if(particles_name != 'PARTICLES'):
             print "You must use a valid class..."
             return
-        
+
+        self._name = 'SCENE'
         self.Camera = Camera()
         self._Particles = Particles
         #I use the autocamera by default
@@ -47,51 +48,75 @@ class Scene():
         
         pos = (1.0*self._Particles.get_pos()).astype(np.float32)
         
-        pos[0,:] -= np.array([self._camera_params['x']])
-        pos[1,:] -= np.array([self._camera_params['y']])
-        pos[2,:] -= np.array([self._camera_params['z']])
-        
         if self._camera_params['t'] != 0:
             pos = rotate(self._camera_params['t'],'x',pos)
         if self._camera_params['p'] != 0:
             pos = rotate(self._camera_params['p'],'y',pos)
 
-        pos[2,:] -= (-1.0*self._camera_params['r'])
-        
-        FOV  = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
-        
-        xmax = self._camera_params['zoom']*np.tan(FOV/2.)
-        xmin = -xmax
-        ymax = 0.5*(xmax-xmin)*self._camera_params['ysize']/self._camera_params['xsize']
-        ymin = -ymax
-        xfovmax =  FOV/2.*180./np.pi
-        xfovmin =  -FOV/2.*180./np.pi
-        # in order to have symmetric y limits
-        yfovmax = 0.5*((xfovmax-xfovmin)*
-                       self._camera_params['ysize']/self._camera_params['xsize'])
-        yfovmin = -yfovmax
-        self.__extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])
-        lbin = 2*xmax/self._camera_params['xsize']
-        
-        kview, = np.where((pos[2,:] > 0.) & 
-                          (np.abs(pos[1,:])<=(np.abs(pos[2,:])* 
-                                              np.tan(FOV/2.))) &
-                          (np.abs(pos[1,:]) <= (np.abs(pos[2,:])*
-                                                np.tan(FOV/2.))))
-        pos = pos[:,kview]
-        mass = self._Particles.get_mass()[kview]
-        hsml = self._Particles.get_hsml()[kview]
-        
-        pos[0,:] = ((pos[0,:]*self._camera_params['zoom']/ 
-                     pos[2,:]-xmin)/(xmax-xmin)*
-                    (self._camera_params['xsize']-1.))
-        pos[1,:] = ((pos[1,:]*self._camera_params['zoom']/ 
-                     pos[2,:]-ymin)/(ymax-ymin)*
-                    (self._camera_params['ysize']-1.))
-        hsml = (hsml*self._camera_params['zoom']/pos[2,:]/lbin)
-        
-        return pos[0,:], pos[1,:], hsml, mass
+        if(self._camera_params['r'] == 'infinity'):                
+            xmax = np.max(pos[0,:])
+            ymax = np.max(pos[1,:])
+            xmin = np.min(pos[0,:])
+            ymin = np.min(pos[1,:])
 
+            lmax = max(xmax,ymax)
+            lmin = min(ymax,ymin)
+
+            xmin = ymin = lmin
+            xmax = ymax = ymax
+
+            self.__extent = np.array([xmin,xmax,ymin,ymax])
+            lbin = 2*xmax/self._camera_params['xsize']
+                   
+            pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
+            pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
+
+            mass = self._Particles.get_mass()
+            hsml = self._Particles.get_hsml()/lbin
+
+            return pos[0,:], pos[1,:], hsml, mass
+        else:
+            pos[0,:] -= np.array([self._camera_params['x']])
+            pos[1,:] -= np.array([self._camera_params['y']])
+            pos[2,:] -= np.array([self._camera_params['z']])
+
+            pos[2,:] -= (-1.0*self._camera_params['r'])
+        
+            FOV  = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
+        
+            xmax = self._camera_params['zoom']*np.tan(FOV/2.)
+            xmin = -xmax
+            ymax = 0.5*(xmax-xmin)*self._camera_params['ysize']/self._camera_params['xsize']
+            ymin = -ymax
+            xfovmax =  FOV/2.*180./np.pi
+            xfovmin =  -FOV/2.*180./np.pi
+            # in order to have symmetric y limits
+            yfovmax = 0.5*((xfovmax-xfovmin)*
+                           self._camera_params['ysize']/self._camera_params['xsize'])
+            yfovmin = -yfovmax
+            self.__extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])
+            lbin = 2*xmax/self._camera_params['xsize']
+            
+            kview, = np.where((pos[2,:] > 0.) & 
+                              (np.abs(pos[1,:])<=(np.abs(pos[2,:])* 
+                                                  np.tan(FOV/2.))) &
+                              (np.abs(pos[1,:]) <= (np.abs(pos[2,:])*
+                                                    np.tan(FOV/2.))))
+            pos = pos[:,kview]
+            mass = self._Particles.get_mass()[kview]
+            hsml = self._Particles.get_hsml()[kview]
+        
+            pos[0,:] = ((pos[0,:]*self._camera_params['zoom']/ 
+                         pos[2,:]-xmin)/(xmax-xmin)*
+                        (self._camera_params['xsize']-1.))
+            pos[1,:] = ((pos[1,:]*self._camera_params['zoom']/ 
+                         pos[2,:]-ymin)/(ymax-ymin)*
+                        (self._camera_params['ysize']-1.))
+            hsml = (hsml*self._camera_params['zoom']/pos[2,:]/lbin)
+            
+            return pos[0,:], pos[1,:], hsml, mass
+
+        
     def get_extent(self):
         return self.__extent
 
