@@ -37,7 +37,7 @@ class Render():
         weave.inline(code,shared,
                      support_code=extra_code,
                      type_converters=converters.blitz,
-                     compiler='gcc', 
+                     compiler='gcc',
                      extra_compile_args=[' -O3 -fopenmp'],
                      extra_link_args=['-lgomp'])
         return image 
