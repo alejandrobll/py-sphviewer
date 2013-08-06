@@ -74,5 +74,5 @@ class Camera():
         r = np.sqrt((xmax-xmin)**2+(ymax-ymin)**2+(zmax-zmin)**2)
 
         self.__params = {'x':xmean,'y':ymean,'z':zmean,'r':r,
-                         't':90,'p':0,'zoom':1,
+                         't':0,'p':0,'zoom':1,
                          'xsize':500, 'ysize':500}
