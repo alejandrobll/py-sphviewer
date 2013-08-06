@@ -13,7 +13,7 @@ if __name__ == '__main__':
     hsml = np.random.rand(1000)
     mass = np.random.rand(1000)
 
-    P = Particles(x,y,z,mass,verbose=True)
+    P = Particles(x,y,z,mass,verbose=True,nb=3)
 
     S = Scene(P)
     
@@ -25,14 +25,16 @@ if __name__ == '__main__':
 #   I = Render(S)
 #   ax1.imshow(I.get_image(), extent=I.Scene.get_extent())
 #   plt.show()
-    for i in xrange(1000):
-        S.update_camera(p=360.0*i/999, r=5-(5-0.5)*i/999.,xsize=300,ysize=300)
+    for i in xrange(100):
+        S.update_camera(r='infinity',xsize=300,ysize=300)
         image = Render(S)
-        print i
-        image.save('output/'+str('%04d'% i)+'.png')
-#        ax1.imshow(np.log10(image.get_image()+1))
-#        plt.draw()
-#        ax1.cla()
+#        print i
+#        image.save('output/'+str('%04d'% i)+'.png')
+        print image.Scene.get_extent()
+        ax1.imshow(np.log10(image.get_image()+1),extent=image.Scene.get_extent(),origin='lower')
+        plt.plot(x, y, 'k.')
+        plt.draw()
+        ax1.cla()
 
 #    ax1  = fig.add_subplot(221)
 #    ax2  = fig.add_subplot(222)

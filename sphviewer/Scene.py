@@ -48,6 +48,10 @@ class Scene():
         
         pos = (1.0*self._Particles.get_pos()).astype(np.float32)
         
+        pos[0,:] -= np.array([self._camera_params['x']])
+        pos[1,:] -= np.array([self._camera_params['y']])
+        pos[2,:] -= np.array([self._camera_params['z']])
+
         if self._camera_params['t'] != 0:
             pos = rotate(self._camera_params['t'],'x',pos)
         if self._camera_params['p'] != 0:
@@ -55,8 +59,8 @@ class Scene():
 
         if(self._camera_params['r'] == 'infinity'):                
             xmax = np.max(pos[0,:])
-            ymax = np.max(pos[1,:])
             xmin = np.min(pos[0,:])
+            ymax = np.max(pos[1,:])
             ymin = np.min(pos[1,:])
 
             lmax = max(xmax,ymax)
@@ -65,21 +69,22 @@ class Scene():
             xmin = ymin = lmin
             xmax = ymax = ymax
 
-            self.__extent = np.array([xmin,xmax,ymin,ymax])
+            self.__extent = np.array([xmin+self._camera_params['x'],
+                                      xmax+self._camera_params['x'],
+                                      ymin+self._camera_params['y'],
+                                      ymax+self._camera_params['y']])
+
+#            self.__extent = np.array([xmin,xmax,ymin,ymax])
             lbin = 2*xmax/self._camera_params['xsize']
                    
             pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
             pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
-
             mass = self._Particles.get_mass()
             hsml = self._Particles.get_hsml()/lbin
 
             return pos[0,:], pos[1,:], hsml, mass
-        else:
-            pos[0,:] -= np.array([self._camera_params['x']])
-            pos[1,:] -= np.array([self._camera_params['y']])
-            pos[2,:] -= np.array([self._camera_params['z']])
 
+        else:
             pos[2,:] -= (-1.0*self._camera_params['r'])
         
             FOV  = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
