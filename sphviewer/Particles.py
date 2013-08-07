@@ -61,7 +61,7 @@ class Particles():
         return self.__mass
     
     def get_hsml(self):
-        return self.__hsm
+        return self.__hsml
 
     def get_rho(self):
         return self.__rho
