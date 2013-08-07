@@ -10,7 +10,6 @@ class Particles():
                  zpos,
                  mass = None,
                  hsml = None,
-                 rho  = None,
                  prop1 = None,
                  prop2 = None,
                  nb = 32,
@@ -26,10 +25,8 @@ class Particles():
 
         if(hsml == None or rho == None):
             self.__hsml = self.__det_hsml(self.__pos,self.__nb)
-            self.__rho  = nb/(4./3.*np.pi*self.__hsml**3)
         else:
             self.__hsml = np.array(hsml)
-            self.__rho  = np.array(rho)
 
 #Setting methods:
     def set_pos(self,xpos,ypos,zpos):
@@ -62,9 +59,6 @@ class Particles():
     
     def get_hsml(self):
         return self.__hsml
-
-    def get_rho(self):
-        return self.__rho
 
     def get_nb(self):
         return self.__nb
