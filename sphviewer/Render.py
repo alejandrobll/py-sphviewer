@@ -3,8 +3,17 @@ from scipy.weave import converters
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import colorsys
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
+def hsv_to_rgb(h,s,v):
+    f = np.vectorize(colorsys.hsv_to_rgb)
+    return f(h,s,v)
+
+def rgb_to_hsv(r,g,b):
+    f = np.vectorize(colorsys.rgb_to_hsv)
+    return f(r,g,b)
 
 def import_code(filename):
     #naive function to import c code
