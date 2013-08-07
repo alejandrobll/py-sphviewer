@@ -23,7 +23,7 @@ class Particles():
         self.__prop1 = np.array(prop1,dtype=np.float32)
         self.__prop2 = np.array(prop2,dtype=np.float32)
 
-        if(hsml == None or rho == None):
+        if(hsml == None):
             self.__hsml = self.__det_hsml(self.__pos,self.__nb)
         else:
             self.__hsml = np.array(hsml)
