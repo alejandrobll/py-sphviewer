@@ -35,14 +35,14 @@ class Scene():
         #I use the autocamera by default
         self.Camera.set_autocamera(Particles)
         self._camera_params = self.Camera.get_params()
-        self.__x, self.__y, self.__hsml, self.__mass = self.__compute_scene()
+        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def get_scene(self):
-        return self.__x, self.__y, self.__hsml, self.__mass
+        return self.__x, self.__y, self.__hsml, self.__kview
 
     def update_camera(self,**kargs):
         self.Camera.set_params(**kargs)
-        self.__x, self.__y, self.__hsml, self.__mass = self.__compute_scene()
+        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def __compute_scene(self):
         
@@ -79,10 +79,10 @@ class Scene():
                    
             pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
             pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
-            mass = self._Particles.get_mass()
             hsml = self._Particles.get_hsml()/lbin
+            kview = np.arange(np.size(hsml))
 
-            return pos[0,:], pos[1,:], hsml, mass
+            return pos[0,:], pos[1,:], hsml, kview
 
         else:
             pos[2,:] -= (-1.0*self._camera_params['r'])
@@ -107,9 +107,8 @@ class Scene():
                                                   np.tan(FOV/2.))) &
                               (np.abs(pos[1,:]) <= (np.abs(pos[2,:])*
                                                     np.tan(FOV/2.))))
-            pos = pos[:,kview]
-            mass = self._Particles.get_mass()[kview]
-            hsml = self._Particles.get_hsml()[kview]
+            pos   = pos[:,kview]
+            hsml  = self._Particles.get_hsml()[kview]
         
             pos[0,:] = ((pos[0,:]*self._camera_params['zoom']/ 
                          pos[2,:]-xmin)/(xmax-xmin)*
@@ -119,7 +118,7 @@ class Scene():
                         (self._camera_params['ysize']-1.))
             hsml = (hsml*self._camera_params['zoom']/pos[2,:]/lbin)
             
-            return pos[0,:], pos[1,:], hsml, mass
+            return pos[0,:], pos[1,:], hsml, kview
 
         
     def get_extent(self):
