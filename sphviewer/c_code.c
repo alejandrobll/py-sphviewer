@@ -23,17 +23,17 @@ for(i=0;i<n;i++){
   if(tt < 1) tt = 1;
   if(tt > size_lim) tt = size_lim;
 
-  if(tt == 1){
-    image(yy,xx) = mass_c;
-  }
-  if(tt > 1){
+//  if(tt == 1){
+//    image(yy,xx) = mass_c;
+//  }
+//  if(tt > 1){
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
 	  image(yy+k,xx+j) += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 	}
       }
-    }
+//    }
   }
  }
 
