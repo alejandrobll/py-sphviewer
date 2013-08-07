@@ -10,42 +10,45 @@ class Particles():
                  zpos,
                  mass = None,
                  hsml = None,
+                 rho  = None,
                  prop1 = None,
                  prop2 = None,
                  nb = 32,
                  verbose = False):
         
         self._name = 'PARTICLES'
-        self.__pos  = np.array([xpos,ypos,zpos])
-        self.__mass = np.array(mass)
+        self.__pos  = np.array([xpos,ypos,zpos],dtype=np.float32)
+        self.__mass = np.array(mass,dtype=np.float32)
         self.__nb   = nb
         self.__verbose = verbose
-        self.__prop1 = np.array(prop1)
-        self.__prop2 = np.array(prop2)
+        self.__prop1 = np.array(prop1,dtype=np.float32)
+        self.__prop2 = np.array(prop2,dtype=np.float32)
 
-        if(hsml == None):
+        if(hsml == None or rho == None):
             self.__hsml = self.__det_hsml(self.__pos,self.__nb)
+            self.__rho  = nb/(4./3.*np.pi*self.__hsml**3)
         else:
             self.__hsml = np.array(hsml)
+            self.__rho  = np.array(rho)
 
 #Setting methods:
     def set_pos(self,xpos,ypos,zpos):
-        self.__pos  = np.array([xpos,ypos,zpos])
+        self.__pos  = np.array([xpos,ypos,zpos],dtype=np.float32)
 
     def set_mass(self,mass):
-        self.__mass  = np.array(mass)
+        self.__mass  = np.array(mass,dtype=np.float32)
     
     def set_hsml(self,hsml):
-        self.__hsml  = np.array(hsml)
+        self.__hsml  = np.array(hsml,dtype=np.float32)
 
     def set_nb(self,nb):
-        self.__nb  = np.array(nb)
+        self.__nb  = np.array(nb,dtype=np.int32)
 
     def set_prop1(self,prop1):
-        self.__prop1  = np.array(prop1)
+        self.__prop1  = np.array(prop1,dtype=np.float32)
 
     def set_prop2(self,prop2):
-        self.__prop2  = np.array(prop2)
+        self.__prop2  = np.array(prop2,dtype=np.float32)
 
 #Getting methods
     def get_pos(self):
@@ -58,15 +61,18 @@ class Particles():
         return self.__mass
     
     def get_hsml(self):
-        return self.__hsml
+        return self.__hsm
+
+    def get_rho(self):
+        return self.__rho
 
     def get_nb(self):
         return self.__nb
 
-    def get_prop1(self,prop1):
+    def get_prop1(self):
         return self.__prop1
 
-    def get_prop2(self,prop2):
+    def get_prop2(self):
         return self.__prop2
 
     def plot(self,plane,axis=None,**kargs):
