@@ -11,7 +11,7 @@ ysize_c = ysize;
 if(xsize_c >= ysize_c) size_lim = xsize_c;
 if(xsize_c < ysize_c)  size_lim = ysize_c;
 
-#pragma omp parallel for private(i,xx,yy,tt,mass_c,j,k,l)
+#pragma omp parallel for private(i,xx,yy,tt,mass_c,j,k)
 #pragma omp+ reduction(+:image)
 #pragma omp schedule(dynamic,1000)
 for(i=0;i<n;i++){
@@ -19,21 +19,19 @@ for(i=0;i<n;i++){
   yy = (int)y(i);
   tt = (int)t(i);
   mass_c = (float) mass(i);
-  
+
   if(tt < 1) tt = 1;
   if(tt > size_lim) tt = size_lim;
 
   if(tt == 1){
-    image(yy,xx) += mass_c; //+(float)l*(float)l, tt);
+    image(yy,xx) = mass_c;
   }
   if(tt > 1){
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
-	//      for(l=-tt; l<tt+1; l++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
-	  image((yy+k),(xx+j)) += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt); //+(float)l*(float)l, tt);
+	  image(yy+k,xx+j) += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 	}
-	  // }
       }
     }
   }
