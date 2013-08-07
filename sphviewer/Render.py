@@ -71,16 +71,39 @@ class Fancy():
                      extra_compile_args=[' -O3 -fopenmp'],
                      extra_link_args=['-lgomp'])
 
+        h,s,v = rgb_to_hsv(image[:,:,0],
+                           image[:,:,1],
+                           image[:,:,2])
+
+        self.__vmin = np.min(v)
+        self.__vmax = np.max(v)
+
         return image 
 
     def get_image(self):
-        return self.__image
+        h,s,v = rgb_to_hsv(self.__image[:,:,0],
+                           self.__image[:,:,1],
+                           self.__image[:,:,2])
+        v = np.clip(v, self.__vmin, self.__vmax)
+        v = (v-self.__vmin)/(self.__vmax-self.__vmin)
+        xsize = self.Scene.Camera.get_params()['xsize']
+        ysize = self.Scene.Camera.get_params()['ysize']
+        image = np.zeros([ysize,xsize,4],dtype=np.float32)
+        image[:,:,3] = 1.
+        image[:,:,0], image[:,:,1], image[:,:,2] = hsv_to_rgb(h,s,v)
+        return image
 
     def get_max(self):
-        return np.max(self.__image)
+        return self.__vmax
 
     def get_min(self):
-        return np.min(self.__image)
+        return self.__vmin
+
+    def set_min(self, vmin):
+        self.__vmin = vmin
+
+    def set_max(self, vmax):
+        self.__vmax = vmax
 
     def get_extent():
         return self.Scene.get_extent()
@@ -90,19 +113,34 @@ class Fancy():
             return
         else:
             if(t):
-                self.__image = np.log10(self.__image+1)
+                h,s,v = rgb_to_hsv(self.__image[:,:,0],
+                                   self.__image[:,:,1],
+                                   self.__image[:,:,2])
+                v = np.log10(v+1.) 
+                self.__image[:,:,0],self.__image[:,:,1],self.__image[:,:,2] = hsv_to_rgb(h,s,v)
                 self.__logscale_flag = True;
+                self.__vmin = np.min(v)
+                self.__vmax = np.max(v)
             else:
-                self.__image = 10**self.__image-1.
+                h,s,v = rgb_to_hsv(self.__image[:,:,0],
+                                   self.__image[:,:,1],
+                                   self.__image[:,:,2])
+                v = 10**v-1.0 
+                self.__image[:,:,0],self.__image[:,:,1],self.__image[:,:,2] = hsv_to_rgb(h,s,v)
                 self.__logscale_flag = False;
+                self.__vmin = np.min(v)
+                self.__vmax = np.max(v)
 
     def get_logscale(self):
         return self.__logscale_flag
 
     def histogram(self,axis=None, **kargs):
+        h,s,v = hsv_to_rgb(self.__image[:,:,0],
+                           self.__image[:,:,1],
+                           self.__image[:,:,2])
         if(axis == None):
             axis = plt.gca()
-        axis.hist(self.__image.ravel(), **kargs)
+        axis.hist(np.ravel(v), **kargs)
         
     def save(self,outputfile,**kargs):
         plt.imsave(outputfile, self.__image, **kargs)
