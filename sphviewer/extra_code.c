@@ -45,6 +45,17 @@ float cubic_kernel3(float r, float h)
   return sigma*func/(h*h*h);
 }
 
+float cubic_kernel4(float r, float h)
+//3D Dome-shapeed quadratic Kernel (1-R^2) (Hicks and Liebrock 2000).
+//It should be used only for fancy plots!!
+{
+  float func;
+  if(r/h < 1.0)  
+    func = 1.0-(r/h)*(r/h);
+  if(r/h > 1.0)  
+    func = 0;
+  return func;
+}
 
 void hsvToRgb (float h, float s, float v, float * r, float * g, float * b)
 {

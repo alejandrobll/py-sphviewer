@@ -28,25 +28,16 @@ for(i=0;i<n;i++){
   if(tt < 1) tt = 1;
   if(tt > size_lim) tt = size_lim;
 
-//  if(tt == 1){
-//    value = mass_c;
-//    hsvToRgb(prop1_c, prop2_c, value, &r, &g, &b);
-//    image(yy,xx,0) = 1.0-(1.0-image(yy,xx,0))*(1.0-r);
-//    image(yy,xx,1) = 1.0-(1.0-image(yy,xx,1))*(1.0-g);
-//    image(yy,xx,2) = 1.0-(1.0-image(yy,xx,2))*(1.0-b);
-//  }
-//  if(tt > 1){
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
-	  value =  mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	  hsvToRgb(prop1_c, prop2_c, value, &r, &g, &b);
-	  image(yy+k,xx+j,0) = 1.0-(1.0-image(yy+k,xx+j,0))*(1.0-r);
-	  image(yy+k,xx+j,1) = 1.0-(1.0-image(yy+k,xx+j,1))*(1.0-g);
-	  image(yy+k,xx+j,2) = 1.0-(1.0-image(yy+k,xx+j,2))*(1.0-b);
-	}
+  for(j=-tt; j<tt+1; j++){
+    for(k=-tt; k<tt+1; k++){
+      if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
+	value =  mass_c*cubic_kernel4(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	hsvToRgb(prop1_c, prop2_c, value, &r, &g, &b);
+	image(yy+k,xx+j,0) = 1.0-(1.0-image(yy+k,xx+j,0))*(1.0-r);
+	image(yy+k,xx+j,1) = 1.0-(1.0-image(yy+k,xx+j,1))*(1.0-g);
+	image(yy+k,xx+j,2) = 1.0-(1.0-image(yy+k,xx+j,2))*(1.0-b);
       }
     }
-    //  }
+  }
  }
 

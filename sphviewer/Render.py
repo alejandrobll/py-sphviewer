@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import colorsys
+import Image
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -54,8 +55,7 @@ class Fancy():
             print 'Check the properties of your particles...'
             return
 
-        image = np.zeros([ysize,xsize,4],dtype=(np.float32))
-        image[:,:,3] = 1.0
+        image = np.zeros([ysize,xsize,3],dtype=(np.float32))
 
             # C code for making the images
         code = import_code(os.path.join(PROJECT_ROOT, '.','c_code_fancy.c'))
@@ -78,7 +78,7 @@ class Fancy():
         self.__vmin = np.min(v)
         self.__vmax = np.max(v)
 
-        return image 
+        return image
 
     def get_image(self):
         h,s,v = rgb_to_hsv(self.__image[:,:,0],
@@ -88,10 +88,19 @@ class Fancy():
         v = (v-self.__vmin)/(self.__vmax-self.__vmin)
         xsize = self.Scene.Camera.get_params()['xsize']
         ysize = self.Scene.Camera.get_params()['ysize']
-        image = np.zeros([ysize,xsize,4],dtype=np.float32)
-        image[:,:,3] = 1.
+        image = np.zeros([ysize,xsize,3],dtype=np.float32)
         image[:,:,0], image[:,:,1], image[:,:,2] = hsv_to_rgb(h,s,v)
-        return image
+        return Image.fromarray((image*255).astype(np.int8),mode='RGB')
+
+    def get_hsv(self):
+        return rgb_to_hsv(self.__image[:,:,0],
+                          self.__image[:,:,1],
+                          self.__image[:,:,2])
+
+    def set_hsv(self,h,s,v):
+        self.__image[:,:,0],self.__image[:,:,1],self.__image[:,:,2] = hsv_to_rgb(h,s,v)
+        self.__vmin = np.min(v)
+        self.__vmax = np.max(v)
 
     def get_max(self):
         return self.__vmax
@@ -149,7 +158,6 @@ class Fancy():
         
     def save(self,outputfile,**kargs):
         plt.imsave(outputfile, self.__image, **kargs)
-
 
 class Render():
     def __init__(self,Scene):    
