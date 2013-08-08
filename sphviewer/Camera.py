@@ -51,7 +51,7 @@ class Camera():
         axis.add_line(camera, **kargs)
         axis.add_line(arrow, **kargs)
 
-    def set_autocamera(self,Particles):
+    def set_autocamera(self,Particles, mode='median'):
         try:
             particles_name = Particles._name
         except AttributeError:
@@ -67,9 +67,15 @@ class Camera():
                           np.min(Particles.get_pos()[1,:]),
                           np.min(Particles.get_pos()[2,:]))
 
-        xmean = (xmax+xmin)/2.
-        ymean = (ymax+ymin)/2.
-        zmean = (zmax+zmin)/2.
+        if(mode == 'minmax'):
+            xmean = (xmax+xmin)/2.
+            ymean = (ymax+ymin)/2.
+            zmean = (zmax+zmin)/2.
+            
+        if(mode == 'median'):
+            xmean = np.median(Particles.get_pos()[0,:])
+            ymean = np.median(Particles.get_pos()[1,:])
+            zmean = np.median(Particles.get_pos()[2,:])
 
         r = np.sqrt((xmax-xmin)**2+(ymax-ymin)**2+(zmax-zmin)**2)
 
