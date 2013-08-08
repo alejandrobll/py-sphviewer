@@ -37,6 +37,11 @@ class Scene():
         self._camera_params = self.Camera.get_params()
         self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
+    def set_autocamera(self,mode='density'):
+        self.Camera.set_autocamera(self._Particles,mode=mode)
+        self._camera_params = self.Camera.get_params()
+        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
+
     def get_scene(self):
         return self.__x, self.__y, self.__hsml, self.__kview
 
