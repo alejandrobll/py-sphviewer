@@ -51,7 +51,7 @@ class Camera():
         axis.add_line(camera, **kargs)
         axis.add_line(arrow, **kargs)
 
-    def set_autocamera(self,Particles, mode='median'):
+    def set_autocamera(self,Particles, mode='density'):
         try:
             particles_name = Particles._name
         except AttributeError:
@@ -72,6 +72,12 @@ class Camera():
             ymean = (ymax+ymin)/2.
             zmean = (zmax+zmin)/2.
             
+        if(mode == 'density'):
+            k = np.argmin(Particles.get_hsml()[:])
+            xmean = Particles.get_pos()[0,k]
+            ymean = Particles.get_pos()[1,k]
+            zmean = Particles.get_pos()[2,k]
+
         if(mode == 'median'):
             xmean = np.median(Particles.get_pos()[0,:])
             ymean = np.median(Particles.get_pos()[1,:])
