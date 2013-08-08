@@ -116,7 +116,11 @@ class Fancy():
                 h,s,v = rgb_to_hsv(self.__image[:,:,0],
                                    self.__image[:,:,1],
                                    self.__image[:,:,2])
-                v = np.log10(v+1.) 
+                
+                self.__k_temp = np.where(v > 0)
+                v[self.__k_temp] = np.log10(v[self.__k_temp])
+                self.__vmin_temp = np.min(v[self.__k_temp])
+                v[self.__k_temp] = (v[self.__k_temp]-self.__vmin_temp)/(-1.0*self.__vmin_temp)
                 self.__image[:,:,0],self.__image[:,:,1],self.__image[:,:,2] = hsv_to_rgb(h,s,v)
                 self.__logscale_flag = True;
                 self.__vmin = np.min(v)
@@ -125,7 +129,8 @@ class Fancy():
                 h,s,v = rgb_to_hsv(self.__image[:,:,0],
                                    self.__image[:,:,1],
                                    self.__image[:,:,2])
-                v = 10**v-1.0 
+                v[self.__k_temp] = v[self.__k_temp]*(-1.0*self.__vmin_temp)+self.__vmin_temp
+                v[self.__k_temp] = 10**v[self.__k_temp]
                 self.__image[:,:,0],self.__image[:,:,1],self.__image[:,:,2] = hsv_to_rgb(h,s,v)
                 self.__logscale_flag = False;
                 self.__vmin = np.min(v)
