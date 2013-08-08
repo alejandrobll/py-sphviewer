@@ -47,7 +47,7 @@ class Fancy():
     def __make_render(self,x,y,t,kview,xsize,ysize):
         n=int(len(x))
         mass = self.Scene._Particles.get_mass()[kview]
-        mass /= np.max(mass)
+#        mass /= np.max(mass)
         try:
             prop1 = self.Scene._Particles.get_prop1()[kview]
             prop2 = self.Scene._Particles.get_prop2()[kview]
