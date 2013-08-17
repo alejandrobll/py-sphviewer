@@ -1,7 +1,7 @@
 from Particles import Particles
 from Camera import Camera
 from Scene import Scene
-import Render
+from Render import Render
 import numpy as np
 import matplotlib.pyplot as plt
 
