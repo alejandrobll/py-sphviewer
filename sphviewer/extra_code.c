@@ -38,7 +38,7 @@ float cubic_kernel3(float r, float h)
   float sigma;
 
   sigma = 15.0/(8.0*3.141592);
-  if(r/h < 1.0)  
+  if(r/h <= 1.0)  
     func = 4.0/3.0*h*pow(sqrt(1.0-(r/h)*(r/h)),3);
   if(r/h > 1.0)  
     func = 0;
