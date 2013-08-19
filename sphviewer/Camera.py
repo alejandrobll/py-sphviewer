@@ -83,6 +83,11 @@ class Camera():
             ymean = np.median(Particles.get_pos()[1,:])
             zmean = np.median(Particles.get_pos()[2,:])
 
+        if(mode == 'mean'):
+            xmean = np.mean(Particles.get_pos()[0,:])
+            ymean = np.mean(Particles.get_pos()[1,:])
+            zmean = np.mean(Particles.get_pos()[2,:])
+
         r = np.sqrt((xmax-xmin)**2+(ymax-ymin)**2+(zmax-zmin)**2)
 
         self.__params = {'x':xmean,'y':ymean,'z':zmean,'r':r,

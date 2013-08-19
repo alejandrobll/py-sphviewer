@@ -20,6 +20,96 @@ def rotate(angle, axis, pos):
 
 class Scene():
     def __init__(self, Particles):
+        """
+        Scene class takes a sphviewer.Particles class and computes the 
+        coordinates of the particles as seen from a Camera. It is to say, 
+        for a given particle, whose coordinates are x,y and z, Scene 
+        computes a new set of coordinates x' and y', which are the aparent 
+        coordinates of the particles as seen from a camera. As Particles 
+        class, Scene has its own getting and setting methods.
+
+        setting methods:
+        ----------------
+
+        - set_autocamera(mode='density'): By default, Scene defines its 
+        own Camera. However, there is no a general way for doing so. Scene 
+        uses a density criterion for getting the point of view. If this is 
+        not a good option for your problem, you can choose among:
+        |'minmax'|'density'|'median'|'mean'|. If None of the previous methods
+        work well, you may define the camera params by yourself.
+
+        - update_camera(**kwarg): By using this method you can define all 
+        the new paramenters of the camera. Read the available **kwarg in 
+        the sphviewer.Camera documentation. 
+
+        getting methods:
+        ----------------
+        - get_scene(): It return the x and y position, the smoothing length 
+        of the particles and the index of the particles that are active in 
+        the scene. In principle this is an internal function and you don't 
+        need this data. 
+
+        - get_extent(): It returns the extent array needed for converting 
+        the image coordinates (given in pixels units) into physical coordinates. 
+        It is an array like the following one: [xmin,xmax,ymin,ymax]; it is to say, 
+        an array that contains the extreme values of the scene. 
+
+        - plot(axis=None, **kwarg): Finally, sphviewer.Scene class has its own plotting method. 
+        It shows the scene as seen by the camera. It is to say, it plots the particles according
+        to their aparent coordinates; axis makes a reference to an existing axis. In case axis is None,
+        the plot is made on the current axis.
+
+         The kwargs are :class:`~matplotlib.lines.Line2D` properties:
+
+        agg_filter: unknown
+        alpha: float (0.0 transparent through 1.0 opaque)         
+        animated: [True | False]         
+        antialiased or aa: [True | False]         
+        axes: an :class:`~matplotlib.axes.Axes` instance         
+        clip_box: a :class:`matplotlib.transforms.Bbox` instance         
+        clip_on: [True | False]         
+        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]         
+        color or c: any matplotlib color         
+        contains: a callable function         
+        dash_capstyle: ['butt' | 'round' | 'projecting']         
+        dash_joinstyle: ['miter' | 'round' | 'bevel']         
+        dashes: sequence of on/off ink in points         
+        data: 2D array (rows are x, y) or two 1D arrays         
+        drawstyle: [ 'default' | 'steps' | 'steps-pre' | 'steps-mid' | 'steps-post' ]         
+        figure: a :class:`matplotlib.figure.Figure` instance         
+        fillstyle: ['full' | 'left' | 'right' | 'bottom' | 'top']         
+        gid: an id string         
+        label: any string         
+        linestyle or ls: [ ``'-'`` | ``'--'`` | ``'-.'`` | ``':'`` | ``'None'`` | ``' '`` | ``''`` ]         and any drawstyle in combination with a linestyle, e.g. ``'steps--'``.         
+        linewidth or lw: float value in points         
+        lod: [True | False]         
+        marker: [ ``7`` | ``4`` | ``5`` | ``6`` | ``'o'`` | ``'D'`` | ``'h'`` | ``'H'`` | ``'_'`` | ``''`` | ``'None'`` | ``' '`` | ``None`` | ``'8'`` | ``'p'`` | ``','`` | ``'+'`` | ``'.'`` | ``'s'`` | ``'*'`` | ``'d'`` | ``3`` | ``0`` | ``1`` | ``2`` | ``'1'`` | ``'3'`` | ``'4'`` | ``'2'`` | ``'v'`` | ``'<'`` | ``'>'`` | ``'^'`` | ``'|'`` | ``'x'`` | ``'$...$'`` | *tuple* | *Nx2 array* ]
+        markeredgecolor or mec: any matplotlib color         
+        markeredgewidth or mew: float value in points         
+        markerfacecolor or mfc: any matplotlib color         
+        markerfacecoloralt or mfcalt: any matplotlib color         
+        markersize or ms: float         
+        markevery: None | integer | (startind, stride)
+        picker: float distance in points or callable pick function         ``fn(artist, event)``         
+        pickradius: float distance in points         
+        rasterized: [True | False | None]         
+        snap: unknown
+        solid_capstyle: ['butt' | 'round' |  'projecting']         
+        solid_joinstyle: ['miter' | 'round' | 'bevel']         
+        transform: a :class:`matplotlib.transforms.Transform` instance         
+        url: a url string         
+        visible: [True | False]         
+        xdata: 1D array         
+        ydata: 1D array         
+        zorder: any number         
+        
+        kwargs *scalex* and *scaley*, if defined, are passed on to
+        :meth:`~matplotlib.axes.Axes.autoscale_view` to determine
+        whether the *x* and *y* axes are autoscaled; the default is
+        *True*.
+        
+        Additional kwargs: hold = [True|False] overrides default hold state
+        """
         try:
             particles_name = Particles._name
         except AttributeError:
