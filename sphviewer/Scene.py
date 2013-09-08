@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from Camera import Camera
 
 def rotate(angle, axis, pos):
     angle *= np.pi/180.0
@@ -19,14 +18,18 @@ def rotate(angle, axis, pos):
     return np.dot(R,pos)
 
 class Scene():
-    def __init__(self, Particles):
+    def __init__(self, Particles, Camera=None):
         """
         Scene class takes a sphviewer.Particles class and computes the 
         coordinates of the particles as seen from a Camera. It is to say, 
         for a given particle, whose coordinates are x,y and z, Scene 
         computes a new set of coordinates x' and y', which are the aparent 
-        coordinates of the particles as seen from a camera. As Particles 
-        class, Scene has its own getting and setting methods.
+        coordinates of the particles as seen from a camera. 
+        By default, Camera=None means that Scene have to use an autocamera. It 
+        will try to define a Camera whose parameters have some sence according
+        to your data set. In case you want to prevent Scene from using an autocamera, 
+        you should provide a valid Camera Class.
+        As Particles class, Scene has its own getting and setting methods.
 
         setting methods:
         ----------------
@@ -47,18 +50,43 @@ class Scene():
         try:
             particles_name = Particles._name
         except AttributeError:
-            print "You must use a valid class..."
+            print "You must use a valid Particles class..."
             return
         if(particles_name != 'PARTICLES'):
-            print "You must use a valid class..."
+            print "You must use a valid Particles class..."
             return
 
         self._name = 'SCENE'
-        self.Camera = Camera()
         self._Particles = Particles
+
         #I use the autocamera by default
-        self.Camera.set_autocamera(Particles)
-        self._camera_params = self.Camera.get_params()
+        if(Camera==None):
+            from Camera import Camera
+            self.Camera = Camera()
+            self.Camera.set_autocamera(Particles)
+            self._camera_params = self.Camera.get_params()
+
+        else:
+            try: 
+                camera_name = Camera._name
+                if(camera_name != 'CAMERA'):
+                    print "You must use a valid Camera class..."
+                    print "I will try to set an autocamera..."
+                    from Camera import Camera
+                    self.Camera = Camera()
+                    self.Camera.set_autocamera(Particles)
+                    self._camera_params = self.Camera.get_params()
+                else:
+                    self.Camera = Camera
+                    self._camera_params = self.Camera.get_params()
+            except AttributeError:
+                print "You must use a valid Camera class..."
+                print "I will try to set an autocamera..."
+                from Camera import Camera
+                self.Camera = Camera()
+                self.Camera.set_autocamera(Particles)
+                self._camera_params = self.Camera.get_params()
+
         self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def set_autocamera(self,mode='density'):
