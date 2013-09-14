@@ -15,7 +15,16 @@ The current release (v0.88) is structured as a package. There are different modu
 
 sphviewer is divided in 4 different classes, which are represented in the following diagram:
 
-http://py-sphviewer.googlecode.com/svn/wiki/figures/sphviewer_scheme.svg
+http://py-sphviewer.googlecode.com/svn/wiki/figures/sphviewer_scheme.png
+
+  # *sphviewer.Particles:* is the main class which stores the particles information and computes some of their properties which will be used later for making the image. 
+  # *sphviewer.Camera:* is the main class which defines the parameters of the camera. 
+  # *sphviewer.Scene:* Scene is the class that defines the link between the particles and the camera. In other words, it computes the Scene as seen from the camera point of view. 
+  # *sphviewer.Render:* Render is the class that makes the final render. It takes the Scene and take a photo, which can be used later for making a movie.  
+
+With this structure in mind we are going to make an image of a set of particles.
+
+
 
 
 = Details =
