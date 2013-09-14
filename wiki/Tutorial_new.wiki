@@ -15,6 +15,7 @@ The current release (v0.88) is structured as a package. There are different modu
 
 sphviewer is divided in 4 different classes, which are represented in the following diagram:
 
+http://py-sphviewer.googlecode.com/svn/wiki/figures/sphviewer_scheme.svg
 
 
 = Details =
