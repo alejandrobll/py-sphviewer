@@ -73,17 +73,58 @@ mass = np.ones(n1+n2)
 
 Our goal is to render the particles with sphviewer. We are going to go through the steps faster; after that we will explain in more detail different features and details from each class we use. 
 
-Steps for making a plot in sphviewer are basically 4:
+Steps for making a plot in sphviewer are basically 3:
 
-  # Define the *Particles* of the Scene:
+  * Define the *Particles* of the Scene:
 
 {{{
 Particles = sphviewer.Particles(x,y,z,mass)
 }}}
 
+  * Define the *Scene* itself:
+
+{{{
+Scene = sphviewer.Scene(Particles)
+}}}
+
+  * *Render* the Scene:
+
+{{{
+Render = sphviewer.Render(Scene)
+}}}
+
+And this is everything you need to know for making a nice image :).
+If we want to look at the final image we can use the set_image method from Render:
+
+{{{
+img = Render.get_image()
+plt.show(img, origin='lower')
+}}}
 
 
+http://py-sphviewer.googlecode.com/svn/wiki/figures/first_image.png
 
+Mmmm, we have to say that it does not look very well. What's going on? sphviewer have different tools that can help us to understand why the image does not look like as we expect. Because I think you are expecting results faster, I will give the recipe for getting a nice image from our Scene and after that I will stop in the details:
+Let's improve the render:
+
+{{{
+Scene = sphviewer.Scene(Particles)
+Scene.update_camera(r='infinity')
+Render = sphviewer.Render(Scene)
+Render.set_logscale()
+img = Render.get_image()
+extent = Render.get_extent()
+plt.imshow(img, origin='lower',vmax=0.3, extent=extent)
+}}}
+
+http://py-sphviewer.googlecode.com/svn/wiki/figures/second_image.png
+
+Which in my opinion is a pretty nice image. 
+
+Now we are going to pay attention to the different steps we made in order to fully understand the structure of sphviewer and to know what we can do with it.
+
+= sphviewer.Particles = 
+ 
 = Details =
 
 Add your content here.  Format your content with:
