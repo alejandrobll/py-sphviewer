@@ -7,6 +7,14 @@ I will assume that you have downloaded the package and everything is working wel
 Please, be aware that in order for sphviewer to work, your system must have installed matplotlib, numpy, multiprocessing and scipy. 
 
 
+= Structure of sphviewer=
+
+Attending suggestions from Pablo Benitez Llambay, I modified completely the structure of sphviewer since the previous release (v 0.45). Please, do not use that version because it is deprecated and it will be not longer maintained anymore. 
+
+The current release (v0.88) is structured as a package. There are different modules stores in a main directory. I think in this way it will be easier to maintain and to develop different branches in case it is necessary. 
+
+
+
 = Details =
 
 Add your content here.  Format your content with:
