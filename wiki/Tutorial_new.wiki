@@ -31,22 +31,23 @@ In order to understand how sphviewer works, let's make a disk with a radial dens
 {{{
 import numpy as np
 import matplotlib.pyplot as plt
-import sphviewer as sph
+import sphviewer
 }}}
 
-Let's make a disk with a radial density profile :
+Let's make a disk with a radial density profile embedded in an uniform density medium:
 
 {{{
-n   = 10000
-r   = np.random.rand(n)
-phi = 2*np.pi*np.random.rand(n)
+n1   = 10000
+n2   = n1/3
+r   = np.random.rand(n1)
+phi = 2*np.pi*np.random.rand(n1)
 x1 = r*np.cos(phi)
 y1 = r*np.sin(phi)
-z1  = 0.1*np.random.rand(n)
+z1  = 0.1*np.random.rand(n1)
 
-x2 = -2+4*np.random.rand(n/3)
-y2 = -2+4*np.random.rand(n/3)
-z2 = -2+4*np.random.rand(n/3)
+x2 = -2+4*np.random.rand(n2)
+y2 = -2+4*np.random.rand(n2)
+z2 = -2+4*np.random.rand(n2)
 
 x = np.append(x1, x2)
 y = np.append(y1, y2)
@@ -61,8 +62,26 @@ plt.xlim(-1,1)
 plt.ylim(-1,1)
 }}}
 
-
 http://py-sphviewer.googlecode.com/svn/wiki/figures/disk_particles.png
+
+Before continue, we have to assume some mass for the particles. We will assume that all particles have the same mass:
+
+{{{
+mass = np.ones(n1+n2)
+}}}
+
+
+Our goal is to render the particles with sphviewer. We are going to go through the steps faster; after that we will explain in more detail different features and details from each class we use. 
+
+Steps for making a plot in sphviewer are basically 4:
+
+  # Define the *Particles* of the Scene:
+
+{{{
+Particles = sphviewer.Particles(x,y,z,mass)
+}}}
+
+
 
 
 = Details =
