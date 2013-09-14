@@ -1,5 +1,9 @@
 #summary One-sentence summary of this page.
 
+= WARNING =
+
+This Tutorial is deprecated. It does not match with the last release of PySPHViewer. The package had significant changes!! We are working in the new tutorial and it will be available soon.
+
 = Introduction =
 
 With this project I would like to start an useful tool for people that need to make nice smoothed particles plots on Python. In particular, I am interested in making nice renders of SPH simulations of galaxy formation. If you are interested in understanding how the code works, please take a look at the code itself. If you are not, I think the best way to learn how Py-SPHViewer works is by looking at an example:
