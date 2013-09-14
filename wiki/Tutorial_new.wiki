@@ -24,8 +24,15 @@ http://py-sphviewer.googlecode.com/svn/wiki/figures/sphviewer_scheme.png
 
 With this structure in mind we are going to make an image of a set of particles.
 
+= How to use SPHViewer=
 
+In order to understand how sphviewer works, let's make a disk with a radial density profile. We are going to use 10000 particles. In the next example we are going to use numpy, matplotlib and (of course) sphviewer:  
 
+{{{
+import numpy as np
+import matplotlib.pyplot as plt
+import sphviewer as sph
+}}}
 
 = Details =
 
