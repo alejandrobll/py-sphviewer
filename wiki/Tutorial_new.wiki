@@ -34,6 +34,28 @@ import matplotlib.pyplot as plt
 import sphviewer as sph
 }}}
 
+Let's make a disk with a radial density profile:
+
+{{{
+n   = 10000
+r   = np.random.rand(n)
+phi = 2*np.pi*np.random.rand(n)
+x   = r*np.cos(phi)
+y   = r*np.sin(phi)
+z   = 0.1*np.random.rand(n)
+}}}
+
+We can check how the distribution looks like:
+
+{{{
+plt.plot(x,y,'k.')
+plt.xlim(-1,1)
+plt.ylim(-1,1)
+}}}
+
+
+http://py-sphviewer.googlecode.com/svn/wiki/figures/disk_particles.png
+
 = Details =
 
 Add your content here.  Format your content with:
