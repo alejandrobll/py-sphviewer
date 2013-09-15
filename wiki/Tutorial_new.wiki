@@ -155,10 +155,11 @@ Finally, in many situations we will be interested in looking the particles store
 
   * plot('plane', axis=None, *kwargs)
 
-where 'plane' is a reference to the 'xy', 'xz' or 'yz' projection and axis let us define the axis where we are going to plot the particles. 
-The kwargs are _matplotlib.lines.Line2D_ properties:
+where 'plane' is a reference to the 'xy', 'xz' or 'yz' projection and axis allow us to define the axis where we are going to plot the particles. Kwargs are _matplotlib.lines.Line2D_ properties and are useful for changing the appearance of the plot. 
 
 = sphviewer.Scene =
+
+The second object we defined above was the Scene. As the previous diagram shows, Scene object is a set made of Particles and a Camera which is looking at some point in the space. 
 
 = Details =
 Add your content here.  Format your content with:
