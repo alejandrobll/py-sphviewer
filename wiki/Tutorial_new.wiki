@@ -212,6 +212,17 @@ Finally, because the choice of the right dynamic range for the image can be diff
 
 
 
+= sphviewer.Camera =
+
+In most cases you don't need to define ant *Camera* class. I recommend you let the *Scene* take care of it. However, once *Scene* defines its own *Camera*, you will need to check its parameters and eventually to change some of them. The parameters of the Camera are basically the following ones:
+
+
+|| *Parameter* || *Function* ||
+||  x,y,z   || position at which the camera points out ||
+||  r          || distance of camera from the (x,y,z) point. ||
+||  t, p || spherical angles to define the position of the camera. ||
+||  zoom || Zoom of the camera. zoom is 1 by default and defines a Field of View (FOV) = 90º. Note that the only way for changing the FOV by setting this parameter. ||
+|| xsize,ysize    || Number of pixels of the resulting image. With this paremeter you can set the "Mpx" of your camera. Note that the higher the resolution, the higher the processing time. ||
 
 
 = Details =
