@@ -151,10 +151,16 @@ On the other hand, the getting methods are useful for getting some information f
   * get_hsml()
   * get_nb() 
 
+Finally, in many situations we will be interested in looking the particles stored in the object without getting them. It can be done easily by using the _plot_ method:
 
+  * plot('plane', axis=None, *kwargs)
+
+where 'plane' is a reference to the 'xy', 'xz' or 'yz' projection and axis let us define the axis where we are going to plot the particles. 
+The kwargs are _matplotlib.lines.Line2D_ properties:
+
+= sphviewer.Scene =
 
 = Details =
-
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
   * Headings, paragraphs, and lists
