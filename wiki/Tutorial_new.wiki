@@ -169,10 +169,20 @@ As the diagram of the structure of sphviewer shows, *Scene* object groups the *P
 
 *Scene* class has different methods. We will summarize each one in the following:
 
-  * Scene.set_autocamera(mode='density'): This method allow to change the mode that the autocamera uses in order to find the center of the image. By default autocamera uses a density criteria. It computes the density of the *Particles* and uses the position of the particles where the maximum is reached. It works very well when you have *Particles* with a radial density profile such us a dark matter halo or a galaxy. In cases you have a set of Particles without a clear density profile increasing towards the center, there are others modes like 'minmax', 'mean' or 'median'. 
+  * Scene.set_autocamera(mode='density'): This method allows to change the mode that the autocamera uses in order to find the center of the image. By default autocamera uses a density criteria. It computes the density of the *Particles* and uses the position of the particles where the maximum is reached. It works very well when you have *Particles* with a radial density profile such us a dark matter halo or a galaxy. In cases you have a set of Particles without a clear density profile increasing towards the center, there are others modes like 'minmax', 'mean' or 'median'. Of course, in many situation you will be not happy with the results of an autocamera. In such a cases, you have to define the parameters of the camera that need to be corrected. It can be done with the method:
+
+ * Scene.update_camera(**kargs): When you think you are not happy with some parameter of the *Camera*, you can change it with this method. **kargs are parameters of the *_sphviewer.Camera_* class. We will explain them in more detail after.
 
 
+As *Particles*, *Scene* has their own getting methods. They are:
 
+  * Scene.get_extent: It returns the extent array needed for converting 
+the coordinates of the image (given in pixel units) into physical coordinates. It is an array like the following one:[xmin,xmax,ymin,ymax]; it is to say, an array containing the extreme values of the scene. It is very useful when you use *_matplotlib.imshow_* for plotting the resulting image after render the *Scene*.
+
+  * Scene.get_scene: After making the Scene, the coordinates of the *Particles* are projected according to the position of the *Camera*. This method return the x and y positions, the smoothing lengths and the index of the particles that are active in the *Scene*. In principle this is an internal function that sphviewer needs. In most cases you don't need this data. However, you may often wish to see the Scene before render it. For doing so you don't need to get the data from the Scene. Scene has its own *plotting* method.
+
+  * Scene.plot(axis=None, **kargs): This methods is similar to the plotting method from *Particles*. It plots in the selected axis the projected positions of your set of Particles. Sometimes it is better to see the Scene after render. It ensures us that everything is going as we expect.
+ 
 
 
 = Details =
