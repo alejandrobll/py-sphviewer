@@ -125,6 +125,34 @@ Now we are going to pay attention to the different steps we made in order to ful
 
 = sphviewer.Particles = 
  
+As we noted before, the *Particles* class stores the particles information that sphviewer need in order to define the Scene. The parameters of this class are:
+
+*_sphviewer.Particles(self, xpos, ypos, zpos, mass, hsml=None, nb=32, verbose=False)_*
+
+_xpos_,_ypos_,_zpos_ and _mass_ do not need explanation because we already saw what they actually are. Regarding _hsml_ and _nb_, they are optional parameters but they are needed in the internal structure of sphviewer. _hsml_ is an array that stores the smoothing lengths of the particles. Smoothing lengths are used in order to determine the contribution of each particle to the density field. There are different techniques for defining this quantity but we define it as the distance to the closer _nb_ neighbor. It is to say, in case _nb_ is 32, the smoothing lengths for each particles will be the distance to its 32 closer neighbor. 
+There are many situations where you know the smoothing lengths of your particles. In such a case, all you have to do is to provide the array with the hsml. Nevertheless, in many situations we don't know the value of the _hsml_. In fact, in the previouse example we didn't know it and we left the _hsml_ as none. Particles class will compute the hsml by itself searching the distance to the closer _nb_ neighbor (which is 32 by default) as far as you left _hsml_ as None. 
+
+*Be aware that the computation of the smoothing lengths for a huge amount of particles may be very expensive*
+
+
+Particles object has its own methods for making life easier.
+
+They can be divided into setting methods ans getting methods. Setting methods are useful for setting some property we forgot at the time where we made the object, or for changing the data stored in the object. They are:
+
+  * set_pos()
+  * set_mass()
+  * set_hsml()
+  * set_nb() 
+
+On the other hand, the getting methods are useful for getting some information from the object, like the smoothing lengths in case we want to save them. They are:
+
+  * get_pos()
+  * get_mass()
+  * get_hsml()
+  * get_nb() 
+
+
+
 = Details =
 
 Add your content here.  Format your content with:
