@@ -165,7 +165,13 @@ The second object we defined in the previous example was the *Scene*. The parame
 
 *_sphviewer.Scene(Particles, Camera=None)_*
 
-As the diagram of the structure of sphviewer shows, *Scene* object groups the *Particles* and the *Camera*. You may remember that we didn't define any *Camera* in in the previous example. In general, defining a *Camera* involves the knowledge of the point at which you want to look and the distance of the Camera to that point. Defining it at first time may be annoying for most user, so Scene have their own methods for setting the parameters of the *Camera*.  
+As the diagram of the structure of sphviewer shows, *Scene* object groups the *Particles* and the *Camera*. You may remember that we didn't define any *Camera* in in the previous example. In general, defining a *Camera* involves the knowledge of the point at which you want to look and the distance of the Camera to that point. Defining it at the first time may be annoying for most user, so *Scene* have their own methods for setting the parameters of the *Camera*. In case you don't want to use an autocamera you have to provide a *Camera* object after the *Particles*. We will explain the *Camera* object after.
+
+*Scene* class has different methods. We will summarize each one in the following:
+
+  * Scene.set_autocamera(mode='density'): This method allow to change the mode that the autocamera uses in order to find the center of the image. By default autocamera uses a density criteria. It computes the density of the *Particles* and uses the position of the particles where the maximum is reached. It works very well when you have *Particles* with a radial density profile such us a dark matter halo or a galaxy. In cases you have a set of Particles without a clear density profile increasing towards the center, there are others modes like 'minmax', 'mean' or 'median'. 
+
+
 
 
 
