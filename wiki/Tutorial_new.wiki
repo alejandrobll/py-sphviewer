@@ -2,7 +2,7 @@
 
 = Introduction =
 
-I will assume that you have downloaded the package and everything is working well in your computer. I will also assume that you have usually work on Python. 
+I will assume that you have downloaded the package and everything is working well in your computer. I will also assume that you usually work on Python. 
 
 Please, be aware that in order for sphviewer to work, your system must have installed matplotlib, numpy, multiprocessing and scipy. 
 
