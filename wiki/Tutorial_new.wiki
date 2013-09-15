@@ -199,6 +199,21 @@ and setting methods:
 
   * set_logscale(): This method applies a logarithm scale to the image. It is to say, if M is the matrix of the image, after using this method, the *get_image* methods will return the image M as log10(M+1).
 
+
+There is a method for saving the image directly to different formats, like *png*, *pdf*, *ps*, etc. This method is:
+
+  * save(outputfile, **kargs): save allows to save the image in any of the common image formats. It uses the pyplot.save method. 
+outputfile is a string containing a path to a filename, of a Python file-like object. If *format* is *None* and *fname* is a string, the output format is deduced from the extension of the filename. 
+
+Finally, because the choice of the right dynamic range for the image can be difficult sometimes, there is a method for plotting the histogram of the image. It can help us to decide which range from the image is better to show:
+
+  * histogram(axis=None, **kargs): It computes and shows the histogram of the image in the selected axis. **kargs are keyboard arguments from matplotlib.pylab.histogram().
+
+
+
+
+
+
 = Details =
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_
