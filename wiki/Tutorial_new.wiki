@@ -236,6 +236,27 @@ and there are two setting methods:
 
   *set_autocamera(): This method allows to get all the parameters of the *Camera* automatically. The disadvantage is that it must be fed with a *Particle* object.   
 
+Finally, there is a final feature that can help you in many situations. Many times we have the need to know the position of the *Camera* respect to our input set of *Particles*. This can be useful when we are want to make a movie showing a flyby and we need to plan the path of the Camera. In order to help the user to do that, *Camera* has its own plotting method. 
+
+  *plot(plane='xy', axis=None, **kargs): This method allows the user to plot the camera as seen in the projection of the input data. Parameters are the same that sphviewer.Particles.plot().
+
+In order to show how does it work, let's take the previous example and let's use the plot method:
+
+{{{
+fig = plt.figure(1,figsize=(15,5))
+plane = ['xy','xz','yz']
+
+for i in xrange(3):
+    ax = fig.add_subplot(1,3,i)
+    Particles.plot(plane[i], axis=ax, markersize=0.5)
+    Scene.update_camera(r=1.5)
+    Scene.Camera.plot(plane[i], axis=ax)
+plt.show()
+}}}
+
+
+http://py-sphviewer.googlecode.com/svn/wiki/figures/camera.png
+
 
 = Details =
 Add your content here.  Format your content with:
