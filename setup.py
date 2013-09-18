@@ -1,8 +1,8 @@
 from distutils.core import setup
 
-setup(name='Py-SPHViewer',
-      version='0.86',
-      description='Framework for rendering images using the SPH scheme.',
+setup(name='py-sphviewer',
+      version='0.88',
+      description='Py-SPHViewer is a framework for rendering particles using the smoothed particle hydrodynamics scheme.',
       author='Alejandro Benitez Llambay',
       author_email='alejandrobll@oac.uncor.edu',
       url='https://code.google.com/p/py-sphviewer/',
@@ -10,11 +10,12 @@ setup(name='Py-SPHViewer',
       package_data={'sphviewer': ['*.c','*.txt']},
       license='GNU GPL v3',
       classifiers=[
-            "Intended Audience :: Science/Research",
-            "License :: GNU GPL v3",
-            "Topic :: Scientific/Engineering :: Astronomy",
-            "Topic :: Scientific/Engineering :: Visualization",
-            "Topic :: Scientific/Engineering :: Rendering"
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Multimedia :: Graphics',
+        'Topic :: Multimedia :: Graphics :: 3D Rendering',
+        'Topic :: Multimedia :: Graphics :: Viewers',
+        'Topic :: Scientific/Engineering :: Visualization',
+        'Topic :: Utilities'
             ],
       keywords="smoothed particle hydrodynamics render particles nbody galaxy formation dark matter sph cosmology movies",      
      )
