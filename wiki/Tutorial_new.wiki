@@ -98,7 +98,7 @@ If we want to look at the final image we can use the set_image method from Rende
 
 {{{
 img = Render.get_image()
-plt.show(img, origin='lower')
+plt.imshow(img, origin='lower')
 }}}
 
 
