@@ -1,7 +1,3 @@
-int i, j, k, l;
-int xx, yy;
-int tt; 
-float mass_c;
 int xsize_c, ysize_c;
 int size_lim;
 
@@ -11,29 +7,71 @@ ysize_c = ysize;
 if(xsize_c >= ysize_c) size_lim = xsize_c;
 if(xsize_c < ysize_c)  size_lim = ysize_c;
 
-#pragma omp parallel for private(i,xx,yy,tt,mass_c,j,k)
-#pragma omp+ reduction(+:image)
-#pragma omp schedule(dynamic,1000)
-for(i=0;i<n;i++){
-  xx = (int)x(i);
-  yy = (int)y(i);
-  tt = (int)t(i);
-  mass_c = (float) mass(i);
+#pragma omp parallel
+{
+  float* local_image;
+  int i, j, k, l;
+  int xx, yy;
+  int tt; 
+  float mass_c;
+  int r, nth, ppt, thread_id;
 
-  if(tt < 1) tt = 1;
-  if(tt > size_lim) tt = size_lim;
+  nth = omp_get_num_threads(); 
+  thread_id = omp_get_thread_num();
+  ppt = n/nth;      // Number or Particles per thread (ppt)
+  r = n-ppt*nth;    // Remainder
+  /*  if(thread_id == 0){
+    printf("Numero de threads = %d\n", nth);
+    printf("Numero de particulas por thread = %d\t%d\n", ppt,r);
+    }*/
+  // Let's compute the image
+  local_image = (float*)malloc(xsize_c*ysize_c*sizeof(float));
+  for(i=0;i<xsize_c*ysize_c;i++){
+    local_image[i] = 0.0;
+      }
 
-//  if(tt == 1){
-//    image(yy,xx) = mass_c;
-//  }
-//  if(tt > 1){
+    for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+      xx = (int)x(i);
+      yy = (int)y(i);
+      tt = (int)t(i);
+      mass_c = (float) mass(i);
+
+      if(tt < 1) tt = 1;
+      if(tt > size_lim) tt = size_lim;
+
+      for(j=-tt; j<tt+1; j++){
+	for(k=-tt; k<tt+1; k++){
+	  if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
+	    local_image[(yy+k)+xsize_c*(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	  }
+	}
+      }
+    }
+   
+  // Let's compute the image for the remainder particles...
+  if((r-thread_id) >= 0){
+    xx = (int)x(i);
+    yy = (int)y(i);
+    tt = (int)t(i);
+    mass_c = (float) mass(i);
+
+    if(tt < 1) tt = 1;
+    if(tt > size_lim) tt = size_lim;
+
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
-	  image(yy+k,xx+j) += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	  local_image[(yy+k)+xsize_c*(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 	}
       }
-//    }
+    }
   }
- }
-
+  #pragma omp critical
+  {
+    for(j=0;j<xsize_c;j++){
+      for(k=0;k<ysize_c;k++){
+	image(j,k) += local_image[k+xsize_c*j];
+      }
+    }
+  }
+}
