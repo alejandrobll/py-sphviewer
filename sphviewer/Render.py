@@ -78,7 +78,7 @@ class Render():
                      support_code=extra_code,
                      type_converters=converters.blitz,
                      compiler='gcc',
-                     headers=["<omp.h>"]
+                     headers=["<omp.h>"],
                      extra_compile_args=[' -O3 -fopenmp'],
                      extra_link_args=['-lgomp'])
         return image 
