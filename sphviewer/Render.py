@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import colorsys
-import Image
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
