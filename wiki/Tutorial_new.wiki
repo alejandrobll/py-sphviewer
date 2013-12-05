@@ -137,7 +137,7 @@ There are many situations where you know the smoothing lengths of your particles
 
 Particles object has its own methods for making life easier.
 
-They can be divided into setting methods and getting methods. Setting methods are useful for setting some property we forgot at the time where we define the object or for changing the data stored in the object. They are:
+They can be divided into setting methods and getting methods. Setting methods are useful for setting some property we forgot at the time when we define the object or for changing the data stored in the object. They are:
 
   * set_pos()
   * set_mass()
