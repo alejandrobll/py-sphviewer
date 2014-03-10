@@ -70,7 +70,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
   {
     for(j=0;j<xsize_c;j++){
       for(k=0;k<ysize_c;k++){
-	image(j,k) += local_image[k+xsize_c*j];
+	image(k,j) += local_image[k+xsize_c*j];
       }
     }
   }

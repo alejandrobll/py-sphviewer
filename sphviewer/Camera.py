@@ -4,11 +4,11 @@ import matplotlib.pylab as plt
 class Camera():
     def __init__(self, x = None, y = None, z = None, r = None, 
                  t = None, p = None, zoom  = None, 
-                 xsize = None, ysize = None):
+                 xsize = None, ysize = None, extent = None):
         self._name = 'CAMERA'        
         self.__params = {'x':x,'y':y,'z':z,'r':r,
                          't':t,'p':p,'zoom':zoom,
-                         'xsize':xsize, 'ysize':ysize}
+                         'xsize':xsize, 'ysize':ysize, 'extent':extent}
 
     def get_params(self):
         return self.__params
@@ -51,7 +51,7 @@ class Camera():
         axis.add_line(camera, **kargs)
         axis.add_line(arrow, **kargs)
 
-    def set_autocamera(self,Particles, mode='density'):
+    def set_autocamera(self,Particles, mode='minmax'):
         try:
             particles_name = Particles._name
         except AttributeError:
@@ -92,4 +92,4 @@ class Camera():
 
         self.__params = {'x':xmean,'y':ymean,'z':zmean,'r':r,
                          't':0,'p':0,'zoom':1,
-                         'xsize':500, 'ysize':500}
+                         'xsize':500, 'ysize':500, 'extent':None}
