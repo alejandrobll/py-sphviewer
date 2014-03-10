@@ -157,10 +157,10 @@ class Scene():
                     xmin = ymin = lmin
                     xmax = ymax = ymax
                 else:
-                    xmin = extent[0]
-                    xmax = extent[1]
-                    ymin = extent[2]
-                    ymax = extent[3]
+                    xmin = float(extent[0])
+                    xmax = float(extent[1])
+                    ymin = float(extent[2])
+                    ymax = float(extent[3])
 
 
                 self.__extent = np.array([xmin+self._camera_params['x'],
