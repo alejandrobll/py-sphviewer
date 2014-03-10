@@ -5,9 +5,7 @@ from multiprocessing import Manager
 from scipy.spatial import cKDTree
 
 class Particles():
-    def __init__(self, xpos,
-                 ypos,
-                 zpos,
+    def __init__(self, pos,
                  mass = None,
                  hsml = None,
                  nb = 32,
@@ -100,8 +98,8 @@ class Particles():
 
         
         self._name = 'PARTICLES'
-        self.__pos  = np.array([xpos,ypos,zpos],dtype=np.float32)
-        self.__mass = np.array(mass,dtype=np.float32)
+        self.__pos  = pos
+        self.__mass = mass
         self.__nb   = nb
         self.__verbose = verbose
 
