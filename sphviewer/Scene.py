@@ -142,31 +142,45 @@ class Scene():
         if self._camera_params['p'] != 0:
             pos = rotate(self._camera_params['p'],'y',pos)
 
-        if(self._camera_params['r'] == 'infinity'):                
-            xmax = np.max(pos[0,:])
-            xmin = np.min(pos[0,:])
-            ymax = np.max(pos[1,:])
-            ymin = np.min(pos[1,:])
+        if(self._camera_params['r'] == 'infinity'):
+            try:
+                extent = self._camera_params['extent']
+                if(extent == None):
+                    xmax = np.max(pos[0,:])
+                    xmin = np.min(pos[0,:])
+                    ymax = np.max(pos[1,:])
+                    ymin = np.min(pos[1,:])
 
-            lmax = max(xmax,ymax)
-            lmin = min(ymax,ymin)
+                    lmax = max(xmax,ymax)
+                    lmin = min(ymax,ymin)
 
-            xmin = ymin = lmin
-            xmax = ymax = ymax
+                    xmin = ymin = lmin
+                    xmax = ymax = ymax
+                else:
+                    xmin = extent[0]
+                    xmax = extent[1]
+                    ymin = extent[2]
+                    ymax = extent[3]
 
-            self.__extent = np.array([xmin+self._camera_params['x'],
-                                      xmax+self._camera_params['x'],
-                                      ymin+self._camera_params['y'],
-                                      ymax+self._camera_params['y']])
 
-#            self.__extent = np.array([xmin,xmax,ymin,ymax])
-            lbin = 2*xmax/self._camera_params['xsize']
-                   
-            pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
-            pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
-            hsml = self._Particles.get_hsml()/lbin
-            kview = np.arange(np.size(hsml))
+                self.__extent = np.array([xmin+self._camera_params['x'],
+                                          xmax+self._camera_params['x'],
+                                          ymin+self._camera_params['y'],
+                                          ymax+self._camera_params['y']])
 
+                lbin = 2*xmax/self._camera_params['xsize']
+
+                kview, = np.where( (pos[0,:] > xmin) & (pos[0,:] < xmax) &
+                                   (pos[1,:] > ymin) & (pos[1,:] < ymax) )
+                
+                pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
+                pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
+                hsml = self._Particles.get_hsml()/lbin
+            
+            except AttributeError:
+                print "There was an error with the extent of the Camera"
+                return
+                    
             return pos[0,:], pos[1,:], hsml, kview
 
         else:
