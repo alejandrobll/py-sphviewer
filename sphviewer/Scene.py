@@ -172,7 +172,10 @@ class Scene():
 
                 kview, = np.where( (pos[0,:] > xmin) & (pos[0,:] < xmax) &
                                    (pos[1,:] > ymin) & (pos[1,:] < ymax) )
-                
+
+                pos   = pos[:,kview]
+                hsml  = self._Particles.get_hsml()[kview]
+
                 pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
                 pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
                 hsml = self._Particles.get_hsml()/lbin
