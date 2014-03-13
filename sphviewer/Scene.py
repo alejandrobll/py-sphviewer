@@ -174,11 +174,10 @@ class Scene():
                                    (pos[1,:] > ymin) & (pos[1,:] < ymax) )
 
                 pos   = pos[:,kview]
-                hsml  = self._Particles.get_hsml()[kview]
+                hsml  = self._Particles.get_hsml()[kview]/lbin
 
                 pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
                 pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
-                hsml = self._Particles.get_hsml()/lbin
             
             except AttributeError:
                 print "There was an error with the extent of the Camera"
