@@ -73,5 +73,6 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
 	image(k,j) += local_image[k+xsize_c*j];
       }
     }
+    free(local_image);
   }
 }
