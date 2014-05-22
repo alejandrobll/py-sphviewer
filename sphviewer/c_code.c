@@ -26,9 +26,12 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
     }*/
   // Let's compute the image
   local_image = (float*)malloc(xsize_c*ysize_c*sizeof(float));
-  for(i=0;i<xsize_c*ysize_c;i++){
-    local_image[i] = 0.0;
-      }
+
+  for(j=0;j<xsize_c;j++){
+    for(k=0;k<ysize_c;k++){
+      local_image[k+xsize_c*j] = 0.0;
+    }
+  }
 
     for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
       xx = (int)x(i);
