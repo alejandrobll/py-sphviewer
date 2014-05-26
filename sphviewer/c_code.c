@@ -29,7 +29,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
 
   for(j=0;j<xsize_c;j++){
     for(k=0;k<ysize_c;k++){
-      local_image[k+xsize_c*j] = 0.0;
+      local_image[k*xsize_c+j] = 0.0;
     }
   }
 
@@ -45,7 +45,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
       for(j=-tt; j<tt+1; j++){
 	for(k=-tt; k<tt+1; k++){
 	  if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
-	    local_image[(yy+k)+xsize_c*(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	    local_image[(yy+k)*xsize_c+(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 	  }
 	}
       }
@@ -65,7 +65,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize_c) && ( (yy+k) >=0) && ( (yy+k) < ysize_c)){
-	  local_image[(yy+k)+xsize_c*(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	  local_image[(yy+k)*xsize_c+(xx+j)] += mass_c*cubic_kernel3(sqrt((float)j*(float)j+(float)k*(float)k), tt);
 	}
       }
     }
@@ -74,7 +74,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
   {
     for(j=0;j<xsize_c;j++){
       for(k=0;k<ysize_c;k++){
-	image(k,j) += local_image[k+xsize_c*j];
+	image(k,j) += local_image[k*xsize_c+j];
       }
     }
     free(local_image);
