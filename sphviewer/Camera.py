@@ -18,7 +18,7 @@ class Camera():
                 self.__params[key] = kargs[key]
 
     def _get_camera(self,plane, **kargs):
-        x0 = self.__params['r']*(np.sin(self.__params['p']*np.pi/180.)*
+        x0 = -self.__params['r']*(np.sin(self.__params['p']*np.pi/180.)*
                                  np.cos(self.__params['t']*np.pi/180.))
         z0 = self.__params['r']*(np.cos(self.__params['p']*np.pi/180.)*
                                 np.cos(self.__params['t']*np.pi/180.))
