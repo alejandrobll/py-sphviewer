@@ -141,6 +141,8 @@ class Scene():
             pos = rotate(self._camera_params['t'],'x',pos)
         if self._camera_params['p'] != 0:
             pos = rotate(self._camera_params['p'],'y',pos)
+        if self._camera_params['roll'] != 0:
+            pos = rotate(self._camera_params['roll'],'z',pos)
 
         if(self._camera_params['r'] == 'infinity'):
             try:
