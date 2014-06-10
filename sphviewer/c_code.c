@@ -53,7 +53,7 @@ if(xsize_c < ysize_c)  size_lim = ysize_c;
    
   // Let's compute the image for the remainder particles...
   if((r-thread_id) > 0){
-    i  = nth*ppt+thread_id+1;
+    i  = nth*ppt+thread_id;
     xx = (int)x(i);
     yy = (int)y(i);
     tt = (int)t(i);
