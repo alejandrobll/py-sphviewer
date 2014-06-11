@@ -11,89 +11,50 @@ class Particles():
                  nb = 32,
                  verbose = False):
         """
-        This class allows to load all relevant particles properties.
-        If positions "xpos", "ypos" and "zpos" are given, this class
-        computes the smoothing lenghts of each particle by using the
-        distance to the "nb" neighbor. By default nb=32. 
-
-        Note that once you have created a Particle object, you don't
-        need to define it again in case you want to change some property.
-        Particles class has its own method for setting and/or getting
-        the properties of the particles:
-
-        Setting method are:
-
-        - set_pos()
-        - set_mass()
-        - set_hsml()
-        - set_nb()
-
-        Getting methods are:
+        Particles class is the first class that must be instantiated 
+        in order to render an image with Py-SPHViewer. 
+        It allows to load all the particles as well as all 
+        their relevant properties, which will be used later for rendering them. 
         
-        - get_pos()
-        - get_mass()
-        - get_hsml()
-        - get_nb()
+        Particles takes as arguments the position of the particles, and their masses
+        and smoothing lenghts as optional parameters. 
+        
+        Positions of the particles must be given using an array *pos* of shape [3,n], in which
+        n is the number of particles, and x = pos[0,:], y = pos[1,:] and z = pos[2,:]. 
+        
+        If mass and hsml are not given, Particles class assumes that particles have all the same mass=1.
+        The smoothing length of each particle is computed using the distance to the "nb" neighbor. By default nb=32. 
+
+        Note that once you have created an instance of Particle, it is not necessary
+        to instantiate it again in case you want to change some property. 
+        Particles class has its own method for setting and/or getting
+        the properties of the particles already stored:
+
+        The methods for setting are:
+
+        - :method:`set_pos(pos)`
+        - :method:`set_mass(mass)`
+        - :method:`set_hsml(hsml)`
+        - :method:`set_nb(nb)`
+
+        The methods for getting are:
+        
+        - :method:`get_pos()`
+        - :method:`get_mass()`
+        - :method:`get_hsml()`
+        - :method:`get_nb()`
 
         Finally, Particles class has its own plotting method:
 
-        - plot('plane', axis=None, *kwargs)
+        - :method:`plot('plane', axis=None, **kwargs)`
 
-        'plane' is one of the available projections of the input data:
-        |'xy'|'xz'|'yz'|.
-        axis makes a reference to an existing axis. In case axis is None,
-        the plot is made on the current axis. 
+        in which 'plane' is one of the available projections of the input data:
+        |'xy'|'xz'|'yz'|, and axis makes a reference to an existing axis. 
+        If axis is None (default), the plot is made on the current active axis. 
+        
+        Please read the matplotlib.pyplot.plot documentation for the accepted
 
         The kwargs are :class:`~matplotlib.lines.Line2D` properties:
-
-        agg_filter: unknown
-        alpha: float (0.0 transparent through 1.0 opaque)         
-        animated: [True | False]         
-        antialiased or aa: [True | False]         
-        axes: an :class:`~matplotlib.axes.Axes` instance         
-        clip_box: a :class:`matplotlib.transforms.Bbox` instance         
-        clip_on: [True | False]         
-        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]         
-        color or c: any matplotlib color         
-        contains: a callable function         
-        dash_capstyle: ['butt' | 'round' | 'projecting']         
-        dash_joinstyle: ['miter' | 'round' | 'bevel']         
-        dashes: sequence of on/off ink in points         
-        data: 2D array (rows are x, y) or two 1D arrays         
-        drawstyle: [ 'default' | 'steps' | 'steps-pre' | 'steps-mid' | 'steps-post' ]         
-        figure: a :class:`matplotlib.figure.Figure` instance         
-        fillstyle: ['full' | 'left' | 'right' | 'bottom' | 'top']         
-        gid: an id string         
-        label: any string         
-        linestyle or ls: [ ``'-'`` | ``'--'`` | ``'-.'`` | ``':'`` | ``'None'`` | ``' '`` | ``''`` ]         and any drawstyle in combination with a linestyle, e.g. ``'steps--'``.         
-        linewidth or lw: float value in points         
-        lod: [True | False]         
-        marker: [ ``7`` | ``4`` | ``5`` | ``6`` | ``'o'`` | ``'D'`` | ``'h'`` | ``'H'`` | ``'_'`` | ``''`` | ``'None'`` | ``' '`` | ``None`` | ``'8'`` | ``'p'`` | ``','`` | ``'+'`` | ``'.'`` | ``'s'`` | ``'*'`` | ``'d'`` | ``3`` | ``0`` | ``1`` | ``2`` | ``'1'`` | ``'3'`` | ``'4'`` | ``'2'`` | ``'v'`` | ``'<'`` | ``'>'`` | ``'^'`` | ``'|'`` | ``'x'`` | ``'$...$'`` | *tuple* | *Nx2 array* ]
-        markeredgecolor or mec: any matplotlib color         
-        markeredgewidth or mew: float value in points         
-        markerfacecolor or mfc: any matplotlib color         
-        markerfacecoloralt or mfcalt: any matplotlib color         
-        markersize or ms: float         
-        markevery: None | integer | (startind, stride)
-        picker: float distance in points or callable pick function         ``fn(artist, event)``         
-        pickradius: float distance in points         
-        rasterized: [True | False | None]         
-        snap: unknown
-        solid_capstyle: ['butt' | 'round' |  'projecting']         
-        solid_joinstyle: ['miter' | 'round' | 'bevel']         
-        transform: a :class:`matplotlib.transforms.Transform` instance         
-        url: a url string         
-        visible: [True | False]         
-        xdata: 1D array         
-        ydata: 1D array         
-        zorder: any number         
-        
-        kwargs *scalex* and *scaley*, if defined, are passed on to
-        :meth:`~matplotlib.axes.Axes.autoscale_view` to determine
-        whether the *x* and *y* axes are autoscaled; the default is
-        *True*.
-        
-        Additional kwargs: hold = [True|False] overrides default hold state
         """
 
         
@@ -109,35 +70,69 @@ class Particles():
             self.__hsml = np.array(hsml)
 
 #Setting methods:
-    def set_pos(self,xpos,ypos,zpos):
-        self.__pos  = np.array([xpos,ypos,zpos],dtype=np.float32)
+    def set_pos(self,pos):
+        """
+        Use this method to overwrite the already stored array of particles.
+        """
+        self.__pos  = pos
 
     def set_mass(self,mass):
-        self.__mass  = np.array(mass,dtype=np.float32)
+        """
+        Use this method to overwrite the already stored array of masses.
+        """
+        self.__mass  = mass
     
     def set_hsml(self,hsml):
-        self.__hsml  = np.array(hsml,dtype=np.float32)
+        """
+        Use this method to overwrite the already stored array of smoothing lengths.
+        """
+        self.__hsml  = hsml
 
     def set_nb(self,nb):
-        self.__nb  = np.array(nb,dtype=np.int32)
+        """
+        Use this method to overwrite the already defined number of neighbors
+        to be used for computing the smoothing lengths.
+        """
+        self.__nb  = nb
 
 #Getting methods
     def get_pos(self):
         """
-        x,y,z = get_positions()
+        Use this method to get the already stored array of particles.
+        - Output: [3,n] numpy array with x = pos[0,:], y = pos[1,:], z = pos[2,:]
+        with n the number of particles.
         """
         return self.__pos
 
     def get_mass(self):
+        """
+        Use this method to get the already stored array of masses.
+        """
         return self.__mass
     
     def get_hsml(self):
+        """
+        Use this method to get the already stored array of smoothing lengths.
+        """
         return self.__hsml
 
     def get_nb(self):
+        """
+        Use this method to get the already defined number of neighbors used to 
+        compute the smoothing lengths.
+        """
         return self.__nb
 
     def plot(self,plane,axis=None,**kargs):
+        """
+        Use this method to plot the set of particles stored by the Particles class.
+        In order to plot the distribution of Particles, a *plane* parameter must be given.
+        "plane" is one of the available orthogonal projections of the particles:  
+        |'xy'|'xz'|'yz'|. If there is multiple axes defined, the active one can be 
+        selected using the axis parameter. If axis paremeter is None (default), the 
+        distribution of particles is plotted in the active axis returned by 
+        the matplotlib.pyplot.gca() method.
+        """
         if(axis == None):
             axis = plt.gca()
         if(plane == 'xy'):
