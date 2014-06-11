@@ -151,7 +151,7 @@ class Particles():
 
     def __det_hsml(self, pos, nb):
         """
-        Use this function to find out the smoothing length of your particles.
+        Use this function to find the smoothing lengths of the particles.
         hsml = det_hsml(pos, nb)
         """
         manager = Manager()
