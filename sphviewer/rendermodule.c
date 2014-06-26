@@ -85,7 +85,7 @@ void c_render(int *x, int *y, int *t, float *mass,
   
   // Let's compute the image for the remainder particles...
   if((r-thread_id) > 0){
-    i  = nth*ppt+thread_id+1;
+    i  = nth*ppt+thread_id;
     xx = x[i];
     yy = y[i];
     tt = t[i];
