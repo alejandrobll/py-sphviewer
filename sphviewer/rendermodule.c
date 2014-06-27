@@ -38,7 +38,7 @@ void c_render(int *x, int *y, int *t, float *mass,
     size_lim = ysize;
   }
   
-  #pragma omp parallel
+#pragma omp parallel
   {
     float *local_image;
     int i,j,k;
@@ -69,7 +69,7 @@ void c_render(int *x, int *y, int *t, float *mass,
     yy = y[i];
     tt = t[i];
     mm = mass[i];
-    
+
     if(tt < 1) tt = 1;
     if(tt > size_lim) tt = size_lim;
     
@@ -103,6 +103,8 @@ void c_render(int *x, int *y, int *t, float *mass,
     }
   }
   // Let's merge the local images
+  
+
   #pragma omp critical
   {
     for(j=0;j<xsize;j++){
@@ -170,28 +172,30 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   // Let's check the size of the 1-dimensions arrays.
   n = (int) x_obj->dimensions[0];
 
-  // Let's allocate the arrays
-  x = (int *)malloc( n * sizeof(int) );
-  y = (int *)malloc( n * sizeof(int) );
-  t = (int *)malloc( n * sizeof(int) );
-  mass = (float *)malloc( n * sizeof(float) );
-
-  // Let's fill the C arrays with data
+  // Let's point the C arrays to the numpy arrays
   x = (int *)x_obj->data;
   y = (int *)y_obj->data;
   t = (int *)t_obj->data;
   mass = (float *)m_obj->data;
 
   image = (float *)malloc( xsize * ysize * sizeof(float) );
-  
+
+  int i, j;
+  for(i=0;i<xsize;i++){
+    for(j=0;j<ysize;j++){
+      image[j*xsize+i] = 0.0;
+    }
+  }
+
   // Here we do the work
   c_render(x,y,t,mass,xsize,ysize,n,image);
   
   // Let's build a numpy array
   npy_intp dims[1] = {xsize*ysize};
-  PyObject *image_obj = (PyObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, image);
+  PyArrayObject *image_obj = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, image);
+  image_obj->flags = NPY_OWNDATA;
   
-  return Py_BuildValue("O", image_obj);
+  return Py_BuildValue("N", image_obj);
 		       
 }
 

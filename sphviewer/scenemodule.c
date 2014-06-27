@@ -166,6 +166,7 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
     return NULL;
 
   n = (int) x_obj->dimensions[0];
+
   // Let's point to the data of the objects
   x = (float *)x_obj->data;
   y = (float *)y_obj->data;
@@ -226,13 +227,13 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   // Let's build a numpy array                         
   npy_intp dims[1] = {idx};
 
-  PyArrayObject *x_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, x_out_c);
+  PyArrayObject *x_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, x_out_c);
   x_out->flags = NPY_OWNDATA;
 
-  PyArrayObject *y_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, y_out_c);
+  PyArrayObject *y_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, y_out_c);
   y_out->flags = NPY_OWNDATA;
 
-  PyArrayObject *h_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT, h_out_c);
+  PyArrayObject *h_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, h_out_c);
   h_out->flags = NPY_OWNDATA;
 
   PyArrayObject *k_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_INT64, k_out_c);
