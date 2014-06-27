@@ -55,12 +55,28 @@ class Render():
         x,y,t,kview = Scene.get_scene()
         xsize = Scene.Camera.get_params()['xsize']
         ysize = Scene.Camera.get_params()['ysize']
-        self.__image = self.__make_render(x,y,t,kview,xsize,ysize)
 
+        self.__image = self.__make_render(x,y,t,kview,xsize,ysize)
         #lets define some flags
         self.__logscale_flag = False;
 
+
     def __make_render(self,x,y,t,kview,xsize,ysize):
+        import extensions.render
+
+        mass = self.Scene._Particles.get_mass()[kview]
+
+        import time
+        start = time.time()
+        image = extensions.render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
+        stop = time.time()
+        print stop-start
+        return np.reshape(image,[ysize,xsize])
+
+
+    def __make_render_old(self,x,y,t,kview,xsize,ysize):
+        #Old function using weave for rendering the images. 
+
         n=int(len(x))
         mass = self.Scene._Particles.get_mass()[kview]
 

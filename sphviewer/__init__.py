@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 
 if __name__ == '__main__':
+    import time
     n1 = 10000 #number of particles to make the disk
     n2 = n1/3  # number of particles to make the background
     r  = np.random.rand(n1)
@@ -33,15 +34,19 @@ if __name__ == '__main__':
     Particles1 = Particles(pos,mass)
     Scene1 = Scene(Particles1)
     Render1 = Render(Scene1)
-    Scene1.update_camera(r=2.00, t=90, roll=30)
-    Render1 = Render(Scene1)
-    Render1.set_logscale()
-    img = Render1.get_image()
-    extent = Render1.get_extent()
-    fig = plt.figure(1,figsize=(5,5))
-    ax1 = fig.add_subplot(111)
-    ax1.imshow(img, extent=extent, origin='lower', cmap='hot', vmax=0.5)
-    ax1.set_xlabel('X', size=15)
-    ax1.set_ylabel('Y', size=15)
-
-    plt.show()
+    for i in xrange(100):
+        start = time.time()
+        Scene1.update_camera(r=2.00, t=90, roll=30, xsize=1920, ysize=1080)
+        Render1 = Render(Scene1)
+        Render1.set_logscale()
+        img = Render1.get_image()
+        extent = Render1.get_extent()
+        stop = time.time()
+        print 'Time = ', stop-start
+        fig = plt.figure(1,figsize=(5,5))
+        ax1 = fig.add_subplot(111)
+        ax1.imshow(img, extent=extent, origin='lower', cmap='hot')
+        ax1.set_xlabel('X', size=15)
+        ax1.set_ylabel('Y', size=15)
+        
+        plt.show()

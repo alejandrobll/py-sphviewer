@@ -130,6 +130,47 @@ class Scene():
         self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def __compute_scene(self):
+        import extensions.scene as scene
+
+        pos = self._Particles.get_pos().astype(np.float32)
+        hsml = self._Particles.get_hsml().astype(np.float32)
+        
+        if(self._camera_params['r'] == 'infinity'):
+            projection = 0
+            rcam = np.float32(0)
+            if(self._camera_params['extent'] == None):
+                xmin = np.min(pos[0,:]).astype(np.float32)
+                xmax = np.max(pos[0,:]).astype(np.float32)
+                ymin = np.min(pos[1,:]).astype(np.float32)
+                ymax = np.max(pos[1,:]).astype(np.float32)
+                self.__extent = np.array([xmin,xmax,ymin,ymax],dtype=np.float32)
+            else:
+                self.__extent = self._camera_params['extent'].astype(np.float32)
+        else:
+            projection = 1
+            rcam = np.float32(self._camera_params['r'])
+            self.__extent = np.array([0,0,0,0],dtype=np.float32)
+
+        #I recast the variables just in case
+        xcam  = np.float32(self._camera_params['x'])
+        ycam  = np.float32(self._camera_params['y'])
+        zcam  = np.float32(self._camera_params['z'])
+        theta = np.float32(self._camera_params['t'])
+        phi   = np.float32(self._camera_params['p'])
+        roll  = np.float32(self._camera_params['roll'])
+        zoom  = np.float32(self._camera_params['zoom'])
+        xsize = np.int32(self._camera_params['xsize'])
+        ysize = np.int32(self._camera_params['ysize'])
+        
+        xx,yy,hh,kk = scene.scene(pos[0,:],pos[1,:],pos[2,:],hsml,
+                                  xcam, ycam, zcam, rcam, theta, phi, roll,
+                                  zoom, self.__extent, xsize, ysize, projection)
+
+        return xx,yy,hh,kk
+
+
+
+    def __compute_scene_old(self):
         
         pos = (1.0*self._Particles.get_pos()).astype(np.float32)
         
