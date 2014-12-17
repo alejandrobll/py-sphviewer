@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Manager
 from scipy.spatial import cKDTree
+from pykdtree.kdtree import KDTree # pykdtree by Esben S. Nielsen 
 
 class Particles():
     def __init__(self, pos,
@@ -143,13 +144,26 @@ class Particles():
             axis.plot(self.__pos[1,:], self.__pos[2,:], 'k.', **kargs)
 
     def __make_kdtree(self,pos):
+        return KDTree(pos.T)
+    
+    def __nbsearch(self, pos, nb, tree):
+        d, idx = tree.query(pos.T, k=nb)
+        hsml = d[:,nb-1]
+        return hsml
+    
+    def __det_hsml(self, pos, nb):
+        tree = self.__make_kdtree(pos)
+        hsml = self.__nbsearch(pos, nb, tree)
+        return hsml
+
+    def __make_kdtree_old(self,pos):
         return cKDTree(pos.T)
 
-    def __nbsearch(self, pos, nb, tree, out_hsml, index):
+    def __nbsearch_old(self, pos, nb, tree, out_hsml, index):
         d, idx = tree.query(pos.T, k=nb)
         out_hsml.put( (index, d[:,nb-1]) )
 
-    def __det_hsml(self, pos, nb):
+    def __det_hsml_old(self, pos, nb):
         """
         Use this function to find the smoothing lengths of the particles.
         hsml = det_hsml(pos, nb)
