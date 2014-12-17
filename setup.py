@@ -1,4 +1,8 @@
-from distutils.core import setup, Extension
+#from distutils.core import setup, Extension
+try:
+    from setuptools import setup, Extension
+except ImportError:
+    from distutils.core import setup, Extension
 
 module_scene = Extension('sphviewer/extensions/scene', sources = ['sphviewer/extensions/scenemodule.c'],
                          extra_compile_args=['-fopenmp'],
@@ -15,6 +19,8 @@ setup(name='py-sphviewer',
       author_email='alejandrobll@oac.uncor.edu',
       url='https://code.google.com/p/py-sphviewer/',
       packages=['sphviewer','sphviewer.extensions'],
+      requires = ['pykdtree', 'numpy'],
+      install_requires = ['pykdtree', 'numpy'],
       package_data={'sphviewer': ['*.c','*.txt']},
       ext_modules = [module_scene, module_render],
       license='GNU GPL v3',
