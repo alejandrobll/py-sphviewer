@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     mass = np.ones(n1+n2)
 
-    Particles1 = Particles(pos,mass)
+    Particles1 = Particles(pos,mass,sort=True)
     Scene1 = Scene(Particles1)
     Render1 = Render(Scene1)
     for i in xrange(100):

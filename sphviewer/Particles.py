@@ -10,7 +10,8 @@ class Particles():
                  mass = None,
                  hsml = None,
                  nb = 32,
-                 verbose = False):
+                 verbose = False,
+                 sort = True):
         """
         Particles class is the first class that must be instantiated 
         in order to render an image with Py-SPHViewer. 
@@ -58,17 +59,25 @@ class Particles():
         The kwargs are :class:`~matplotlib.lines.Line2D` properties:
         """
 
-        
         self._name = 'PARTICLES'
-        self.__pos  = pos
-        self.__mass = mass
-        self.__nb   = nb
+
         self.__verbose = verbose
 
         if(hsml == None):
-            self.__hsml = self.__det_hsml(self.__pos,self.__nb)
+            hsml = self.__det_hsml(pos,nb)
+        
+        if(sort):
+            ksort = np.argsort(hsml)
+            npart = np.size(mass)
+            self.__pos = np.ndarray([3,npart], dtype=np.float32)
+            self.__pos[:,:]  = pos[:,ksort]
+            self.__mass = mass[ksort]
+            self.__hsml = hsml[ksort]
         else:
-            self.__hsml = np.array(hsml)
+            self.__pos  = pos
+            self.__mass = mass
+            self.__hsml = hsml
+
 
 #Setting methods:
     def set_pos(self,pos):
