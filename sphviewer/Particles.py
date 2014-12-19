@@ -11,7 +11,7 @@ class Particles():
                  hsml = None,
                  nb = 32,
                  verbose = False,
-                 sort = True):
+                 sort = False):
         """
         Particles class is the first class that must be instantiated 
         in order to render an image with Py-SPHViewer. 
@@ -63,20 +63,20 @@ class Particles():
 
         self.__verbose = verbose
 
+        npart = np.size(mass)
+
         if(hsml == None):
             hsml = self.__det_hsml(pos,nb)
         
         if(sort):
             ksort = np.argsort(hsml)
-            npart = np.size(mass)
-            self.__pos = np.ndarray([3,npart], dtype=np.float32)
-            self.__pos[:,:]  = pos[:,ksort]
-            self.__mass = mass[ksort]
-            self.__hsml = hsml[ksort]
+            self.__pos  = np.ascontiguousarray(pos[:,ksort])
+            self.__mass = np.ascontiguousarray(mass[ksort])
+            self.__hsml = np.ascontiguousarray(hsml[ksort])
         else:
-            self.__pos  = pos
-            self.__mass = mass
-            self.__hsml = hsml
+            self.__pos  = np.ascontiguousarray(pos)
+            self.__mass = np.ascontiguousarray(mass)
+            self.__hsml = np.ascontiguousarray(hsml)
 
 
 #Setting methods:
