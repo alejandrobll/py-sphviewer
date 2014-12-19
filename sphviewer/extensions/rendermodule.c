@@ -41,7 +41,7 @@ void c_render(int *x, int *y, int *t, float *mass,
 #pragma omp parallel
   {
     float *local_image;
-    int i,j,k;
+    int i,j,k,l;
     int xx, yy, tt;
     float mm;
     int r, nth, ppt, thread_id;
@@ -64,7 +64,9 @@ void c_render(int *x, int *y, int *t, float *mass,
   
 
   // Let's compute the local image 
-  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+  //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+  for(l=0;l<ppt;l++){
+    i = thread_id+nth*l;
     xx = x[i];
     yy = y[i];
     tt = t[i];
