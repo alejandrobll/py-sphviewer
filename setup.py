@@ -4,6 +4,8 @@ try:
 except ImportError:
     from distutils.core import setup, Extension
 
+import numpy as np
+
 module_scene = Extension('sphviewer/extensions/scene', sources = ['sphviewer/extensions/scenemodule.c'],
                          extra_compile_args=['-fopenmp'],
                          extra_link_args=['-lgomp'])
@@ -19,6 +21,7 @@ setup(name='py-sphviewer',
       author_email='alejandrobll@oac.uncor.edu',
       url='https://code.google.com/p/py-sphviewer/',
       packages=['sphviewer','sphviewer.extensions'],
+      include_dirs = [np.get_include()],
       requires = ['pykdtree'],
       install_requires = ['pykdtree'],
       package_data={'sphviewer': ['*.c','*.txt']},
