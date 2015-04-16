@@ -134,22 +134,6 @@ class Scene():
 
         pos = self._Particles.get_pos().astype(np.float32)
         hsml = self._Particles.get_hsml().astype(np.float32)
-        
-        if(self._camera_params['r'] == 'infinity'):
-            projection = 0
-            rcam = np.float32(0)
-            if(self._camera_params['extent'] == None):
-                xmin = np.min(pos[0,:]).astype(np.float32)
-                xmax = np.max(pos[0,:]).astype(np.float32)
-                ymin = np.min(pos[1,:]).astype(np.float32)
-                ymax = np.max(pos[1,:]).astype(np.float32)
-                self.__extent = np.array([xmin,xmax,ymin,ymax],dtype=np.float32)
-            else:
-                self.__extent = self._camera_params['extent'].astype(np.float32)
-        else:
-            projection = 1
-            rcam = np.float32(self._camera_params['r'])
-            self.__extent = np.array([0,0,0,0],dtype=np.float32)
 
         #I recast the variables just in case
         xcam  = np.float32(self._camera_params['x'])
@@ -161,7 +145,26 @@ class Scene():
         zoom  = np.float32(self._camera_params['zoom'])
         xsize = np.int32(self._camera_params['xsize'])
         ysize = np.int32(self._camera_params['ysize'])
-        
+                
+        if(self._camera_params['r'] == 'infinity'):
+            projection = 0
+            rcam = np.float32(0)
+            if(self._camera_params['extent'] == None):
+                xmin = np.min(pos[0,:]).astype(np.float32)
+                xmax = np.max(pos[0,:]).astype(np.float32)
+                ymin = np.min(pos[1,:]).astype(np.float32)
+                ymax = np.max(pos[1,:]).astype(np.float32)
+                self.__extent = np.array([xmin-xcam,
+                                          xmax-xcam,
+                                          ymin-ycam,
+                                          ymax-ycam],dtype=np.float32)
+            else:
+                self.__extent = np.float32(self._camera_params['extent'])
+        else:
+            projection = 1
+            rcam = np.float32(self._camera_params['r'])
+            self.__extent = np.array([0,0,0,0],dtype=np.float32)
+
         xx,yy,hh,kk = scene.scene(pos[0,:],pos[1,:],pos[2,:],hsml,
                                   xcam, ycam, zcam, rcam, theta, phi, roll,
                                   zoom, self.__extent, xsize, ysize, projection)
