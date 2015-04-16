@@ -13,7 +13,7 @@ module_render = Extension('sphviewer/extensions/render', sources = ['sphviewer/e
                           extra_link_args=['-lgomp'])
 
 setup(name='py-sphviewer',
-      version='0.163',
+      version='0.166',
       description='Py-SPHViewer is a framework for rendering particles using the smoothed particle hydrodynamics scheme.',
       author='Alejandro Benitez Llambay',
       author_email='alejandrobll@oac.uncor.edu',
