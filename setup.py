@@ -7,11 +7,11 @@ except ImportError:
 import numpy as np
 
 module_scene = Extension('sphviewer/extensions/scene', sources = ['sphviewer/extensions/scenemodule.c'],
-                         extra_compile_args=['-fopenmp'],
+                         extra_compile_args=['-fopenmp','-w'],
                          extra_link_args=['-lgomp'])
 
 module_render = Extension('sphviewer/extensions/render', sources = ['sphviewer/extensions/rendermodule.c'],
-                          extra_compile_args=['-fopenmp'],
+                          extra_compile_args=['-fopenmp','-w'],
                           extra_link_args=['-lgomp'])
 
 setup(name='py-sphviewer',
