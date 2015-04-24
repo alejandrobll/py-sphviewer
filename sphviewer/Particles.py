@@ -13,33 +13,31 @@ class Particles():
                  verbose = False,
                  sort = False):
         """
-        Particles class is the first class that must be instantiated 
-        in order to render an image with Py-SPHViewer. 
-        It allows to load all the particles as well as all 
-        their relevant properties, which will be used later for rendering them. 
+        Particles class stores particle's information that will be used 
+        later for rendering the image. 
         
-        Particles takes as arguments the position of the particles, and their masses
-        and smoothing lenghts as optional parameters. 
+        Particles takes the following arguments: particle positions, mass and optionally smoothing lengths. 
         
-        Positions of the particles must be given using an array *pos* of shape [3,n], in which
-        n is the number of particles, and x = pos[0,:], y = pos[1,:] and z = pos[2,:]. 
+        Positions of the particles are given by the array *pos* with shape [3,n], where
+        n is the number of particles, and pos[0,:] = x, pos[1,:] = y and pos[2,:] = z. 
         
-        If mass and hsml are not given, Particles class assumes that particles have all the same mass=1.
-        The smoothing length of each particle is computed using the distance to the "nb" neighbor. By default nb=32. 
+        If masses and smoothing lengths are not given, Particles class assumes the same mass=1 for every particle, 
+        and the smoothing length of each particle is computed using the distance to its "nb" closer neighbor. 
+        By default nb=32. 
 
         Note that once you have created an instance of Particle, it is not necessary
-        to instantiate it again in case you want to change some property. 
+        to instantiate it again in case you need to change any property. 
         Particles class has its own method for setting and/or getting
-        the properties of the particles already stored:
+        the properties of the particles stored already:
 
-        The methods for setting are:
+        The "setting" methods are:
 
         - :method:`set_pos(pos)`
         - :method:`set_mass(mass)`
         - :method:`set_hsml(hsml)`
         - :method:`set_nb(nb)`
 
-        The methods for getting are:
+        The "getting" methods are:
         
         - :method:`get_pos()`
         - :method:`get_mass()`
@@ -55,7 +53,6 @@ class Particles():
         If axis is None (default), the plot is made on the current active axis. 
         
         Please read the matplotlib.pyplot.plot documentation for the accepted
-
         The kwargs are :class:`~matplotlib.lines.Line2D` properties:
         """
 
@@ -82,25 +79,25 @@ class Particles():
 #Setting methods:
     def set_pos(self,pos):
         """
-        Use this method to overwrite the already stored array of particles.
+        Use this method to overwrite the stored array of particles.
         """
         self.__pos  = pos
 
     def set_mass(self,mass):
         """
-        Use this method to overwrite the already stored array of masses.
+        Use this method to overwrite the stored array of masses.
         """
         self.__mass  = mass
     
     def set_hsml(self,hsml):
         """
-        Use this method to overwrite the already stored array of smoothing lengths.
+        Use this method to overwrite the stored array of smoothing lengths.
         """
         self.__hsml  = hsml
 
     def set_nb(self,nb):
         """
-        Use this method to overwrite the already defined number of neighbors
+        Use this method to overwrite the defined number of neighbors
         to be used for computing the smoothing lengths.
         """
         self.__nb  = nb
@@ -108,7 +105,7 @@ class Particles():
 #Getting methods
     def get_pos(self):
         """
-        Use this method to get the already stored array of particles.
+        Use this method to get the stored array of particles.
         - Output: [3,n] numpy array with x = pos[0,:], y = pos[1,:], z = pos[2,:]
         with n the number of particles.
         """
@@ -116,19 +113,19 @@ class Particles():
 
     def get_mass(self):
         """
-        Use this method to get the already stored array of masses.
+        Use this method to get the stored array of masses.
         """
         return self.__mass
     
     def get_hsml(self):
         """
-        Use this method to get the already stored array of smoothing lengths.
+        Use this method to get the stored array of smoothing lengths.
         """
         return self.__hsml
 
     def get_nb(self):
         """
-        Use this method to get the already defined number of neighbors used to 
+        Use this method to get the number of neighbors that were used to 
         compute the smoothing lengths.
         """
         return self.__nb
@@ -140,7 +137,7 @@ class Particles():
         "plane" is one of the available orthogonal projections of the particles:  
         |'xy'|'xz'|'yz'|. If there is multiple axes defined, the active one can be 
         selected using the axis parameter. If axis paremeter is None (default), the 
-        distribution of particles is plotted in the active axis returned by 
+        distribution of particles is plotted in the active axis, which is returned by 
         the matplotlib.pyplot.gca() method.
         """
         if(axis == None):
