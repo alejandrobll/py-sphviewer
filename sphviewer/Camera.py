@@ -7,7 +7,7 @@ class Camera():
                  xsize = None, ysize = None, extent = None):
         self._name = 'CAMERA'        
         self.__params = {'x':x,'y':y,'z':z,'r':r,
-                         't':t,'p':p,'zoom':zoom,
+                         't':t,'p':p,'zoom':zoom, 'roll':roll,
                          'xsize':xsize, 'ysize':ysize, 'extent':extent}
 
     def get_params(self):
