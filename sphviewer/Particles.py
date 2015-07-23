@@ -16,19 +16,19 @@ class Particles():
         Particles class stores particle's information that will be used 
         later for rendering the image. 
         
-        Particles takes the following arguments: particle positions, mass and optionally smoothing lengths. 
+        Input arguments are: particles position, mass and optionally smoothing lengths. 
         
         Positions of the particles are given by the array *pos* with shape [3,n], where
         n is the number of particles, and pos[0,:] = x, pos[1,:] = y and pos[2,:] = z. 
         
-        If masses and smoothing lengths are not given, Particles class assumes the same mass=1 for every particle, 
-        and the smoothing length of each particle is computed using the distance to its "nb" closer neighbor. 
+        If masses and smoothing lengths are not given, Particles class assumes the same mass = 1 for every particle, 
+        and the corresponding smoothing length of each particle is computed as the distance to its "nb" closer neighbor. 
         By default nb=32. 
 
         Note that once you have created an instance of Particle, it is not necessary
-        to instantiate it again in case you need to change any property. 
+        to instantiate it again in case you may want to change any property. 
         Particles class has its own method for setting and/or getting
-        the properties of the particles stored already:
+        the properties of the particles already stored:
 
         The "setting" methods are:
 
