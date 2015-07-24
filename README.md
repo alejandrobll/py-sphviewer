@@ -28,6 +28,12 @@ The image above shows the dark matter distribution colored according to the velo
 
 More examples of the power of Py-SPHViewer are the following movies:
 
+<a href="http://www.youtube.com/watch?v=vqGYURAgYUY
+" target="_blank"><img src="http://img.youtube.com/vi/vqGYURAgYUY/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
+or, 
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=O6Adwk41J58
 " target="_blank"><img src="http://img.youtube.com/vi/O6Adwk41J58/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
