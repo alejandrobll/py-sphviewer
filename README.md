@@ -1,4 +1,6 @@
-# py-sphviewer
+# py-sphviewer [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703)
+
+
 
 Py-SPHViewer is a publicly available Python package to visualize and explore N-body + Hidrodynamical simulations. The Smoothed Particle Hydrodynamics interpolation scheme is used to interpolate the underlaying density field (or any other property) traced by a finite set of particles, t hus producing smooth images of a particle distribution that can be easily interpreted. It does also provide the natural way for visualizing in a self-consistent way gas dynamical simulations in which the same technique is used to compute the particle interactions.
 
@@ -54,7 +56,20 @@ Py-SPHViewer is under GNU GPL v3 licence, and was started by Alejandro Benitez-L
 
 If you are interested in using Py-SPHVIewer, you should take a look at the very little [tutorial](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/alejandrobll/py-sphviewer/master/wiki/tutorial_sphviewer.ipynb). This tutorial assumes that you are familiar with Python. If not, please go to learn Python and come back. 
 
+# Citing the code
 
+If Py-SPHViewer has been significant in your project and leads to a publication, please acknowledge by citing the project. You can check the DOI at Zenodo: [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703), or just use the following BibTex:
 
+    @misc{alejandro_benitez_llambay_2015_21703,
+    author       = {Alejandro Benitez-Llambay},
+    title        = {py-sphviewer: Py-SPHViewer v1.0.0},
+    month        = jul,
+    year         = 2015,
+    doi          = {10.5281/zenodo.21703},
+    url          = {http://dx.doi.org/10.5281/zenodo.21703}
+    }
 
+or in plain text:
+
+Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10.5281/zenodo.21703
 
