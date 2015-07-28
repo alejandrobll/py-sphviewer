@@ -66,11 +66,7 @@ class Render():
 
         mass = self.Scene._Particles.get_mass()[kview]
 
-        import time
-        start = time.time()
         image = extensions.render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
-        stop = time.time()
-        print stop-start
         return np.reshape(image,[ysize,xsize])
 
 
