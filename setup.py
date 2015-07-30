@@ -14,13 +14,15 @@ module_render = Extension('sphviewer/extensions/render', sources = ['sphviewer/e
                           extra_compile_args=['-fopenmp','-w'],
                           extra_link_args=['-lgomp'])
 
+exec(open('sphviewer/version.py').read())
+
 setup(name='py-sphviewer',
-      version='0.173',
+      version=__version__,
       description='Py-SPHViewer is a framework for rendering particles using the smoothed particle hydrodynamics scheme.',
       author='Alejandro Benitez Llambay',
       author_email='alejandrobll@oac.uncor.edu',
       url='https://github.com/alejandrobll/py-sphviewer',
-      packages=['sphviewer','sphviewer.extensions'],
+      packages=['sphviewer','sphviewer.extensions', 'sphviewer.tools'],
       include_dirs = [np.get_include()],
       requires = ['pykdtree'],
       install_requires = ['pykdtree'],

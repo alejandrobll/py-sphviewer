@@ -13,7 +13,7 @@ from Scene import Scene
 from Render import Render
 import numpy as np
 import matplotlib.pyplot as plt
-
+from version import __version__
 
 if __name__ == '__main__':
     import time
