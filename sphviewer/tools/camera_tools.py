@@ -16,7 +16,7 @@ def get_camera_trayectory(targets,anchors):
     #I wrote this function to get the parameters of the camera 
     #that define its trayectory according to a small set of anchors. 
     #It is based on a first code written by Adrien Thob, who was 
-    #inspired in the "Surge Target" plugin for Adobe After Effects.
+    #inspired by the "Surge Target" plugin for Adobe After Effects.
 
     keys = ['id_targets', 't', 'p', 'r', 'zoom']
     f_interp = {}
