@@ -14,6 +14,11 @@ module_render = Extension('sphviewer/extensions/render', sources = ['sphviewer/e
                           extra_compile_args=['-fopenmp','-w'],
                           extra_link_args=['-lgomp'])
 
+module_makehsv = Extension('sphviewer/tools/makehsv', sources = ['sphviewer/tools/makehsvmodule.c'],
+                           extra_compile_args=['-fopenmp','-w'],
+                           extra_link_args=['-lgomp'])
+
+
 exec(open('sphviewer/version.py').read())
 
 setup(name='py-sphviewer',
@@ -27,7 +32,7 @@ setup(name='py-sphviewer',
       requires = ['pykdtree'],
       install_requires = ['pykdtree'],
       package_data={'sphviewer': ['*.c','*.txt']},
-      ext_modules = [module_scene, module_render],
+      ext_modules = [module_scene, module_render, module_makehsv],
       license='GNU GPL v3',
       classifiers=[
         'Programming Language :: Python :: 2.7',
