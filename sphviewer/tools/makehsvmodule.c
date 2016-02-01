@@ -1,3 +1,6 @@
+//This code is part of py-sphviewer and it is included as a tool.
+//Author: Alejandro Benitez-Llambay
+
 #include <Python.h>
 
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
@@ -65,12 +68,14 @@ float hsv_to_rgb(float h, float s, float v,
 }
 
 void make_image(float *image_h,
-		float *image_s,
 		float *image_v,
 		float *image_r,
 		float *image_g,
 		float *image_b,
-		int xsize, int ysize){
+		int xsize, int ysize,
+		float image_h_min, float image_h_max,
+		float image_v_min, float image_v_max,
+		float huemin, float huemax){
 
   float h, s, v;
   float r, g, b;
@@ -80,8 +85,19 @@ void make_image(float *image_h,
   for(i=0;i<xsize;i++){
     for(j=0;j<ysize;j++){
       h = image_h[j*xsize+i];
-      s = image_s[j*xsize+i];
       v = image_v[j*xsize+i];
+
+      //Now we clip the values to the desired range and normalize:
+      if(h >= image_h_max) h = image_h_max;
+      if(h <= image_h_min) h = image_h_min;
+      h = huemin+(h-image_h_min)/(image_h_max-image_h_min)*(huemax-huemin);
+
+      if(v >= image_v_max) v = image_v_max;
+      if(v <= image_v_min) v = image_v_min;
+      v = (v-image_v_min)/(image_v_max-image_v_min);
+
+      s = 1.0 - v; 
+
       hsv_to_rgb(h,s,v,&r, &g, &b);
       image_r[j*xsize+i] = r;
       image_g[j*xsize+i] = g;
@@ -95,11 +111,18 @@ static PyObject *makehsvmodule(PyObject *self, PyObject *args){
   PyArrayObject *img_h_obj, *img_s_obj, *img_v_obj;
   float *img_h, *img_s, *img_v;
   float *img_r, *img_g, *img_b;
+  float img_hmin, img_hmax, img_vmin, img_vmax;
+  float hmin, hmax;
 
-  if(!PyArg_ParseTuple(args, "OOO",
+  if(!PyArg_ParseTuple(args, "OOffffff",
 		       &img_h_obj,
-		       &img_s_obj,
-		       &img_v_obj))
+		       &img_v_obj,
+		       &img_hmin,
+		       &img_hmax,
+		       &img_vmin,
+		       &img_vmax,
+		       &hmin,
+		       &hmax))
     return NULL;
     
   // Let's point the C arrays to the numpy arrays
@@ -116,9 +139,12 @@ static PyObject *makehsvmodule(PyObject *self, PyObject *args){
 
   
   // Here we do the work
-  make_image(img_h, img_s, img_v,
+  make_image(img_h, img_v,
 	     img_r, img_g, img_b,
-	     xsize, ysize);
+	     xsize, ysize,
+	     img_hmin, img_hmax,
+	     img_vmin, img_vmax,
+	     hmin, hmax);
 
   // Let's build a numpy array
   npy_intp dims[1] = {xsize*ysize};
@@ -144,23 +170,3 @@ PyMODINIT_FUNC initmakehsv(void) {
   (void) Py_InitModule("makehsv", MakehsvMethods);
   import_array();
 }
-
-
-
-
-
-
-//void main(){
-//  float h, s, v;
-//  float r, g, b;
-//  float rr, gg, bb;
-//
-//  h = 0.1;
-//  s = 0.5;
-//  v = 0.3;
-//
-//  hsv_to_rgb(h,s,v,&r, &g, &b);
-//
-//  printf("%.2f\t%.2f\t%.2f\n", r,g,b);
-//
-//}
