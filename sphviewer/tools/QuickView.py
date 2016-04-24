@@ -36,7 +36,7 @@ class QuickView():
             
     def imshow(self, **kwargs):
         ax = plt.gca()
-        ax.imshow(self._img, extent=self._extent, **kwargs)
+        ax.imshow(self._img, extent=self._extent, origin=lower, **kwargs)
         plt.show()
 
     def get_image(self):
