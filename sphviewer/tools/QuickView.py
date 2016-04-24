@@ -14,19 +14,19 @@ class QuickView():
             mass = np.ones(len(pos[0,:]))
                     
         if(nb == None):
-            P = sph.Particles(pos, mass, hsml)
+            self._P = sph.Particles(pos, mass, hsml)
         else:
-            P = sph.Particles(pos, mass, hsml, nb)
+            self._P = sph.Particles(pos, mass, hsml, nb)
 
-        S = sph.Scene(P)
-        S.update_camera(**kwargs)
+        self._S = sph.Scene(self._P)
+        self._S.update_camera(**kwargs)
 
-        R = sph.Render(S)
+        self._R = sph.Render(self._S)
         if(logscale):
-            R.set_logscale()
+            self._R.set_logscale()
 
-        self._img = R.get_image()
-        self._extent = R.get_extent()
+        self._img = self._R.get_image()
+        self._extent = self._R.get_extent()
 
         if(plot):
             self.imshow(aspect='auto')
@@ -40,10 +40,10 @@ class QuickView():
         plt.show()
 
     def get_image(self):
-        return self.img
+        return self._img
 
     def get_extent(self):
-        return self.extent
+        return self._extent
 
     def imsave(self, filename, **kwargs):
         try:
@@ -52,5 +52,6 @@ class QuickView():
         except:
             print 'Error while saving image'
         return
+        
         
     
