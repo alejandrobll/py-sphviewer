@@ -62,7 +62,7 @@ class Particles():
 
         npart = np.size(mass)
 
-        if(hsml == None):
+        if(hsml is None):
             hsml = self.__det_hsml(pos,nb)
         
         if(sort):
