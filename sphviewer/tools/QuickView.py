@@ -29,7 +29,7 @@ class QuickView():
         self._extent = R.get_extent()
 
         if(plot):
-            self.imshow()
+            self.imshow(aspect='auto')
             return
         else:
             return
