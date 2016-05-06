@@ -50,7 +50,7 @@ Previous movies show a 3D rotation around a dark matter halo taken from a cosmol
 
 #Changelogs
 - version 1.0.4
-   * QuickView tool for making quick visualization in just one line (see this [post](https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/) for instructions).
+   * New QuickView tool for making quick visualizations using just one single line of code (see this [post](https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/) for instructions).
    * I added a new examples directory, which essentially contains a hdf5 file with the coordinates of the particles belonging to a dark matter halo extracted from a cosmological simulation. This is useful to make quick tests. 
    * Minor bugs fixed.
 
