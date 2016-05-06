@@ -2,7 +2,7 @@
 
 
 
-Py-SPHViewer is a publicly available Python package to visualize and explore N-body + Hidrodynamical simulations. The Smoothed Particle Hydrodynamics interpolation scheme is used to interpolate the underlaying density field (or any other property) traced by a finite set of particles, t hus producing smooth images of a particle distribution that can be easily interpreted. It does also provide the natural way for visualizing in a self-consistent way gas dynamical simulations in which the same technique is used to compute the particle interactions.
+Py-SPHViewer is a publicly available Python package to visualize and explore N-body + Hidrodynamical simulations. The Smoothed Particle Hydrodynamics interpolation scheme is used to interpolate the underlaying density field (or any other property) traced by a finite set of particles, thus producing smooth images of a particle distribution that can be easily interpreted. It does also provide the natural way for visualizing in a self-consistent way gas dynamical simulations in which the same technique is used to compute the particle interactions.
 
 Part of the code is written in C, but it can be used interactively from Python, using tools such as [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/). It does not only smooth the properties of particles over a ceratin influence domain, but also allows to explore the simulated volumes using different projections. 
  
@@ -47,6 +47,13 @@ and,
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
 Previous movies show a 3D rotation around a dark matter halo taken from a cosmological simulation and the "Cosmic Web Stripping" process, which arise from hydrodynamical interaction betweet the gas content of dwarf galaxies and the large-scale structure of the Universe, respectively
+
+#Changelogs
+- version 1.0.4
+   * QuickView tool for making quick visualization in just one line (see this [post](https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/) for instructions).
+   * I added a new examples directory, which essentially contains a hdf5 file with the coordinates of the particles belonging to a dark matter halo extracted from a cosmological simulation. This is useful to make quick tests. 
+   * Minor bugs fixed.
+
 
 # Code Licence
 
