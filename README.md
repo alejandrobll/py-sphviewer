@@ -65,7 +65,7 @@ If you are interested in using Py-SPHVIewer, you should take a look at the very 
 
 # Citing the code
 
-If Py-SPHViewer has been significant in your project and leads to a publication, please acknowledge by citing the project. You can check the DOI at Zenodo: [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703), or just use the following BibTex:
+If Py-SPHViewer has been significant in your project and leads to a publication, please acknowledge by citing the project. Also, if your paper contains Figures that have been made with this package, please also cite (or aknowledge) the project. Check the DOI at Zenodo: [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703), or just use the following BibTex:
 
     @misc{alejandro_benitez_llambay_2015_21703,
     author       = {Alejandro Benitez-Llambay},
