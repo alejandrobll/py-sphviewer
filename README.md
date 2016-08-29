@@ -62,6 +62,10 @@ Py-SPHViewer is under GNU GPL v3 licence, and was started by Alejandro Benitez-L
 # Basic Tutorial
 
 If you are interested in using Py-SPHVIewer, you should take a look at the very little [tutorial](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/alejandrobll/py-sphviewer/master/wiki/tutorial_sphviewer.ipynb). This tutorial assumes that you are familiar with Python. If not, please go to learn Python and come back. 
+I also try to write different post highlighting some of the capabilities of Py-SPHViewer. Here I list them:
+
+* [Using QuickView to simplify the use of Py-SPHViewer] (https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/)
+* [Streamlines with Py-SPHViewer] (https://alejandrobll.wordpress.com/2016/08/29/streamlines-with-py-sphviewer/)
 
 # Citing the code
 
