@@ -2,29 +2,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Tools for blending images. There are plenty of possibilities, and
-#depending on the images, the final result can vary significantly. 
+#depending on the images, the final result can vary significantly.
 
 class Blend():
-    def __init__(self, image1, image2, mode='Screen'):
+    def __init__(self, image1, image2):
         self.image1 = image1
         self.image2 = image2
 
 
     def Screen(self):
         output = np.zeros(np.shape(self.image1))
+
+        if np.shape(self.image1)[2] == 4:  # test for RGBA input image
+            output[:,:,3] = 1  # set alpha values to unity
+
         for i in xrange(3):
             output[:,:,i] = (1.0-(1.0-self.image1[:,:,i])*
                                  (1.0-self.image2[:,:,i]))
         return output
-    
+
     def Overlay(self):
         output = np.zeros(np.shape(self.image1))
+
+        if np.shape(self.image1)[2] == 4:  # test for RGBA input image
+            output[:,:,3] = 1  # set alpha values to unity
+
         for i in xrange(3):
             output[:,:,i] = (self.image1[:,:,i]*
                             (self.image1[:,:,i]+2*self.image2[:,:,i]*
                             (1.0-self.image1[:,:,i])) )
-                             
+
         return output
+
 
 
 if __name__ == "__main__":
@@ -36,14 +45,14 @@ if __name__ == "__main__":
     def get_normalized_image(image):
         image = (image-np.min(image))/(np.max(image)-np.min(image))
         return image
-    
+
     pos1 = np.zeros([5000,3])
     pos2 = np.zeros([10000,3])
 
     pos1[:,0:2] = -1+2*np.random.rand(5000,2)
     pos2[:,0:2] = -1+2*np.random.rand(10000,2)
 
-    
+
     r2 = np.sqrt(pos2[:,0]**2+pos2[:,1]**2)
     k2, = np.where(r2 < 0.5)
     pos2 = pos2[k2,:]
@@ -55,15 +64,15 @@ if __name__ == "__main__":
                     r='infinity', logscale=False, plot=False,
                     extent=[-1,1,-1,1], x=0, y=0, z=0)
 
-    
-    image1 = cm.gist_heat(get_normalized_image(qv1.get_image()))[:,:,0:3]
-    image2 = cm.gist_stern(get_normalized_image(qv2.get_image()))[:,:,0:3]
+
+    image1 = cm.gist_heat(get_normalized_image(qv1.get_image()))
+    image2 = cm.gist_stern(get_normalized_image(qv2.get_image()))
 
 
     fig = plt.figure(1, figsize=(10,5))
     ax1 = fig.add_subplot(121)
     ax2 = fig.add_subplot(122)
-    
+
     blend = Blend(image1, 1.0*image2)
     screen  = blend.Screen()
     overlay = blend.Overlay()
@@ -74,9 +83,3 @@ if __name__ == "__main__":
     ax2.set_title('Overlay')
     plt.show()
 
-
-
-
-            
-
-        
