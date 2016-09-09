@@ -46,7 +46,7 @@ and,
 " target="_blank"><img src="http://img.youtube.com/vi/XOcCguGU0cE/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
-Previous movies show a 3D rotation around a dark matter halo taken from a cosmological simulation and the "Cosmic Web Stripping" process, which arise from hydrodynamical interaction betweet the gas content of dwarf galaxies and the large-scale structure of the Universe, respectively
+Previous movies show a 3D rotation around a dark matter halo taken from a cosmological simulation and the "Cosmic Web Stripping" process, which arises from hydrodynamical interaction betweet the gas content of a dwarf galaxy and the large-scale structure of the Universe
 
 #Changelogs
 - version 1.0.4
