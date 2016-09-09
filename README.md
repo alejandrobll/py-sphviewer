@@ -16,7 +16,7 @@ or:
 
 Note that if you don't have *root* permissions, the --user flag is usually needed.
 
-In case you might want to clone and install the package from this repository, you can simply do:
+You may want to clone and install the package from this repository. In such a case, simply do:
 
     git clone https://github.com/alejandrobll/py-sphviewer.git
     cd py-sphviewer
