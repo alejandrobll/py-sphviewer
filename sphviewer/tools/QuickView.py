@@ -8,7 +8,7 @@ import numpy as np
 
 class QuickView():
     def    __init__(self, pos, mass=None, hsml=None, nb=None,
-                    logscale=True, plot=True, **kwargs):
+                    logscale=True, plot=True, min_hsml=None, max_hsml=None, **kwargs):
 
         if(mass is None):
             mass = np.ones(len(pos[0,:]))
@@ -18,6 +18,21 @@ class QuickView():
         else:
             self._P = sph.Particles(pos, mass, hsml, nb)
 
+        if( (min_hsml is not None) or (max_hsml is not None) ):
+            hsml = self.get_hsml()
+            if(min_hsml is not None):
+                min_hsml = min_hsml
+            else:
+                min_hsml = np.min(hsml)
+            if(max_hsml is not None):
+                max_hsml = max_hsml
+            else:
+                max_hsml = np.max(hsml)
+
+            hsml = np.clip(hsml, min_hsml, max_hsml)
+            print 'Limiting smoothing lenght to the range [%.3f,%.3f]'%(min_hsml, max_hsml)
+            self._P.set_hsml(hsml)
+            
         self._S = sph.Scene(self._P)
         self._S.update_camera(**kwargs)
 
@@ -52,6 +67,15 @@ class QuickView():
         except:
             print 'Error while saving image'
         return
+
+    def get_hsml(self):
+        return self._P.get_hsml()
         
         
+if __name__ == '__main__':
+    import h5py
+    halo = h5py.File('../../examples/dm_halo.h5py', 'r')
+    pos  = halo['Coordinates'].value
+
+    qv = QuickView(pos.T, r='infinity', nb=8)
     
