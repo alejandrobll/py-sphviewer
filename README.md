@@ -1,10 +1,9 @@
 # py-sphviewer [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703)
 
+Py-SPHViewer is a publicly available Python package to visualize and explore N-body + Hydrodynamics simulations. It does interpolate the underlying density field (or any other property) traced by a set of particles using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme, thus producing not only beautiful but also scientifically useful images. In addition, Py-SPHViewer enables the user to explore the simulated volumes using different projections. Finally, Py-SPHViewer provides the natural way to visualize in a self-consistent fashion gas dynamical simulations, which use the same technique to compute the interactions between particles.
 
 
-Py-SPHViewer is a publicly available Python package to visualize and explore N-body + Hidrodynamical simulations. It interpolates an underlaying density field (or any other property) traced by a finite set of particles using the Smoothed Particle Hydrodynamics interpolation scheme, and produces smooth images that can be easily interpreted. It does also provide the natural way for visualizing (in a self-consistent fashion) gas dynamical simulations, which uses the same technique to compute the interactions between particles.
-
-All expensive calculations are permormed by C compiled code, but it can be used interactively from Python, [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/). In addition, Py-SPHViewer allows to explore the simulated volumes using different projections. 
+All expensive calculations are permormed by compiled C code, but the package can be used interactively from a Python shell, [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/). 
  
 Latest versions are normally available in the Python Package Index (or [Pypi](https://pypi.python.org/pypi?:action=display&name=py-sphviewer&version=0.166) for short), and you can get those with:
 
