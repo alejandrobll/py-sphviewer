@@ -91,7 +91,7 @@ or in plain text:
 
 Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10.5281/zenodo.21703
 
-# Papers that have used py-sphviewer:
+# Papers that used py-sphviewer:
 
 I try to keep track of the papers that use py-sphviewer. If your paper used it and is not listed here, please let me know so that I can add it to the list:
 
