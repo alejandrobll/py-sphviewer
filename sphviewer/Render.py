@@ -1,5 +1,5 @@
-from scipy import weave
-from scipy.weave import converters
+#from scipy import weave
+#from scipy.weave import converters
 import numpy as np
 import matplotlib.pyplot as plt
 import os
