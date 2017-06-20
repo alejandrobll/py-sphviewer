@@ -1,6 +1,15 @@
 import numpy as np
 import scipy.interpolate as interp
 
+def get_snapshots_and_times(time, snaplist, timelist):
+    current_snap   = np.interp(time, timelist, snaplist)
+    lower_snapshot = np.floor(current_snap).astype(np.int32)
+    upper_snapshot = np.floor(current_snap).astype(np.int32)+1
+    lower_time     = timelist[lower_snapshot]
+    upper_time     = timelist[upper_snapshot]
+    return lower_snapshot, upper_snapshot, lower_time, upper_time
+                                
+
 def same_pass(param, frames):
     while 'same' in param:
         idx = param.index('same')
@@ -18,7 +27,7 @@ def get_camera_trayectory(targets,anchors):
     #It is based on a first code written by Adrien Thob, who was 
     #inspired by the "Surge Target" plugin for Adobe After Effects.
 
-    keys = ['id_targets', 't', 'p', 'r', 'zoom']
+    keys = ['sim_times', 'id_targets', 't', 'p', 'r', 'zoom']
     f_interp = {}
     for key in keys:
         frames = [i for i in anchors['id_frames']]
@@ -41,7 +50,7 @@ def get_camera_trayectory(targets,anchors):
     camera_params = []
     frames = np.arange(anchors['id_frames'][0], anchors['id_frames'][-1])
     camera_params = []
-    keys = ['r','t','p','x','y','z', 'zoom']
+    keys = ['sim_times','r','t','p','x','y','z', 'zoom']
     for i in frames:
         params = {}
         for key in keys:
@@ -61,6 +70,7 @@ if __name__ == "__main__":
     targets = [cm_1, cm_2]
 
     anchors = {}
+    anchors['sim_times'] = [0.0, 1.0, 'pass', 3.0, 'same','same','same']
     anchors['id_frames'] =  [0,180,750,840,930,1500,1680]
     anchors['r']         =  [10,2,'same',4,2,'same',10]
     anchors['id_targets']=  [0,1,'same','pass',0,'same',1]
