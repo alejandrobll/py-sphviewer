@@ -5,8 +5,12 @@ def get_snapshots_and_times(time, snaplist, timelist):
     current_snap   = np.interp(time, timelist, snaplist)
     lower_snapshot = np.floor(current_snap).astype(np.int32)
     upper_snapshot = np.floor(current_snap).astype(np.int32)+1
-    lower_time     = timelist[lower_snapshot]
-    upper_time     = timelist[upper_snapshot]
+    if(upper_snapshot < len(timelist)):
+        lower_time     = timelist[lower_snapshot]
+        upper_time     = timelist[upper_snapshot]
+    else:
+        lower_time     = timelist[lower_snapshot-1]
+        upper_time     = timelist[upper_snapshot-1]
     return lower_snapshot, upper_snapshot, lower_time, upper_time
                                 
 
@@ -56,7 +60,8 @@ def get_camera_trayectory(targets,anchors):
         for key in keys:
             params[key] = float(f_interp[key](i))
         camera_params.append(params)
-        
+   camera_params['id_frames'] = frames        
+
     return camera_params
 
 
