@@ -31,7 +31,7 @@ def get_camera_trayectory(targets,anchors):
     #It is based on a first code written by Adrien Thob, who was 
     #inspired by the "Surge Target" plugin for Adobe After Effects.
 
-    keys = ['sim_times', 'id_targets', 't', 'p', 'r', 'zoom']
+    keys = ['sim_times', 'id_targets', 't', 'p', 'r', 'zoom','extent']
     f_interp = {}
     for key in keys:
         frames = [i for i in anchors['id_frames']]
@@ -54,16 +54,20 @@ def get_camera_trayectory(targets,anchors):
     camera_params = []
     frames = np.arange(anchors['id_frames'][0], anchors['id_frames'][-1])
     camera_params = []
-    keys = ['sim_times','r','t','p','x','y','z', 'zoom']
+    keys = ['id_frames','sim_times','r','t','p','x','y','z', 'zoom','extent']
     for i in frames:
         params = {}
         for key in keys:
-            params[key] = float(f_interp[key](i))
+            if(key == 'id_frames'):
+                params[key] = i
+            elif(key == 'extent'):
+                value = float(f_interp[key](i))
+                params[key] = [-value, value, -value, value]
+            else:
+                params[key] = float(f_interp[key](i))
         camera_params.append(params)
-   camera_params['id_frames'] = frames        
 
     return camera_params
-
 
 if __name__ == "__main__":
     import sphviewer as sph
@@ -82,6 +86,7 @@ if __name__ == "__main__":
     anchors['t']         = [0,'pass','pass',45,'pass','pass',0]
     anchors['p']         = [0,'pass','pass','pass','pass','pass',900]
     anchors['zoom']      = [1.,'same','same','same','same','same','same']
+    anchors['extent']    = [10, 'pass','pass','pass','pass','pass',30]
     
     data = get_camera_trayectory(targets,anchors)
 
