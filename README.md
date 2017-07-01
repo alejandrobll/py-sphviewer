@@ -98,16 +98,18 @@ Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10
 
 # Papers that used py-sphviewer:
 
-I try to keep track of the papers that use py-sphviewer. If your paper used it and is not listed here, please let me know so that I can add it to the list:
+When people cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the scientific community. If your paper used the code and is not listed here, please let me know so that I can add it to the list. Some of the papers that used Py-SPHViewer are the following ones:
 
-* [Ludlow & Angulo (2016), Einasto Profiles and The Dark Matter Power Spectrum, arXiv:1610.04620] (https://arxiv.org/pdf/1610.04620)
-* [Benitez-Llambay et al. (2016), The properties of "dark" LCDM halos in the Local Group, arXiv:1609.01301] (https://arxiv.org/abs/1609.01301)
-* [Algorry et al. (2016), Barred galaxies in the EAGLE cosmological hydrodynamical simulation, arXiv:1609.05909] (https://arxiv.org/pdf/1609.05909)
-* [Ferrero et al. (2016), Size matters: abundance matching, galaxy sizes, and the Tully-Fisher relation in EAGLE, arXiv:1607.03100] (https://arxiv.org/pdf/1607.03100)
-* [Benitez-Llambay et al. (2016), Mergers and the outside-in formation of dwarf spheroidals, arXiv:1511.06188] (https://arxiv.org/abs/1511.06188)
-* [Benitez-Llambay et al. (2015), The imprint of reionization on the star formation histories of dwarf galaxies, arXiv:1405.5540] (https://arxiv.org/abs/1405.5540)
-* [Algorry et al. (2014), Counterrotating stars in simulated galaxy discs, arXiv:1311.1215] (https://arxiv.org/pdf/1311.1215)
-* [Benitez-Llambay et al. (2013), Dwarf Galaxies and the Cosmic Web, arXiv:1211.0536] (https://arxiv.org/abs/1211.0536)
+* Leo et al. (2017), The Effect of Thermal Velocities on
+Structure Formation in N-body Simulations of Warm Dark Matter, arXiv:1706.07837 (https://arxiv.org/abs/1706.07837)
+* Ludlow & Angulo (2016), Einasto Profiles and The Dark Matter Power Spectrum, arXiv:1610.04620 (https://arxiv.org/pdf/1610.04620)
+* Benitez-Llambay et al. (2016), The properties of "dark" LCDM halos in the Local Group, arXiv:1609.01301 (https://arxiv.org/abs/1609.01301)
+* Algorry et al. (2016), Barred galaxies in the EAGLE cosmological hydrodynamical simulation, arXiv:1609.05909 (https://arxiv.org/pdf/1609.05909)
+* Ferrero et al. (2016), Size matters: abundance matching, galaxy sizes, and the Tully-Fisher relation in EAGLE, arXiv:1607.03100 (https://arxiv.org/pdf/1607.03100)
+* Benitez-Llambay et al. (2016), Mergers and the outside-in formation of dwarf spheroidals, arXiv:1511.06188 (https://arxiv.org/abs/1511.06188)
+* Benitez-Llambay et al. (2015), The imprint of reionization on the star formation histories of dwarf galaxies, arXiv:1405.5540 (https://arxiv.org/abs/1405.5540)
+* Algorry et al. (2014), Counterrotating stars in simulated galaxy discs, arXiv:1311.1215 (https://arxiv.org/pdf/1311.1215)
+* Benitez-Llambay et al. (2013), Dwarf Galaxies and the Cosmic Web, arXiv:1211.0536 (https://arxiv.org/abs/1211.0536)
 
 
 
