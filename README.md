@@ -112,8 +112,6 @@ Structure Formation in N-body Simulations of Warm Dark Matter, arXiv:1706.07837 
 * Algorry et al. (2014), Counterrotating stars in simulated galaxy discs, arXiv:1311.1215 (https://arxiv.org/pdf/1311.1215)
 * Benitez-Llambay et al. (2013), Dwarf Galaxies and the Cosmic Web, arXiv:1211.0536 (https://arxiv.org/abs/1211.0536)
 
-https://arxiv.org/abs/1707.08046
-
 
 
 
