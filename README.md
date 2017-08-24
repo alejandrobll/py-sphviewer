@@ -100,6 +100,7 @@ Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10
 
 When people cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the scientific community. If your paper used the code and is not listed here, please let me know so that I can add it to the list. Some of the papers that used Py-SPHViewer are the following ones:
 
+* Benitez-Llambay et al. (2017), The vertical structure of gaseous galaxy discs in cold dark matter halos, arXiv:1707.08046 (https://arxiv.org/abs/1707.08046)
 * Leo et al. (2017), The Effect of Thermal Velocities on
 Structure Formation in N-body Simulations of Warm Dark Matter, arXiv:1706.07837 (https://arxiv.org/abs/1706.07837)
 * Ludlow & Angulo (2016), Einasto Profiles and The Dark Matter Power Spectrum, arXiv:1610.04620 (https://arxiv.org/pdf/1610.04620)
@@ -111,7 +112,7 @@ Structure Formation in N-body Simulations of Warm Dark Matter, arXiv:1706.07837 
 * Algorry et al. (2014), Counterrotating stars in simulated galaxy discs, arXiv:1311.1215 (https://arxiv.org/pdf/1311.1215)
 * Benitez-Llambay et al. (2013), Dwarf Galaxies and the Cosmic Web, arXiv:1211.0536 (https://arxiv.org/abs/1211.0536)
 
-
+https://arxiv.org/abs/1707.08046
 
 
 
