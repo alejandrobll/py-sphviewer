@@ -53,7 +53,7 @@ alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
 Previous movies shows a 3D rotation around a dark matter halo taken from a cosmological simulation and the "Cosmic Web Stripping" process, which arises from hydrodynamical interaction betweet the gas content of a dwarf galaxy and the large-scale structure of the Universe
 
-#Changelogs
+# Changelogs
 - version 1.0.5
   * Scipy.weave is now deprecated in Scipy 0.19, so I removed all dependencies to it.
   * Minor bugs fixed.
