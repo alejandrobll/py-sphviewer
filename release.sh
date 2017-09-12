@@ -1,2 +1,2 @@
-python setup.py register
-python setup.py sdist upload
+python setup.py register -r pypi
+python setup.py sdist upload -r pypi
