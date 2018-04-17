@@ -1,0 +1,10 @@
+name: py-sphviewer
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - numpy
+  - matplotlib
+  - h5py
+  - pip:
+    - py-sphviewer
