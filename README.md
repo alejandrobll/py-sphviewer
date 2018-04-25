@@ -25,7 +25,9 @@ Perhaps a good example of the current power of Py-SPHViewer is the logo of the p
 
 ![Image](https://raw.githubusercontent.com/alejandrobll/py-sphviewer/master/wiki/pysph-logo_small.png)
 
-which shows the dark matter distribution colored according to the velocity dispersion of a small halo taken from a cosmological simulation.
+which shows the dark matter distribution colored according to the velocity dispersion of a small halo taken from a cosmological simulation, or this mock image of a galaxy:
+
+<img src="https://alejandrobll.files.wordpress.com/2015/07/stars-05.jpeg" width="300" height="300">
 
 More examples of the power of Py-SPHViewer are the following movies:
 
