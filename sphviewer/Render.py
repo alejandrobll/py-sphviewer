@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, division
 
 #from scipy import weave
 #from scipy.weave import converters
