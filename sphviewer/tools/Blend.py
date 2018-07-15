@@ -18,7 +18,7 @@ class Blend(object):
         if np.shape(self.image1)[2] == 4:  # test for RGBA input image
             output[:,:,3] = 1  # set alpha values to unity
 
-        for i in xrange(3):
+        for i in range(3):
             output[:,:,i] = (1.0-(1.0-self.image1[:,:,i])*
                                  (1.0-self.image2[:,:,i]))
         return output
@@ -29,7 +29,7 @@ class Blend(object):
         if np.shape(self.image1)[2] == 4:  # test for RGBA input image
             output[:,:,3] = 1  # set alpha values to unity
 
-        for i in xrange(3):
+        for i in range(3):
             output[:,:,i] = (self.image1[:,:,i]*
                             (self.image1[:,:,i]+2*self.image2[:,:,i]*
                             (1.0-self.image1[:,:,i])) )

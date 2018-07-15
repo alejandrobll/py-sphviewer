@@ -195,7 +195,7 @@ class Particles(object):
         if self.__verbose:
                 print('Searching the ', nb,
                       'closer neighbors to each particle...')
-        for rank in xrange(size):
+        for rank in range(size):
             task = multiprocessing.Process(target=self.__nbsearch, 
                                            args=(pos[rank], nb, tree, 
                                                  out_hsml,rank))
@@ -208,7 +208,7 @@ class Particles(object):
 
             index = []
             hsml  = []
-        for i in xrange(size):
+        for i in range(size):
             a, b = out_hsml.get()
             index.append(a)
             hsml.append(b)

@@ -36,7 +36,7 @@ if __name__ == '__main__':
     Particles1 = Particles(pos,mass,sort=True)
     Scene1 = Scene(Particles1)
     Render1 = Render(Scene1)
-    for i in xrange(100):
+    for i in range(100):
         start = time.time()
         Scene1.update_camera(r=2.00, t=90, roll=30, xsize=1920, ysize=1080)
         Render1 = Render(Scene1)
