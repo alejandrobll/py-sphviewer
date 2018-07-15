@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 #from scipy import weave
 #from scipy.weave import converters
 import numpy as np
@@ -62,11 +64,11 @@ class Render():
 
 
     def __make_render(self,x,y,t,kview,xsize,ysize):
-        import extensions.render
+        from .extensions import render
 
         mass = self.Scene._Particles.get_mass()[kview]
 
-        image = extensions.render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
+        image = render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
         return np.reshape(image,[ysize,xsize])
 
 

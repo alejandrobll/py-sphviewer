@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -61,7 +63,7 @@ class Scene():
 
         #I use the autocamera by default
         if(Camera==None):
-            from Camera import Camera
+            from .Camera import Camera
             self.Camera = Camera()
             self.Camera.set_autocamera(Particles)
             self._camera_params = self.Camera.get_params()
@@ -72,7 +74,7 @@ class Scene():
                 if(camera_name != 'CAMERA'):
                     print "You must use a valid Camera class..."
                     print "I will try to set an autocamera..."
-                    from Camera import Camera
+                    from .Camera import Camera
                     self.Camera = Camera()
                     self.Camera.set_autocamera(Particles)
                     self._camera_params = self.Camera.get_params()
@@ -82,7 +84,7 @@ class Scene():
             except AttributeError:
                 print "You must use a valid Camera class..."
                 print "I will try to set an autocamera..."
-                from Camera import Camera
+                from .Camera import Camera
                 self.Camera = Camera()
                 self.Camera.set_autocamera(Particles)
                 self._camera_params = self.Camera.get_params()
@@ -130,7 +132,7 @@ class Scene():
         self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def __compute_scene(self):
-        import extensions.scene as scene
+        from .extensions import scene
 
         pos = self._Particles.get_pos().astype(np.float32)
         hsml = self._Particles.get_hsml().astype(np.float32)

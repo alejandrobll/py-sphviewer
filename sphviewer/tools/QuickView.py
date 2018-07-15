@@ -2,6 +2,8 @@
 #way to get quick images of the simulations.
 #Author: Alejandro Benitez-Llambay
 
+from __future__ import absolute_import
+
 import sphviewer as sph
 import matplotlib.pyplot as plt
 import numpy as np

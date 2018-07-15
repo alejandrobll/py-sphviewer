@@ -6,14 +6,16 @@ Author: Alejandro Benitez-Llambay
 E-mail: If you have any question, or you want to report bugs, issues, etc., please contact me at alejandrobll@oac.uncor.edu.
 Acknowledgment: Many thanks to Pablo Benitez-Llambay. He has improved the original idea a lot, and without his help, Py-SPHViewer would not be what it is. 
 """
+from __future__ import absolute_import
 
-from Particles import Particles
-from Camera import Camera
-from Scene import Scene
-from Render import Render
 import numpy as np
 import matplotlib.pyplot as plt
-from version import __version__
+
+from .Particles import Particles
+from .Camera import Camera
+from .Scene import Scene
+from .Render import Render
+from .version import __version__
 
 if __name__ == '__main__':
     import time

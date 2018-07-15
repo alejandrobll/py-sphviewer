@@ -2,8 +2,12 @@
 #This tools is part of py-sphviewer. 
 #Author: Alejandro Benitez-Llambay
 #//////////////////////////////////////////////////////
-from makehsv import makehsv
+from __future__ import absolute_import
+
 import numpy as np
+
+from .makehsv import makehsv
+
 
 def image_from_hsv(h = 0, v = 0, 
                    img_hmin = None, img_hmax=None,
