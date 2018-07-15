@@ -2,7 +2,7 @@
 #way to get quick images of the simulations.
 #Author: Alejandro Benitez-Llambay
 
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import sphviewer as sph
 import matplotlib.pyplot as plt
@@ -32,7 +32,8 @@ class QuickView():
                 max_hsml = np.max(hsml)
 
             hsml = np.clip(hsml, min_hsml, max_hsml)
-            print 'Limiting smoothing lenght to the range [%.3f,%.3f]'%(min_hsml, max_hsml)
+            print('Limiting smoothing length to the range '
+                  '[%.3f,%.3f]' % (min_hsml, max_hsml))
             self._P.set_hsml(hsml)
             
         self._S = sph.Scene(self._P)
@@ -65,9 +66,9 @@ class QuickView():
     def imsave(self, filename, **kwargs):
         try:
             plt.imsave(filename, self._img, **kwargs)
-            print 'Image saved in '+ filename
+            print('Image saved in', filename)
         except:
-            print 'Error while saving image'
+            print('Error while saving image')
         return
 
     def get_hsml(self):

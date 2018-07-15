@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import matplotlib.pylab as plt
@@ -41,8 +41,8 @@ class Camera():
             camera = plt.Line2D([ycam],[zcam], c='m', marker='o', markersize=15, **kargs)
             arrow =  plt.Line2D([ycam,self.__params['y']],[zcam,self.__params['z']],lw=5)
         else:
-            print 'Incorrect plane:', plane
-            print "Possibles planes are: 'xy';'xz';'yz'"
+            print('Incorrect plane:', plane)
+            print("Possibles planes are: 'xy';'xz';'yz'")
             return
         return camera, arrow
 
@@ -57,10 +57,10 @@ class Camera():
         try:
             particles_name = Particles._name
         except AttributeError:
-            print "You must use a valid class..."
+            print("You must use a valid class...")
             return
         if (particles_name != 'PARTICLES'):
-            print "You must use a valid Particles class..."
+            print("You must use a valid Particles class...")
             return
         xmax,ymax,zmax = (np.max(Particles.get_pos()[0,:]),
                           np.max(Particles.get_pos()[1,:]),

@@ -6,7 +6,7 @@ Author: Alejandro Benitez-Llambay
 E-mail: If you have any question, or you want to report bugs, issues, etc., please contact me at alejandrobll@oac.uncor.edu.
 Acknowledgment: Many thanks to Pablo Benitez-Llambay. He has improved the original idea a lot, and without his help, Py-SPHViewer would not be what it is. 
 """
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         img = Render1.get_image()
         extent = Render1.get_extent()
         stop = time.time()
-        print 'Time = ', stop-start
+        print('Time = ', stop - start)
         fig = plt.figure(1,figsize=(5,5))
         ax1 = fig.add_subplot(111)
         ax1.imshow(img, extent=extent, origin='lower', cmap='hot')

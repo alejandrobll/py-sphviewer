@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 #from scipy import weave
 #from scipy.weave import converters
@@ -47,10 +47,10 @@ class Render():
         try:
             class_name = Scene._name
         except AttributeError:
-            print "You must use a valid class..."
+            print("You must use a valid class...")
             return
         if(class_name != 'SCENE'):
-            print "You must use a valid class..."
+            print("You must use a valid class...")
             return
 
         self.Scene = Scene
@@ -174,7 +174,7 @@ class Render():
         trapezoidal integration of the probability density function::
         
         pdf, bins, patches = ax.hist(...)
-        print np.sum(pdf * np.diff(bins))
+        print(np.sum(pdf * np.diff(bins)))
         
         .. note::
         

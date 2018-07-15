@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import scipy.interpolate as interp
@@ -111,7 +111,7 @@ if __name__ == "__main__":
         i['roll'] = 0
         S = sph.Scene(P)
         S.update_camera(**i)
-        print S.Camera.get_params()
+        print(S.Camera.get_params())
         R = sph.Render(S)
         img = R.get_image()
         R.set_logscale()

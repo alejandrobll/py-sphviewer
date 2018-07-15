@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -52,10 +52,10 @@ class Scene():
         try:
             particles_name = Particles._name
         except AttributeError:
-            print "You must use a valid Particles class..."
+            print("You must use a valid Particles class...")
             return
         if(particles_name != 'PARTICLES'):
-            print "You must use a valid Particles class..."
+            print("You must use a valid Particles class...")
             return
 
         self._name = 'SCENE'
@@ -72,8 +72,8 @@ class Scene():
             try: 
                 camera_name = Camera._name
                 if(camera_name != 'CAMERA'):
-                    print "You must use a valid Camera class..."
-                    print "I will try to set an autocamera..."
+                    print("You must use a valid Camera class...")
+                    print("I will try to set an autocamera...")
                     from .Camera import Camera
                     self.Camera = Camera()
                     self.Camera.set_autocamera(Particles)
@@ -82,8 +82,8 @@ class Scene():
                     self.Camera = Camera
                     self._camera_params = self.Camera.get_params()
             except AttributeError:
-                print "You must use a valid Camera class..."
-                print "I will try to set an autocamera..."
+                print("You must use a valid Camera class...")
+                print("I will try to set an autocamera...")
                 from .Camera import Camera
                 self.Camera = Camera()
                 self.Camera.set_autocamera(Particles)
@@ -228,7 +228,7 @@ class Scene():
                 pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
             
             except AttributeError:
-                print "There was an error with the extent of the Camera"
+                print("There was an error with the extent of the Camera")
                 return
                     
             return pos[0,:], pos[1,:], hsml, kview
