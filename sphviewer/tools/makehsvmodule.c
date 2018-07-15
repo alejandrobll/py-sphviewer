@@ -166,7 +166,29 @@ static PyMethodDef MakehsvMethods[] = {
   {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "makehsv",      /* m_name */
+    NULL,           /* m_doc */
+    -1,             /* m_size */
+    MakehsvMethods, /* m_methods */
+    NULL,           /* m_reload */
+    NULL,           /* m_traverse */
+    NULL,           /* m_clear */
+    NULL,           /* m_free */
+};
+
+PyMODINIT_FUNC
+PyInit_makehsv(void)
+{
+    PyObject *m = PyModule_Create(&moduledef);
+    import_array();
+    return m;
+}
+#else
 PyMODINIT_FUNC initmakehsv(void) {
   (void) Py_InitModule("makehsv", MakehsvMethods);
   import_array();
 }
+#endif

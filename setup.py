@@ -36,6 +36,7 @@ setup(name='py-sphviewer',
       license='GNU GPL v3',
       classifiers=[
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Multimedia :: Graphics',
         'Topic :: Multimedia :: Graphics :: 3D Rendering',
         'Topic :: Multimedia :: Graphics :: Viewers',

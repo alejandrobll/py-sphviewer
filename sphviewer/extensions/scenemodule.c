@@ -253,8 +253,30 @@ static PyMethodDef SceneMethods[] = {
   {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "scene",        /* m_name */
+    NULL,           /* m_doc */
+    -1,             /* m_size */
+    SceneMethods,   /* m_methods */
+    NULL,           /* m_reload */
+    NULL,           /* m_traverse */
+    NULL,           /* m_clear */
+    NULL,           /* m_free */
+};
+
+PyMODINIT_FUNC
+PyInit_scene(void)
+{
+    PyObject *m = PyModule_Create(&moduledef);
+    import_array();
+    return m;
+}
+#else
 PyMODINIT_FUNC initscene(void) {
   (void) Py_InitModule("scene", SceneMethods);
   import_array();
 }
+#endif
 

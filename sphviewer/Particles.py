@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing
@@ -5,7 +7,8 @@ from multiprocessing import Manager
 from scipy.spatial import cKDTree
 from pykdtree.kdtree import KDTree # pykdtree by Esben S. Nielsen 
 
-class Particles():
+
+class Particles(object):
     def __init__(self, pos,
                  mass = None,
                  hsml = None,
@@ -178,7 +181,8 @@ class Particles():
         out_hsml  = manager.Queue()
         size  = multiprocessing.cpu_count()	
 
-        if(self.__verbose): print 'Building a KDTree...'
+        if self.__verbose:
+            print('Building a KDTree...')
         tree = self.__make_kdtree(pos)
 
         index  = np.arange(np.shape(pos)[1])
@@ -188,8 +192,10 @@ class Particles():
         procs = []
 
         #We distribute the tasks among different processes
-        if(self.__verbose): print 'Searching the ', nb, 'closer neighbors to each particle...'
-        for rank in xrange(size):
+        if self.__verbose:
+                print('Searching the ', nb,
+                      'closer neighbors to each particle...')
+        for rank in range(size):
             task = multiprocessing.Process(target=self.__nbsearch, 
                                            args=(pos[rank], nb, tree, 
                                                  out_hsml,rank))
@@ -202,16 +208,17 @@ class Particles():
 
             index = []
             hsml  = []
-        for i in xrange(size):
+        for i in range(size):
             a, b = out_hsml.get()
             index.append(a)
             hsml.append(b)
-    #	    if(a == 0): print b[0]			
+    #	    if a == 0: print(b[0])
 
             #I have to order the data before return it
         k = np.argsort(index)
         hsml1 = np.array([])
         for i in k:
             hsml1 = np.append(hsml1,hsml[i])
-        if(self.__verbose): print 'Done...'
+        if self.__verbose:
+            print('Done...')
         return hsml1        

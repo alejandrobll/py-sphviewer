@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function
+
 #from scipy import weave
 #from scipy.weave import converters
 import numpy as np
@@ -16,7 +18,7 @@ def import_code(filename):
     return string
 
 
-class Render():
+class Render(object):
     def __init__(self,Scene):
         """
         sphviewer.Render class renderizes a sphviewer.Scene class. It uses a kernel interpolation 
@@ -45,10 +47,10 @@ class Render():
         try:
             class_name = Scene._name
         except AttributeError:
-            print "You must use a valid class..."
+            print("You must use a valid class...")
             return
         if(class_name != 'SCENE'):
-            print "You must use a valid class..."
+            print("You must use a valid class...")
             return
 
         self.Scene = Scene
@@ -62,11 +64,11 @@ class Render():
 
 
     def __make_render(self,x,y,t,kview,xsize,ysize):
-        import extensions.render
+        from .extensions import render
 
         mass = self.Scene._Particles.get_mass()[kview]
 
-        image = extensions.render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
+        image = render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
         return np.reshape(image,[ysize,xsize])
 
 
@@ -172,7 +174,7 @@ class Render():
         trapezoidal integration of the probability density function::
         
         pdf, bins, patches = ax.hist(...)
-        print np.sum(pdf * np.diff(bins))
+        print(np.sum(pdf * np.diff(bins)))
         
         .. note::
         

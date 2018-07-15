@@ -1,10 +1,12 @@
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 #Tools for blending images. There are plenty of possibilities, and
 #depending on the images, the final result can vary significantly.
-
-class Blend():
+class Blend(object):
     def __init__(self, image1, image2):
         self.image1 = image1
         self.image2 = image2
@@ -16,7 +18,7 @@ class Blend():
         if np.shape(self.image1)[2] == 4:  # test for RGBA input image
             output[:,:,3] = 1  # set alpha values to unity
 
-        for i in xrange(3):
+        for i in range(3):
             output[:,:,i] = (1.0-(1.0-self.image1[:,:,i])*
                                  (1.0-self.image2[:,:,i]))
         return output
@@ -27,7 +29,7 @@ class Blend():
         if np.shape(self.image1)[2] == 4:  # test for RGBA input image
             output[:,:,3] = 1  # set alpha values to unity
 
-        for i in xrange(3):
+        for i in range(3):
             output[:,:,i] = (self.image1[:,:,i]*
                             (self.image1[:,:,i]+2*self.image2[:,:,i]*
                             (1.0-self.image1[:,:,i])) )

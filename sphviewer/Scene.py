@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,7 +19,8 @@ def rotate(angle, axis, pos):
                       [0,0,1]])
     return np.dot(R,pos)
 
-class Scene():
+
+class Scene(object):
     def __init__(self, Particles, Camera=None):
         """
         Scene class takes a sphviewer.Particles class and computes the 
@@ -50,10 +53,10 @@ class Scene():
         try:
             particles_name = Particles._name
         except AttributeError:
-            print "You must use a valid Particles class..."
+            print("You must use a valid Particles class...")
             return
         if(particles_name != 'PARTICLES'):
-            print "You must use a valid Particles class..."
+            print("You must use a valid Particles class...")
             return
 
         self._name = 'SCENE'
@@ -61,7 +64,7 @@ class Scene():
 
         #I use the autocamera by default
         if(Camera==None):
-            from Camera import Camera
+            from .Camera import Camera
             self.Camera = Camera()
             self.Camera.set_autocamera(Particles)
             self._camera_params = self.Camera.get_params()
@@ -70,9 +73,9 @@ class Scene():
             try: 
                 camera_name = Camera._name
                 if(camera_name != 'CAMERA'):
-                    print "You must use a valid Camera class..."
-                    print "I will try to set an autocamera..."
-                    from Camera import Camera
+                    print("You must use a valid Camera class...")
+                    print("I will try to set an autocamera...")
+                    from .Camera import Camera
                     self.Camera = Camera()
                     self.Camera.set_autocamera(Particles)
                     self._camera_params = self.Camera.get_params()
@@ -80,9 +83,9 @@ class Scene():
                     self.Camera = Camera
                     self._camera_params = self.Camera.get_params()
             except AttributeError:
-                print "You must use a valid Camera class..."
-                print "I will try to set an autocamera..."
-                from Camera import Camera
+                print("You must use a valid Camera class...")
+                print("I will try to set an autocamera...")
+                from .Camera import Camera
                 self.Camera = Camera()
                 self.Camera.set_autocamera(Particles)
                 self._camera_params = self.Camera.get_params()
@@ -130,7 +133,7 @@ class Scene():
         self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
 
     def __compute_scene(self):
-        import extensions.scene as scene
+        from .extensions import scene
 
         pos = self._Particles.get_pos().astype(np.float32)
         hsml = self._Particles.get_hsml().astype(np.float32)
@@ -226,7 +229,7 @@ class Scene():
                 pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
             
             except AttributeError:
-                print "There was an error with the extent of the Camera"
+                print("There was an error with the extent of the Camera")
                 return
                     
             return pos[0,:], pos[1,:], hsml, kview
