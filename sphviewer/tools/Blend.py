@@ -3,10 +3,10 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 #Tools for blending images. There are plenty of possibilities, and
 #depending on the images, the final result can vary significantly.
-
-class Blend():
+class Blend(object):
     def __init__(self, image1, image2):
         self.image1 = image1
         self.image2 = image2

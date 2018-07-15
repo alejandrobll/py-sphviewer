@@ -18,7 +18,7 @@ def import_code(filename):
     return string
 
 
-class Render():
+class Render(object):
     def __init__(self,Scene):
         """
         sphviewer.Render class renderizes a sphviewer.Scene class. It uses a kernel interpolation 

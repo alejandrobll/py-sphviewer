@@ -8,7 +8,8 @@ import sphviewer as sph
 import matplotlib.pyplot as plt
 import numpy as np
 
-class QuickView():
+
+class QuickView(object):
     def    __init__(self, pos, mass=None, hsml=None, nb=None,
                     logscale=True, plot=True, min_hsml=None, max_hsml=None, **kwargs):
 

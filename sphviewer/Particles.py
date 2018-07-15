@@ -7,7 +7,8 @@ from multiprocessing import Manager
 from scipy.spatial import cKDTree
 from pykdtree.kdtree import KDTree # pykdtree by Esben S. Nielsen 
 
-class Particles():
+
+class Particles(object):
     def __init__(self, pos,
                  mass = None,
                  hsml = None,

@@ -3,7 +3,8 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pylab as plt
 
-class Camera():
+
+class Camera(object):
     def __init__(self, x = None, y = None, z = None, r = None, 
                  t = None, p = None, zoom  = None, roll = None,
                  xsize = None, ysize = None, extent = None):

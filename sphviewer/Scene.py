@@ -19,7 +19,8 @@ def rotate(angle, axis, pos):
                       [0,0,1]])
     return np.dot(R,pos)
 
-class Scene():
+
+class Scene(object):
     def __init__(self, Particles, Camera=None):
         """
         Scene class takes a sphviewer.Particles class and computes the 
