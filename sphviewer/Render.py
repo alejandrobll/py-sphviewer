@@ -21,8 +21,8 @@ def import_code(filename):
 class Render(object):
     def __init__(self,Scene):
         """
-        sphviewer.Render class renderizes a sphviewer.Scene class. It uses a kernel interpolation 
-        method. It has setting and getting methods:
+        Produces a render of the Scene. It uses a kernel interpolation 
+        method. Its setting and getting methods are:
         
         getting methods:
         ----------------
@@ -47,10 +47,10 @@ class Render(object):
         try:
             class_name = Scene._name
         except AttributeError:
-            print("You must use a valid class...")
+            print("ERROR: use a valid class...")
             return
         if(class_name != 'SCENE'):
-            print("You must use a valid class...")
+            print("ERROR: use a valid class...")
             return
 
         self.Scene = Scene
@@ -98,26 +98,28 @@ class Render(object):
 
     def get_image(self):
         """
-        - get_image(): This method returns the matrix of the image, whose dimension is [xsize,ysize], 
-        where xsize and ysize are the number of pixels of the image defined as parameters of the camera.
+        - get_image(): Returns the image, with dimension [xsize,ysize], 
+        where xsize and ysize are the number of pixels of the image defined by the Camera.
         """
-        return self.__image
+        extent = self.Scene.get_extent()
+        pixel_side = abs(extent[1]-extent[0])
+        return self.__image / pixel_side**2
 
     def get_max(self):
         """
-        - get_max(): This method returns the maximum value found in the image.
+        - get_max(): Returns the maximum value of the image.
         """
         return np.max(self.__image)
 
     def get_min(self):
         """
-        - get_min(): This method returns the minimum value found in the image.
+        - get_min(): Returns the minimum value of the image.
         """
         return np.min(self.__image)
 
     def get_extent(self):
         """
-        - get_extent(): It calls to the method get_extent from the sphviewer.Scene class.
+        - get_extent(): call to sphviewer.Scene.get_extent().
         """
         return self.Scene.get_extent()
 
@@ -137,15 +139,15 @@ class Render(object):
 
     def get_logscale(self):
         """
-        - get_logscale(): It returns True or False depending on the scale of the image.
+        - get_logscale(): Returns True or False depending on the scale of the image.
         """
         return self.__logscale_flag
 
     def histogram(self,axis=None, **kargs):
         """
         - histogram(axis=None, **kargs): It computes and shows the histogram of the image. This is 
-        usefull in order to choose a proper scale to the output, or for clipping some values. If 
-        axis is None, it choose the current axis to plot the histogram.
+        usefull for choosing a proper scale to the output, or for clipping some values. If 
+        axis is None, it selects the current axis to plot the histogram.
         
         Keyword arguments:
         
@@ -295,9 +297,8 @@ class Render(object):
         
     def save(self,outputfile,**kargs):
         """
-        - save allows to save the image in any of the 
-        common image formats. It uses the pyplot.save 
-        method. 
+        - Save the image in some common image formats. It uses the pyplot.save 
+        method.  
         outputfile is a string containing a path to a filename, 
         of a Python file-like object. If *format* is *None* and
         *fname* is a string, the output format is deduced from
