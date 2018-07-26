@@ -68,7 +68,7 @@ Previous movies shows a 3D rotation around a dark matter halo taken from a cosmo
   * Minor bugs fixed.
 
 - version 1.0.4
-   * New QuickView tool for making quick visualizations using just one single line of code (see this [post](https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/) for instructions).
+   * New QuickView tool for making quick visualizations using just one single line of code (see this [post](https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview) for instructions).
    * I added a new directory called "examples", which essentially contains hdf5 files with simulation outputs. Those are useful to perform quick tests. 
    * Minor bugs fixed.
 
@@ -81,8 +81,8 @@ Py-SPHViewer is under GNU GPL v3 licence, and was started by Alejandro Benitez-L
 
 If you are interested in using Py-SPHVIewer, you should take a look at this extremely simple Tutorial. In addition, I wrote a few posts highlighting some of the capabilities of Py-SPHViewer. Here I list some of them:
 
-* [Using QuickView to simplify the use of Py-SPHViewer] (https://alejandrobll.wordpress.com/2016/05/04/using-quickview-from-py-sphviewer-1-0-4/)
-* [Streamlines with Py-SPHViewer] (https://alejandrobll.wordpress.com/2016/08/29/streamlines-with-py-sphviewer/)
+* [Using QuickView to simplify the use of Py-SPHViewer] (https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview)
+* [Streamlines with Py-SPHViewer] (https://sites.google.com/view/abll/codes/py-sphviewer/streamlines)
 
 # Citing the code
 
