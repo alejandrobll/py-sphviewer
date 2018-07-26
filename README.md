@@ -81,7 +81,7 @@ Py-SPHViewer is under GNU GPL v3 licence, and was started by Alejandro Benitez-L
 
 If you are interested in using Py-SPHVIewer, you should take a look at this extremely simple Tutorial. In addition, I wrote a few posts highlighting some of the capabilities of Py-SPHViewer. Here I list some of them:
 
-* [Using QuickView to simplify the use of Py-SPHViewer](https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview)
+* [Using QuickView](https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview)
 * [Streamlines with Py-SPHViewer](https://sites.google.com/view/abll/codes/py-sphviewer/streamlines)
 
 # Citing the code
