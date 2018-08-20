@@ -113,6 +113,7 @@ Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10
 
 When people cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the scientific community. If your paper used the code and is not listed here, please let me know so that I can add it to the list. Some of the papers that used Py-SPHViewer are the following ones:
 
+* Cui et al. (2018), The Three Hundred project: a large catalogue of theoretically modelled galaxy clusters for cosmological and astrophysical applications, MNRAS 480, 2898. ([Link](https://academic.oup.com/mnras/article-abstract/480/3/2898/5066184?redirectedFrom=fulltext))
 * Barber et al. (2018), Calibrated, cosmological hydrodynamical simulations with variable IMFs III: Spatially-resolved properties and evolution, arXiv:1807.11310 (https://arxiv.org/abs/1807.11310)
 * Salcido et al. (2017),  The impact of dark energy on galaxy formation. What does the future of our Universe hold? , arXiv:1710.06861 (https://arxiv.org/abs/1710.06861)
 * Benitez-Llambay et al. (2017), The vertical structure of gaseous galaxy discs in cold dark matter halos, arXiv:1707.08046 (https://arxiv.org/abs/1707.08046)
