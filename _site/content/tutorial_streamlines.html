@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+
+    
+    <meta charset="UTF-8">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Streamlines with Py-SPHViewer | Py-SPHViewer</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Streamlines with Py-SPHViewer" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Py-SPHViewer is a Python package to visualize and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme." />
+<meta property="og:description" content="Py-SPHViewer is a Python package to visualize and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme." />
+<link rel="canonical" href="http://localhost:4000/content/tutorial_streamlines.html" />
+<meta property="og:url" content="http://localhost:4000/content/tutorial_streamlines.html" />
+<meta property="og:site_name" content="Py-SPHViewer" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Streamlines with Py-SPHViewer","url":"http://localhost:4000/content/tutorial_streamlines.html","description":"Py-SPHViewer is a Python package to visualize and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/assets/css/style.css?v=e710a28b8a226db936100a4766b4ec6daa6ec462">
+  </head>
+  <body>
+    <a id="skip-to-content" href="#content">Skip to the content.</a>
+
+    <header class="page-header" role="banner">
+      <h1 class="project-name">Py-SPHViewer</h1>
+      <h2 class="project-tagline">Py-SPHViewer is a Python package to visualize and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme.</h2>
+
+      <a href="/index.html" class="btn">Home</a>
+      <a href=" /content/tutorials.html" class="btn">Tutorials</a>
+      <a href="/content/gallery.html" class="btn">Gallery</a>
+
+      
+        <a href="http://github.com/alejandrobll/py-sphviewer" class="btn">View on GitHub</a>
+      
+      
+        <a href="https://github.com/alejandrobll/py-sphviewer/archive/master.zip" class="btn">Download .zip</a>
+	
+
+
+
+    </header>
+
+    <main id="content" class="main-content" role="main">
+      <h1 id="streamlines-of-n-body-simulations">Streamlines of N-body simulations</h1>
+
+<p>Have you ever wondered how to get the <a href="https://en.wikipedia.org/wiki/Streamlines,_streaklines,_and_pathlines">streamlines</a> of the velocity field of a N-body simulation?</p>
+
+<p>Streamlines are an extraordinary tool to get insight on what is going on in a simulation by inspecting one single snapshot. They are also extremely useful in many applications that are outside the scope of this tutorial.</p>
+
+<p>The Figure below shows the streamlines of the velocity field of a cosmological N-body simulation. Although the underlying density field is not shown, we can infer its presence by looking at the flux lines. Indeed, we can infer the presence of a “void” at (x,y) = (10,-20) because the flux lines point outward. We can also infer the location of filaments by looking at the intersection of opposing lines.</p>
+
+<p align="center">
+   <img src="../assets/img/tutorial_streamlines_1.png" alt="Streamlines with Py-SPHViewer" />
+</p>
+
+<p>Doing streamlines plots is relatively straightforward once we have the velocity field calculated on a regular grid. However, for N-body simulations (or hydrodynamical SPH simulations) this information is not usually available. Here is where Py-SPHViewer can give us a hand.</p>
+
+<p>With Py-SPHViewer we can calculate the instantaneous (and continuous) mean velocity field, which can then be passed to matplotlib to construct the streamlines.</p>
+
+<p>We give below the recipe to get incredible results in only a few steps:</p>
+
+<h1 id="getting-the-data-for-this-example-and-drawing-the-streamlines">Getting the data for this example and drawing the streamlines</h1>
+
+<p>In this example we shall use an output of a low-resolution N-Body cosmological simulation ran with <a href="https://wwwmpa.mpa-garching.mpg.de/gadget/">Gadget-2</a>.</p>
+
+<p>The initial conditions were created using the <a href="https://www-n.oca.eu/ohahn/MUSIC/">MUSIC</a>. Please, download the <a href="https://github.com/alejandrobll/py-sphviewer/blob/master/examples/darkmatter_box.h5py?raw=true">simulated data</a> before continuing with the tutorial.</p>
+
+<p>The Figure below shows a scatter plot of the data contained in the simulation output:</p>
+
+<p align="center">
+   <img src="../assets/img/tutorial_streamlines_2.png" alt="Streamlines with Py-SPHViewer" />
+</p>
+
+<p>We could obtain the local velocity field of the box by considering different slices individually, or we could obtain the mean projected velocity field by projecting the full box. We shall consider the latter. In particular, we will consider the density-weighted average, so that the first relevant quantity that is needed is the projected density field of the entire box, which can be calculated using <a href="/content/tutorial_quickview.html">QuickView</a>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">from</span> <span class="nn">sphviewer.tools</span> <span class="kn">import</span> <span class="n">QuickView</span>
+<span class="c">#Read the file</span>
+<span class="k">with</span> <span class="n">f</span> <span class="k">as</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s">'darkmatter_box.h5py'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">):</span>
+  <span class="n">pos</span> <span class="o">=</span> <span class="n">snap</span><span class="p">[</span><span class="s">'PartType1/Coordinates'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+  <span class="n">vel</span> <span class="o">=</span> <span class="n">snap</span><span class="p">[</span><span class="s">'PartType1/Velocities'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+  <span class="n">hsml</span> <span class="o">=</span> <span class="n">snap</span><span class="p">[</span><span class="s">'PartType1/SmoothingLength'</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+<span class="c">#Calculate the density field</span>
+<span class="n">qv</span> <span class="o">=</span> <span class="n">QuickView</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">hsml</span><span class="o">=</span><span class="n">hsml</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="s">'infinity'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+               <span class="n">plot</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">],</span> <span class="n">logscale</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">density_field</span> <span class="o">=</span> <span class="n">qv</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+<span class="n">extent</span> <span class="o">=</span> <span class="n">qv</span><span class="o">.</span><span class="n">get_extent</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>The Figure below shows the resulting density field:</p>
+
+<p align="center">
+   <img src="../assets/img/tutorial_streamlines_3.png" alt="Streamlines with Py-SPHViewer" />
+</p>
+
+<p>We need to repeat the procedure but for the <em>x</em> and <em>y</em> components of the velocity field:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">vfield</span> <span class="o">=</span> <span class="p">[]</span>
+ <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+     <span class="n">qv</span> <span class="o">=</span> <span class="n">QuickView</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">vel</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">hsml</span><span class="o">=</span><span class="n">hsml</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="s">'infinity'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span><span class="n">plot</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+     <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="o">-</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">],</span> <span class="n">logscale</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+     <span class="n">vfield</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qv</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span><span class="o">/</span><span class="n">density_field</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>in which we have smoothed the velocity field (<em>x</em> and <em>y</em> components separately), and divided the resulting field by the density field, which effectively produces a density-weighted average. The resulting fields are shown in the Figure below:</p>
+
+<p align="center">
+   <img src="../assets/img/tutorial_streamlines_4.png" alt="Streamlines with Py-SPHViewer" />
+</p>
+
+<p>We have now <em>all</em> the ingredients to let matplotlib do the magic:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extent</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">extent</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">density_field</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="s">'lower'</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'bone'</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vfield</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">vfield</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">color</span> <span class="o">=</span> <span class="n">v</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">color</span>
+<span class="n">streams</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">streamplot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">vfield</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vfield</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                        <span class="n">density</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'jet'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">arrowsize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">extent</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">extent</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">extent</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">minorticks_on</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r'$\rm X / \ Mpc \ h^{-1}$'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r'$\rm Y / \ Mpc \ h^{-1}$'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p align="center">
+   <img src="../assets/img/tutorial_streamlines_5.png" alt="Streamlines with Py-SPHViewer" />
+</p>
+
+<p>In previous figure, colours indicate the magnitude of the modulus of the velocity, from blue to red. The width of the lines are also a function of this quantity.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>Streamlines are straightforward to calculate for N-body simulations, provided the velocity field is known on a regular grid. The velocity field can be calculated using Py-SPHViewer and streamlines can be constructed with matplotlib.</p>
+
+<p>Finally, Streamlines can also be animated to give a really deep insight on what is going on in the simulation. <a href="https://www.windy.com">Windy.com</a> is a great example. This is part a different tutorial though.</p>
+
+
+      <footer class="site-footer">
+        
+          <span class="site-footer-owner"><a href="http://github.com/alejandrobll/py-sphviewer">py-sphviewer</a> is maintained by <a href="http://github.com/alejandrobll">alejandrobll</a>.</span>
+        
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
+      </footer>
+    </main>
+  </body>
+</html>
