@@ -1,4 +1,0 @@
-title: Py-SPHViewer
-description: Py-SPHViewer is a Python package to visualize and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) interpolation scheme.
-show_downloads: True
-theme: jekyll-theme-cayman
