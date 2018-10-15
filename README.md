@@ -37,7 +37,7 @@ Individuals or organizations that use Py-SPHViewer are encouraged to cite the co
 
 If Py-SPHViewer has been significant for a research project that leads to a publication, **please acknowledge** by citing the project and using the following DOI as reference:
 
-Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10.5281/zenodo.21703
+**Alejandro Benitez-Llambay. (2015). py-sphviewer: Py-SPHViewer v1.0.0. Zenodo. 10.5281/zenodo.21703**
 
 You may also use the the following BibTex:
 
