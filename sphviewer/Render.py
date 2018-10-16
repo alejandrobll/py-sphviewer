@@ -102,8 +102,7 @@ class Render(object):
         where xsize and ysize are the number of pixels of the image defined by the Camera.
         """
         extent = self.Scene.get_extent()
-        pixel_side = abs(extent[1]-extent[0])
-        return self.__image / pixel_side**2
+        return self.__image
 
     def get_max(self):
         """
