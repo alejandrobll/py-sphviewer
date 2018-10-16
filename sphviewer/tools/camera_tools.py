@@ -26,10 +26,10 @@ def same_pass(param, frames):
         del param[idx]
         del frames[idx]
 
-def get_camera_trayectory(targets,anchors):
+def get_camera_trajectory(targets,anchors):
     #Author: Alejandro Benitez-Llambay
     #I wrote this function to get the parameters of the camera 
-    #that define its trayectory according to a small set of anchors. 
+    #that define its trajectory according to a small set of anchors. 
     #It is based on a first code written by Adrien Thob, who was 
     #inspired by the "Surge Target" plugin for Adobe After Effects.
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     anchors['zoom']      = [1.,'same','same','same','same','same','same']
     anchors['extent']    = [10, 'pass','pass','pass','pass','pass',30]
     
-    data = get_camera_trayectory(targets,anchors)
+    data = get_camera_trajectory(targets,anchors)
 
     n1 = 10000
 
