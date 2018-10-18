@@ -90,7 +90,7 @@ class Scene(object):
                 self.Camera.set_autocamera(Particles)
                 self._camera_params = self.Camera.get_params()
 
-        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
 
     def set_autocamera(self,mode='density'):
         """
@@ -103,7 +103,7 @@ class Scene(object):
         """
         self.Camera.set_autocamera(self._Particles,mode=mode)
         self._camera_params = self.Camera.get_params()
-        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
 
     def get_scene(self):
         """
@@ -112,7 +112,7 @@ class Scene(object):
         the scene. In principle this is an internal function and you don't 
         need this data. 
         """
-        return self.__x, self.__y, self.__hsml, self.__kview
+        return self._x, self._y, self._hsml, self._kview
 
     def get_extent(self):
         """
@@ -130,13 +130,13 @@ class Scene(object):
         the sphviewer.Camera documentation. 
         """
         self.Camera.set_params(**kargs)
-        self.__x, self.__y, self.__hsml, self.__kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
 
     def __compute_scene(self):
         from .extensions import scene
 
-        pos = self._Particles.get_pos().astype(np.float32)
-        hsml = self._Particles.get_hsml().astype(np.float32)
+        pos = self._Particles._pos
+        hsml = self._Particles._hsml
 
         #I recast the variables just in case
         xcam  = np.float32(self._camera_params['x'])

@@ -67,16 +67,26 @@ class Particles(object):
 
         if(hsml is None):
             hsml = self.__det_hsml(pos,nb)
-        
+
         if(sort):
             ksort = np.argsort(hsml)
-            self.__pos  = np.ascontiguousarray(pos[:,ksort])
-            self.__mass = np.ascontiguousarray(mass[ksort])
-            self.__hsml = np.ascontiguousarray(hsml[ksort])
+            self._pos  = pos[ksort,:]
+            self._mass = mass[ksort]
+            self._hsml = hsml[ksort]
         else:
-            self.__pos  = np.ascontiguousarray(pos)
-            self.__mass = np.ascontiguousarray(mass)
-            self.__hsml = np.ascontiguousarray(hsml)
+            self._pos  = pos
+            self._mass = mass
+            self._hsml = hsml
+
+        if not (pos.flags['C_CONTIGUOUS']):
+            print("Warning: postions were not C_CONTIGUOUS")
+            self._pos  = np.ascontiguousarray(self._pos)
+        if not (mass.flags['C_CONTIGUOUS']):
+            print("Warning: masses were not C_CONTIGUOUS")
+            self._mass  = np.ascontiguousarray(self._mass)
+        if not (hsml.flags['C_CONTIGUOUS']):
+            print("Warning: Smoothing Lengths were not C_CONTIGUOUS")
+            self._hsml  = np.ascontiguousarray(self._hsml)
 
 
 #Setting methods:
@@ -84,19 +94,19 @@ class Particles(object):
         """
         Use this method to overwrite the stored array of particles.
         """
-        self.__pos  = pos
+        self._pos  = pos
 
     def set_mass(self,mass):
         """
         Use this method to overwrite the stored array of masses.
         """
-        self.__mass  = mass
+        self._mass  = mass
     
     def set_hsml(self,hsml):
         """
         Use this method to overwrite the stored array of smoothing lengths.
         """
-        self.__hsml  = hsml
+        self._hsml  = hsml
 
     def set_nb(self,nb):
         """
@@ -112,19 +122,19 @@ class Particles(object):
         - Output: [3,n] numpy array with x = pos[0,:], y = pos[1,:], z = pos[2,:]
         with n the number of particles.
         """
-        return self.__pos
+        return self._pos
 
     def get_mass(self):
         """
         Use this method to get the stored array of masses.
         """
-        return self.__mass
+        return self._mass
     
     def get_hsml(self):
         """
         Use this method to get the stored array of smoothing lengths.
         """
-        return self.__hsml
+        return self._hsml
 
     def get_nb(self):
         """
@@ -146,11 +156,11 @@ class Particles(object):
         if(axis == None):
             axis = plt.gca()
         if(plane == 'xy'):
-            axis.plot(self.__pos[0,:], self.__pos[1,:], 'k.', **kargs)
+            axis.plot(self._pos[0,:], self._pos[1,:], 'k.', **kargs)
         elif(plane == 'xz'):
-            axis.plot(self.__pos[0,:], self.__pos[2,:], 'k.', **kargs)
+            axis.plot(self._pos[0,:], self._pos[2,:], 'k.', **kargs)
         elif(plane == 'yz'):
-            axis.plot(self.__pos[1,:], self.__pos[2,:], 'k.', **kargs)
+            axis.plot(self._pos[1,:], self._pos[2,:], 'k.', **kargs)
 
     def __make_kdtree(self,pos):
         return KDTree(pos.T)

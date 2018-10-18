@@ -7,15 +7,15 @@ except ImportError:
 import numpy as np
 
 module_scene = Extension('sphviewer/extensions/scene', sources = ['sphviewer/extensions/scenemodule.c'],
-                         extra_compile_args=['-fopenmp','-w'],
+                         extra_compile_args=['-fopenmp','-w', '-std=c99'],
                          extra_link_args=['-lgomp'])
 
 module_render = Extension('sphviewer/extensions/render', sources = ['sphviewer/extensions/rendermodule.c'],
-                          extra_compile_args=['-fopenmp','-w'],
+                          extra_compile_args=['-fopenmp','-w', '-std=c99'],
                           extra_link_args=['-lgomp'])
 
 module_makehsv = Extension('sphviewer/tools/makehsv', sources = ['sphviewer/tools/makehsvmodule.c'],
-                           extra_compile_args=['-fopenmp','-w'],
+                           extra_compile_args=['-fopenmp','-w', '-std=c99'],
                            extra_link_args=['-lgomp'])
 
 
