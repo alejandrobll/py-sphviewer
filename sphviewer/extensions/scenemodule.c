@@ -221,18 +221,7 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   hlocal = get_array(h_obj, n);
 
 
-  /* check positions data type */
-  type = PyArray_TYPE(extent_obj);
-  if(type == NPY_FLOAT){
-    get_array = get_float_array;
-  }
-  else if(type == NPY_DOUBLE){
-    get_array = get_double_array;
-  }else {
-    return NULL;
-  }
-
-  extent = get_array(extent_obj, n);
+  extent = (float *) extent_obj->data;
 
   // Let's do the job
   long int *klocal = (long int *)malloc( n * sizeof(long int) );
