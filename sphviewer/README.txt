@@ -32,4 +32,4 @@ the project at the end. For any request, comments, please contact me.
 
 Author: Alejandro Benitez Llambay
 Date:   09/2013
-E-mail: alejandrobll@oac.uncor.edu
+E-mail: alejandro.b.llambay@durham.ac.uk
