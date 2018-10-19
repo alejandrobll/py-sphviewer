@@ -69,7 +69,8 @@ class Render(object):
 
         mass = self.Scene._Particles.get_mass()[kview]
 
-        image = render.render(np.int32(x),np.int32(y),np.int32(t),np.float32(mass),np.int32(xsize),np.int32(ysize))
+        image = render.render(self.Scene._x, self.Scene._y, self.Scene._hsml, 
+                              self.Scene._m,np.int32(xsize),np.int32(ysize))
         return np.reshape(image,[ysize,xsize])
 
 
