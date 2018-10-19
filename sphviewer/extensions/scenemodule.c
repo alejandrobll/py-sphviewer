@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <time.h>
 
+
 void rx(float angle, float *x, float *y, float *z, int n){
   // counter-clockwise rotation matrix along x-axis  
   int i;
@@ -86,7 +87,7 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
   float lbin;
   long int idx = 0;
   float xmin, xmax, ymin, ymax;
-  
+
   // Let's refer the particles to the camera point of view.
   for(i=0;i<n;i++){
     x[i] -= x0_cam;
@@ -193,7 +194,6 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
 
   /* check positions data type */
   int type = PyArray_TYPE(x_obj);
-  type = PyArray_TYPE(x_obj);
   if(type == NPY_FLOAT){
     get_array = get_float_array;
   }

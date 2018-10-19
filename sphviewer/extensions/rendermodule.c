@@ -10,6 +10,19 @@
 #include <stdio.h>
 #include <time.h>
 
+float *get_double_array(PyArrayObject *array_obj, int n){
+  /* This function returns the data stored in a double PyArrayObject*/
+  double *local_array = (double *)array_obj->data;  
+  float *output = (float *)malloc( n * sizeof(float) );
+
+#pragma omp parallel for firstprivate(n)
+  for(int i=0;i<n;i++){
+    output[i] = local_array[i];
+  }
+
+  return output;
+}
+
 
 float cubic_kernel(float r, float h){
   //2D Dome-shapeed quadratic Kernel (1-R^2) (Hicks and Liebrock 2000).
@@ -25,7 +38,7 @@ float cubic_kernel(float r, float h){
 }
 
 
-void c_render(int *x, int *y, int *t, float *mass, 
+void c_render(float *x, float *y, float *t, float *mass, 
 	      int xsize, int ysize, int n, float *image){ 
   
   // C function calculating the image of the particles convolved with our kernel
@@ -67,9 +80,9 @@ void c_render(int *x, int *y, int *t, float *mass,
   //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
   for(l=0;l<ppt;l++){
     i = thread_id+nth*l;
-    xx = x[i];
-    yy = y[i];
-    tt = t[i];
+    xx = (int) x[i];
+    yy = (int) y[i];
+    tt = (int) t[i];
     mm = mass[i];
 
     if(tt < 1) tt = 1;
@@ -88,9 +101,9 @@ void c_render(int *x, int *y, int *t, float *mass,
   // Let's compute the image for the remainder particles...
   if((r-thread_id) > 0){
     i  = nth*ppt+thread_id;
-    xx = x[i];
-    yy = y[i];
-    tt = t[i];
+    xx = (int) x[i];
+    yy = (int) y[i];
+    tt = (int) t[i];
     mm = mass[i];
     
     if(tt < 1) tt = 1;
@@ -162,7 +175,7 @@ void test_C(){
 static PyObject *rendermodule(PyObject *self, PyObject *args){
   PyArrayObject *x_obj, *y_obj, *t_obj;
   PyArrayObject *m_obj;
-  int *x, *y, *t;
+  float *x, *y, *t;
   float *mass;
   int xsize, ysize;
   int n;
@@ -172,13 +185,25 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
     return NULL;
     
   // Let's check the size of the 1-dimensions arrays.
-  n = (int) x_obj->dimensions[0];
+  n = (int) m_obj->dimensions[0];
 
   // Let's point the C arrays to the numpy arrays
-  x = (int *)x_obj->data;
-  y = (int *)y_obj->data;
-  t = (int *)t_obj->data;
-  mass = (float *)m_obj->data;
+  x    = (float *)x_obj->data;
+  y    = (float *)y_obj->data; 
+  t    = (float *)t_obj->data; /* These are always floats, as they come from Scene */
+
+
+
+  /* Let's check the type of mass, which could be either double or float */
+  int type = PyArray_TYPE(m_obj);
+  if(type == NPY_FLOAT){
+    mass = (float *)m_obj->data;
+  }
+  else if(type == NPY_DOUBLE){
+    mass = get_double_array(m_obj, n);
+  }else {
+    return NULL;
+  }
 
   image = (float *)malloc( xsize * ysize * sizeof(float) );
 

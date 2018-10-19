@@ -91,6 +91,7 @@ class Scene(object):
                 self._camera_params = self.Camera.get_params()
 
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
+        self._m = self._Particles._mass[self._kview]
 
     def set_autocamera(self,mode='density'):
         """
@@ -104,6 +105,7 @@ class Scene(object):
         self.Camera.set_autocamera(self._Particles,mode=mode)
         self._camera_params = self.Camera.get_params()
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
+        self._m = Particles._mass[self._kview]
 
     def get_scene(self):
         """
@@ -112,7 +114,7 @@ class Scene(object):
         the scene. In principle this is an internal function and you don't 
         need this data. 
         """
-        return self._x, self._y, self._hsml, self._kview
+        return self._x, self._y, self._hsml, self._m, self._kview
 
     def get_extent(self):
         """
@@ -131,7 +133,8 @@ class Scene(object):
         """
         self.Camera.set_params(**kargs)
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
-
+        self._m = self._Particles._mass[self._kview]
+        
     def __compute_scene(self):
         from .extensions import scene
 
@@ -222,11 +225,11 @@ class Scene(object):
                 kview, = np.where( (pos[0,:] > xmin) & (pos[0,:] < xmax) &
                                    (pos[1,:] > ymin) & (pos[1,:] < ymax) )
 
-                pos   = pos[:,kview]
+                pos   = pos[kview,:]
                 hsml  = self._Particles.get_hsml()[kview]/lbin
 
-                pos[0,:] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
-                pos[1,:] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
+                pos[:,0] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
+                pos[:,1] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
             
             except AttributeError:
                 print("There was an error with the extent of the Camera")
@@ -257,13 +260,13 @@ class Scene(object):
                                                   np.tan(FOV/2.))) &
                               (np.abs(pos[1,:]) <= (np.abs(pos[2,:])*
                                                     np.tan(FOV/2.))))
-            pos   = pos[:,kview]
+            pos   = pos[kview,:]
             hsml  = self._Particles.get_hsml()[kview]
         
-            pos[0,:] = ((pos[0,:]*self._camera_params['zoom']/ 
+            pos[:,0] = ((pos[0,:]*self._camera_params['zoom']/ 
                          pos[2,:]-xmin)/(xmax-xmin)*
                         (self._camera_params['xsize']-1.))
-            pos[1,:] = ((pos[1,:]*self._camera_params['zoom']/ 
+            pos[:,1] = ((pos[1,:]*self._camera_params['zoom']/ 
                          pos[2,:]-ymin)/(ymax-ymin)*
                         (self._camera_params['ysize']-1.))
             hsml = (hsml*self._camera_params['zoom']/pos[2,:]/lbin)
