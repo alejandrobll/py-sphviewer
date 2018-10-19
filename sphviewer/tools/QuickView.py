@@ -11,10 +11,11 @@ import numpy as np
 
 class QuickView(object):
     def    __init__(self, pos, mass=None, hsml=None, nb=None,
-                    logscale=True, plot=True, min_hsml=None, max_hsml=None, **kwargs):
+                    logscale=True, plot=True, min_hsml=None,
+                    max_hsml=None, **kwargs):
 
         if(mass is None):
-            mass = np.ones(len(pos[0,:]))
+            mass = np.ones(len(pos))
                     
         if(nb == None):
             self._P = sph.Particles(pos, mass, hsml)
@@ -81,5 +82,5 @@ if __name__ == '__main__':
     halo = h5py.File('../../examples/dm_halo.h5py', 'r')
     pos  = halo['Coordinates'].value
 
-    qv = QuickView(pos.T, r='infinity', nb=8)
+    qv = QuickView(pos, r='infinity', nb=8)
     
