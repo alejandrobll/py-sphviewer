@@ -172,9 +172,8 @@ class Scene(object):
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0,0,0,0],dtype=np.float32)
 
-        # I use np.float32 because pos won't be aligned otherwise.
-        xx,yy,hh,kk = scene.scene(np.float32(pos[:,0]),np.float32(pos[:,1]),
-                                  np.float32(pos[:,2]),np.float32(hsml),
+        xx,yy,hh,kk = scene.scene(pos[:,0],pos[:,1],
+                                  pos[:,2],hsml,
                                   xcam, ycam, zcam, rcam, theta, phi, roll,
                                   zoom, self.__extent, xsize, ysize, projection)
 

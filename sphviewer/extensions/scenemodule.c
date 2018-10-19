@@ -53,19 +53,30 @@ void rz(float angle, float *x, float *y, float *z, int n){
 
 float *get_float_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a float PyArrayObject*/
-  float *local_array = (float *)array_obj->data;  
+
+  /*We enfore C contiguous arrays*/
+  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, PyArray_FLOAT, 1, 3);
+
+  float *local_array = (float *)cont_obj->data;  
   float *output = (float *)malloc( n * sizeof(float) );
 
 #pragma omp parallel for firstprivate(n)
   for(int i=0;i<n;i++){
     output[i] = local_array[i];
   }
+
+  /* release memory */
+  Py_DECREF(cont_obj);
   return output;
 }
 
 float *get_double_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a double PyArrayObject*/
-  double *local_array = (double *)array_obj->data;  
+
+  /*We enfore C contiguous arrays*/
+  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, PyArray_DOUBLE, 1, 3);
+
+  double *local_array = (double *)cont_obj->data;  
   float *output = (float *)malloc( n * sizeof(float) );
 
 #pragma omp parallel for firstprivate(n)
@@ -73,6 +84,8 @@ float *get_double_array(PyArrayObject *array_obj, int n){
     output[i] = local_array[i];
   }
 
+  /* release memory */
+  Py_DECREF(cont_obj);
   return output;
 }
 

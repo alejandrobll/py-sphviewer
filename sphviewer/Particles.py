@@ -78,16 +78,6 @@ class Particles(object):
             self._mass = mass
             self._hsml = hsml
 
-        if not (pos.flags['C_CONTIGUOUS']):
-            print("Warning: postions were not C_CONTIGUOUS")
-            self._pos  = np.ascontiguousarray(self._pos)
-        if not (mass.flags['C_CONTIGUOUS']):
-            print("Warning: masses were not C_CONTIGUOUS")
-            self._mass  = np.ascontiguousarray(self._mass)
-        if not (hsml.flags['C_CONTIGUOUS']):
-            print("Warning: Smoothing Lengths were not C_CONTIGUOUS")
-            self._hsml  = np.ascontiguousarray(self._hsml)
-
 
 #Setting methods:
     def set_pos(self,pos):
