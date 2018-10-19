@@ -180,6 +180,7 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   int xsize, ysize;
   int n;
   float *image;
+  int DOUBLE = 0;
 
   if(!PyArg_ParseTuple(args, "OOOOii",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize))
     return NULL;
@@ -201,6 +202,7 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   }
   else if(type == NPY_DOUBLE){
     mass = get_double_array(m_obj, n);
+    DOUBLE = 1;
   }else {
     return NULL;
   }
@@ -216,6 +218,8 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
 
   // Here we do the work
   c_render(x,y,t,mass,xsize,ysize,n,image);
+
+  if(DOUBLE) free(mass);
   
   // Let's build a numpy array
   npy_intp dims[1] = {xsize*ysize};
