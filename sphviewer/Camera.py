@@ -63,12 +63,12 @@ class Camera(object):
         if (particles_name != 'PARTICLES'):
             print("You must use a valid Particles class...")
             return
-        xmax,ymax,zmax = (np.max(Particles.get_pos()[0,:]),
-                          np.max(Particles.get_pos()[1,:]),
-                          np.max(Particles.get_pos()[2,:]))
-        xmin,ymin,zmin = (np.min(Particles.get_pos()[0,:]),
-                          np.min(Particles.get_pos()[1,:]),
-                          np.min(Particles.get_pos()[2,:]))
+        xmax,ymax,zmax = (np.max(Particles._pos[:,0]),
+                          np.max(Particles._pos[:,1]),
+                          np.max(Particles._pos[:,2]))
+        xmin,ymin,zmin = (np.min(Particles._pos[:,0]),
+                          np.min(Particles._pos[:,1]),
+                          np.min(Particles._pos[:,2]))
 
         if(mode == 'minmax'):
             xmean = (xmax+xmin)/2.
@@ -77,19 +77,19 @@ class Camera(object):
             
         if(mode == 'density'):
             k = np.argmin(Particles.get_hsml()[:])
-            xmean = Particles.get_pos()[0,k]
-            ymean = Particles.get_pos()[1,k]
-            zmean = Particles.get_pos()[2,k]
+            xmean = Particles._pos[k,0]
+            ymean = Particles._pos[k,1]
+            zmean = Particles._pos[k,2]
 
         if(mode == 'median'):
-            xmean = np.median(Particles.get_pos()[0,:])
-            ymean = np.median(Particles.get_pos()[1,:])
-            zmean = np.median(Particles.get_pos()[2,:])
+            xmean = np.median(Particles._pos[:,0])
+            ymean = np.median(Particles._pos[:,1])
+            zmean = np.median(Particles._pos[:,2])
 
         if(mode == 'mean'):
-            xmean = np.mean(Particles.get_pos()[0,:])
-            ymean = np.mean(Particles.get_pos()[1,:])
-            zmean = np.mean(Particles.get_pos()[2,:])
+            xmean = np.mean(Particles.get_pos()[:,0])
+            ymean = np.mean(Particles.get_pos()[:,1])
+            zmean = np.mean(Particles.get_pos()[:,2])
 
         r = np.sqrt((xmax-xmin)**2+(ymax-ymin)**2+(zmax-zmin)**2)
 

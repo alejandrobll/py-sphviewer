@@ -67,8 +67,6 @@ class Render(object):
     def __make_render(self,x,y,t,kview,xsize,ysize):
         from .extensions import render
 
-        mass = self.Scene._Particles.get_mass()[kview]
-
         image = render.render(self.Scene._x, self.Scene._y, self.Scene._hsml, 
                               self.Scene._m,np.int32(xsize),np.int32(ysize))
         return np.reshape(image,[ysize,xsize])
@@ -79,7 +77,6 @@ class Render(object):
 
         n=int(len(x))
         mass = self.Scene._Particles.get_mass()[kview]
-
         image = np.zeros([ysize,xsize],dtype=(np.float32))
 
             # C code for making the images

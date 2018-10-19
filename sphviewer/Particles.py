@@ -156,17 +156,17 @@ class Particles(object):
         if(axis == None):
             axis = plt.gca()
         if(plane == 'xy'):
-            axis.plot(self._pos[0,:], self._pos[1,:], 'k.', **kargs)
+            axis.plot(self._pos[:,0], self._pos[:,0], 'k.', **kargs)
         elif(plane == 'xz'):
-            axis.plot(self._pos[0,:], self._pos[2,:], 'k.', **kargs)
+            axis.plot(self._pos[:,1], self._pos[:,2], 'k.', **kargs)
         elif(plane == 'yz'):
-            axis.plot(self._pos[1,:], self._pos[2,:], 'k.', **kargs)
+            axis.plot(self._pos[:,2], self._pos[:,2], 'k.', **kargs)
 
     def __make_kdtree(self,pos):
-        return KDTree(pos.T)
+        return KDTree(pos)
     
     def __nbsearch(self, pos, nb, tree):
-        d, idx = tree.query(pos.T, k=nb)
+        d, idx = tree.query(pos, k=nb)
         hsml = d[:,nb-1]
         return hsml
     
@@ -176,10 +176,10 @@ class Particles(object):
         return hsml
 
     def __make_kdtree_old(self,pos):
-        return cKDTree(pos.T)
+        return cKDTree(pos)
 
     def __nbsearch_old(self, pos, nb, tree, out_hsml, index):
-        d, idx = tree.query(pos.T, k=nb)
+        d, idx = tree.query(pos, k=nb)
         out_hsml.put( (index, d[:,nb-1]) )
 
     def __det_hsml_old(self, pos, nb):

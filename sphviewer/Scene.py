@@ -105,7 +105,7 @@ class Scene(object):
         self.Camera.set_autocamera(self._Particles,mode=mode)
         self._camera_params = self.Camera.get_params()
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
-        self._m = Particles._mass[self._kview]
+        self._m = self._Particles._mass[self._kview]
 
     def get_scene(self):
         """
@@ -156,10 +156,11 @@ class Scene(object):
             projection = 0
             rcam = np.float32(0)
             if(self._camera_params['extent'] == None):
-                xmin = np.min(pos[0,:]).astype(np.float32)
-                xmax = np.max(pos[0,:]).astype(np.float32)
-                ymin = np.min(pos[1,:]).astype(np.float32)
-                ymax = np.max(pos[1,:]).astype(np.float32)
+                xmin = np.min(pos[:,0]).astype(np.float32)
+                xmax = np.max(pos[:,0]).astype(np.float32)
+                ymin = np.min(pos[:,1]).astype(np.float32)
+                ymax = np.max(pos[:,1]).astype(np.float32)
+
                 self.__extent = np.array([xmin-xcam,
                                           xmax-xcam,
                                           ymin-ycam,
@@ -171,7 +172,9 @@ class Scene(object):
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0,0,0,0],dtype=np.float32)
 
-        xx,yy,hh,kk = scene.scene(pos[0,:],pos[1,:],pos[2,:],hsml,
+        # I use np.float32 because pos won't be aligned otherwise.
+        xx,yy,hh,kk = scene.scene(np.float32(pos[:,0]),np.float32(pos[:,1]),
+                                  np.float32(pos[:,2]),np.float32(hsml),
                                   xcam, ycam, zcam, rcam, theta, phi, roll,
                                   zoom, self.__extent, xsize, ysize, projection)
 
