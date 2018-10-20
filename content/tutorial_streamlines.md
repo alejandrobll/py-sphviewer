@@ -45,7 +45,7 @@ with f as h5py.File('darkmatter_box.h5py', 'r'):
   hsml = snap['PartType1/SmoothingLength'].value
 
 #Calculate the density field
-qv = QuickView(pos.T, hsml=hsml, r='infinity', x=32, y=32, z=32,
+qv = QuickView(pos, hsml=hsml, r='infinity', x=32, y=32, z=32,
                plot=False, extent=[-32,32,-32,32], logscale=False)
 density_field = qv.get_image()
 extent = qv.get_extent()
@@ -62,7 +62,7 @@ The Figure below shows the resulting density field:
  ```python
  vfield = []
  for i in xrange(2):
-     qv = QuickView(pos.T, vel[:,i], hsml=hsml, r='infinity', x=32, y=32, z=32,plot=False,
+     qv = QuickView(pos, vel[:,i], hsml=hsml, r='infinity', x=32, y=32, z=32,plot=False,
      extent=[-32,32,-32,32], logscale=False)
      vfield.append(qv.get_image()/density_field)
  ```

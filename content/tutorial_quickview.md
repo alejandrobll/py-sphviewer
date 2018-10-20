@@ -31,7 +31,7 @@ The projected density field can be calculated (and visualised) using QuickView:
 
 ```python
 from sphviewer.tools import QuickView
-qv = QuickView(pos.T, r='infinity', plot=False)
+qv = QuickView(pos, r='infinity', plot=False)
 qv.imshow()
 ```
 
@@ -40,7 +40,7 @@ qv.imshow()
 </p>
 
 
-Note that we pass pos.T as argument because our array was ```pos[Npart,3]```, whereas PySPHViewer expects an array of shape ```pos[3,Npart]```. The argument ```r=’infinity’``` indicates that the camera is looking at the scene from the infinity, so that the scene has to be rendered using a [parallel (or orthographic)](https://en.wikipedia.org/wiki/Parallel_projection) projection.
+The argument ```r=’infinity’``` indicates that the camera is looking at the scene from the infinity, so that the scene has to be rendered using a [parallel (or orthographic)](https://en.wikipedia.org/wiki/Parallel_projection) projection.
 
 QuickView retrieves the active axis and places the image on it; ```plot=False``` prevents this from happening. QuickView objects have an associated ```imshow``` method to show the final image. Valid ```*kwargs``` are identical to those accepted by matplotlib.pyplot.imshow. For example, we can change the ```colormap``` and ```vmin``` as follows:
 

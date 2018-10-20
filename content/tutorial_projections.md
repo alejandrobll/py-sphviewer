@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import h5py
 from sphviewer.tools import QuickView
 
-qv_parallel = QuickView(pos.T, r='infinity', plot=False,
+qv_parallel = QuickView(pos, r='infinity', plot=False,
                         x=0,y=0,z=0, extent=[-0.1,0.1,-0.1,0.1])
 
 hsml = qv_parallel.get_hsml()
@@ -49,7 +49,7 @@ Note that ```qv.get_extent()``` returns the actual physical extent of the image.
 Before considering a different projection, let's change previous parameters slightly so that it becomes clear what is their impact on the image. For example, the image reveals that there is a small subhalo located at ```x=0.005``` and ```y=-0.045```. To point the camera to this object, and zoom in, we use the code below:
 
 ```python
-qv_subhalo = QuickView(pos.T, hsml=hsml, r='infinity', plot=False,
+qv_subhalo = QuickView(pos, hsml=hsml, r='infinity', plot=False,
                        x=-0.005,y=-0.045,z=0, extent=[-0.02,0.02,-0.02,0.02])
 
 fig = plt.figure(1, figsize=(6,6))
@@ -75,7 +75,7 @@ import matplotlib.pyplot as plt
 import h5py
 from sphviewer.tools import QuickView
 
-qv_perspective = QuickView(pos.T, r=0.1, plot=False,
+qv_perspective = QuickView(pos, r=0.1, plot=False,
                            x=0,y=0,z=0, extent=[-0.1,0.1,-0.1,0.1])
 
 fig = plt.figure(1, figsize=(6,6))
@@ -110,7 +110,7 @@ import matplotlib.pyplot as plt
 import h5py
 from sphviewer.tools import QuickView
 
-qv_perspective = QuickView(pos.T, r=0.1, plot=False,
+qv_perspective = QuickView(pos, r=0.1, plot=False,
                            x=0,y=0,z=0, extent=[-0.1,0.1,-0.1,0.1], zoom=4)
 
 fig = plt.figure(1, figsize=(6,6))
