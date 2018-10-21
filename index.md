@@ -86,7 +86,7 @@ from sphviewer.tools import QuickView
 with h5py.File('darkmatter_box.h5py','r') as f:
     pdrk = f['PartType1/Coordinates'].value
 
-QuickView(pdrk, r='infinity', cmap='heat')
+QuickView(pdrk, r='infinity')
 ```
 
 which produces the following image:
