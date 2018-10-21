@@ -20,10 +20,10 @@ from sphviewer.tools import camera_tools
 n1 = 10000
 
 cube1 = np.random.rand(3,n1)
-cube1[1,:] -= 6
+cube1[:,1] -= 6
 cube2 = np.random.rand(3,n1)
-cube2[1,:] += 1
-cubes = np.concatenate((cube1,cube2),axis=1)
+cube2[:,1] += 1
+cubes = np.concatenate((cube1,cube2),axis=0)
 mass  = np.ones(n1+n1)
 ```
 
@@ -48,7 +48,7 @@ Before defining the trajectory of the camera, we should think what we would like
 * the camera is still at the second cube until snapshot 750, after which it starts moving gradually towards the first cube.
 * the camera reaches the first cube in snapshot 930, and remains there until snapshot 1500, after which the camera starts moving towards the second cube, which is reached at snapshot 1680.
 
-Previous sequence defines the trajectory (or behaviour) of the camera using **"anchors"**. ``camera_tools`` uses this anchors to construct a smooth trajectory interpolated between the anchors. This is done as follows:
+Previous sequence defines the trajectory (or behaviour) of the camera using **"anchors"**. ``camera_tools`` uses this anchors to construct a smooth trajectory interpolated between the them. This is done as follows:
 
 ```python
 cm_1 = [0.5,1.5,0.5]
@@ -84,14 +84,14 @@ for i in data:
 
 The 7 anchors, defined by the ```anchors``` dictionary, contain most of the relevant parameters of the camera, such as ```zoom, extent, r, t, p```. There are other parameters such as ```id_targets```, which defines the index of individual targets, ```id_frames```, which defines the current snapshot of the anchor, and ```sim_times```, useful for defining the trajectory of the camera in simulations that evolve in time. These anchors are then passed to ```camera_tools.get_camera_trajectory```, which returns a list of the parameters of the camera that should be used to evolve the camera at each snapshot.
 
-Note that we also use special arguments called ```same``` and ```pass```. These are defining the behaviour of the camera at each anchor. For example, ```same``` means that the parameter of the current anchor must be identical to that of the previous anchor. ```pass``` indicates that the value of the current anchor has to be interpolated between the values from the previous and the next anchor. The result of the previous code is shown below:
+Note also that we use special arguments called ```same``` and ```pass```. These are defining the behaviour of the camera at each anchor. ```same``` means that the parameter of the current anchor must be identical to that of the previous one. ```pass```, on the other hand, indicates that the value of the current anchor has to be interpolated between the values from the previous and the next anchors. The result of the previous code is shown below:
 
 <p align="center">
    <img src="../assets/img/tutorial_smooth_1.gif" alt="Tutorial Smooth Camera">
 </p>
 
 
-In order to make previous video slightly more impressive, we may vary more parameters at the same time. For example, we could rotate the camera along either the vertical or horizontal axis, change its distance to the cubes, etc. Consider the following anchors:
+In order to make previous video slightly impressive, we may vary more parameters at the same time. For example, we could rotate the camera along either the vertical or horizontal axis, change its distance to the cubes, etc. Consider the following anchors:
 ```python
 anchors = {}
 anchors['sim_times'] = [0.0, 1.0, 'pass', 3.0, 'same','same','same']
@@ -111,7 +111,7 @@ which produce the result shown below:
    <img src="../assets/img/tutorial_smooth_2.gif" alt="Tutorial Smooth Camera">
 </p>
 
-Hopefully, these two examples gave you a quick overview of the power of ```camera_tools```. There are infinite ways of combining the parameters of the camera to obtain impressive videos. The following video was generated using this ```camera_tools```:
+Hopefully, these two examples gave you a quick overview of the power of ```camera_tools```. There are infinite ways of combining the parameters of the camera to obtain impressive videos. The following video was generated using ```camera_tools```:
 
 <p align="center">
    <a href="https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4" target="_blank"><img src="../assets/img/video_stars.png" alt="First image with QuickView"> </a>

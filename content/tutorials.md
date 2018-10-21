@@ -16,7 +16,7 @@ If you prefer to get started with Py-SPHViewer and come back to the tutorials la
 
 # Getting started
 
-Getting started with Py-SPHViewer is easy. We show below the minimal example of its use to obtain a good rendering of the distribution of dark matter particles in a cosmological simulation. After this example we include a number of tutorials that are useful to get started and understanding how Py-SPHViewer work in more depth.
+Getting started with Py-SPHViewer is easy. We show below a minimal example on how to obtain the projected density field of the distribution of dark matter particles in a cosmological simulation. After this example you should check the tutorials, which are useful to get started and understanding how Py-SPHViewer works.
 
 The example below uses [this hdf5 file](https://github.com/alejandrobll/py-sphviewer/raw/master/examples/darkmatter_box.h5py), so please download it before running the code below:
 
