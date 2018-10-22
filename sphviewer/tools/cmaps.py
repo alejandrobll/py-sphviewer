@@ -5,8 +5,8 @@ from matplotlib import colors as _mpl_c
 #Tool for Py-SPHViewer with various interesting colour maps.
 
 def night(Nbins=256):
-    colors = ["#000000", "#fbfbfb",
-              "#ffa800"]
+    colors = ["#ffffff", "#000000",
+              "#f6e588"]
     current_cmap = _mpl_c.LinearSegmentedColormap.from_list("night", colors, N=Nbins)
     return current_cmap
                                                                
