@@ -100,5 +100,5 @@ The result is very impressive when considering that it is a cosmological volume 
 High-resolution cosmological simulations might result in extremely amusing results, such us the one shown in the next [video](https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4):
 
 <p align="center">
-   <a href="https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4" target="_blank"><img src="assets/img/video_stars.png" alt="First image with QuickView"> </a>
+<iframe width="640" height="480" src="https://www.youtube.com/embed/4ZIgVbNlDU4" frameborder="0" allowfullscreen></iframe>
 </p>

@@ -114,5 +114,5 @@ which produce the result shown below:
 Hopefully, these two examples gave you a quick overview of the power of ```camera_tools```. There are infinite ways of combining the parameters of the camera to obtain impressive videos. The following video was generated using ```camera_tools```:
 
 <p align="center">
-   <a href="https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4" target="_blank"><img src="../assets/img/video_stars.png" alt="First image with QuickView"> </a>
+<iframe width="640" height="480" src="https://www.youtube.com/embed/4ZIgVbNlDU4" frameborder="0" allowfullscreen></iframe>
 </p>
