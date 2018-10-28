@@ -95,9 +95,9 @@ which produces the following image:
    <img src="assets/img/first_image.png" alt="First image with QuickView">
 </p>
 
-The result is very impressive when considering that it is a cosmological volume simulated with only 32768 dark matter particles.
+The result is very impressive given the low-resolution of the simulated volume (only 32768 dark matter particles).
 
-High-resolution cosmological simulations might result in extremely amusing results, such us the one shown in the next [video](https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4):
+High-resolution cosmological simulations might result in extremely amusing results, such as the one shown in the next [video](https://www.youtube.com/watch?annotation_id=annotation_692472089&feature=iv&src_vid=vqGYURAgYUY&v=4ZIgVbNlDU4):
 
 <p align="center">
 <iframe width="640" height="480" src="https://www.youtube.com/embed/4ZIgVbNlDU4" frameborder="0" allowfullscreen></iframe>
