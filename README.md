@@ -22,6 +22,27 @@ cd py-sphviewer
 python setup.py install
 ```
 
+# Changelogs
+
+Py-SPHViewer is in active development. We often add new features and fix bugs. We list below the update notes:
+
+- **version 1.1.0**
+
+  * Py-SPHViewer is now compatible with Python 3. We thank Elliott Sales de Andrade (@QuLogic) for making this possible.
+  * Image returned by Render.get_image(), or QuickView.get_image() is normalized by the pixel area. This means that the value of each pixel, when smoothing the particle mass, can be regarded as the actual surface density.
+
+- **version 1.0.5**
+
+  * Scipy.weave is deprecated in Scipy 0.19, so we removed all dependencies to it.
+  * Minor bugs fixed.
+
+- **version 1.0.4**
+
+   * New QuickView tool for making quick visualisations (see this [post](https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview) for instructions).
+   * We added a new directory "examples" that contains hdf5 files with simulation outputs. These are useful to perform quick tests.
+   * Minor bugs fixed.
+   
+
 # Getting started
 
 To get started with Py-SPHViewer please visit the official website:
