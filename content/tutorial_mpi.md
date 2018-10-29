@@ -1,4 +1,3 @@
-
 ---
 title: Py-SPHViewer and MPI
 ---
