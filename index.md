@@ -4,7 +4,7 @@ title: HomePage
 
 Py-SPHViewer is a parallel Python package to visualise and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) scheme. The code estimates an underlying scalar field (e.g., the density field) traced by a finite number of particles, and produces not only beautiful, but also scientifically useful images. In addition, Py-SPHViewer enables the user to explore simulated volumes using different projections.
 
-Although the package was conceived as a rendering tool for cosmological SPH simulations, it can be used in a number of applications.
+Although the package was conceived as a rendering tool for cosmological SPH simulations, it can be used in a number of applications such as those that benefit from smoothing the data.
 
 Intensive calculations are all performed in parallel C code (which requires OpenMP) but, as any python package, it can be used interactively in a Python shell, [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/).
 
