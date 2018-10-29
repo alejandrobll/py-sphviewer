@@ -2,11 +2,11 @@
 title: HomePage
 ---
 
-Py-SPHViewer is a publicly available Python package to visualise and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) scheme. The code estimates the underlying density field (or any other property) traced by a finite number of particles, and produces not only beautiful, but also scientifically useful images. In addition, Py-SPHViewer enables the user to explore simulated volumes using different projections.
+Py-SPHViewer is a parallel Python package to visualise and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) scheme. The code estimates an underlying scalar field (e.g., the density field) traced by a finite number of particles, and produces not only beautiful, but also scientifically useful images. In addition, Py-SPHViewer enables the user to explore simulated volumes using different projections.
 
 Although the package was conceived as a rendering tool for cosmological SPH simulations, it can be used in a number of applications.
 
-Intensive calculations are all performed in parallel C code. However, the package can be used interactively in a Python shell, [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/).
+Intensive calculations are all performed in parallel C code (which requires OpenMP) but, as any python package, it can be used interactively in a Python shell, [Ipython](http://ipython.org/) or [Ipython notebook](http://ipython.org/).
 
 
 # Installation
@@ -21,26 +21,6 @@ The development version is available in GitHub. The following lines will clone, 
     cd py-sphviewer
     python setup.py install
 
-
-# Changelogs
-
-Py-SPHViewer is in active development. We often add new features and fix bugs. We list below the update notes:
-
-- **version 1.1.0**
-
-  * Py-SPHViewer is now compatible with Python 3. We thank Elliott Sales de Andrade (@QuLogic) for making this possible.
-  * Image returned by Render.get_image(), or QuickView.get_image() is normalized by the pixel area. This means that the value of each pixel, when smoothing the particle mass, can be regarded as the actual surface density.
-
-- **version 1.0.5**
-
-  * Scipy.weave is deprecated in Scipy 0.19, so we removed all dependencies to it.
-  * Minor bugs fixed.
-
-- **version 1.0.4**
-
-   * New QuickView tool for making quick visualisations (see this [post](https://sites.google.com/view/abll/codes/py-sphviewer/using-quickview) for instructions).
-   * We added a new directory "examples" that contains hdf5 files with simulation outputs. These are useful to perform quick tests.
-   * Minor bugs fixed.
 
 # Code Licence and citations
 
