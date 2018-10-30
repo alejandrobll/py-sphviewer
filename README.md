@@ -26,6 +26,10 @@ python setup.py install
 
 Py-SPHViewer is in active development. We often add new features and fix bugs. We list below the update notes:
 
+- ** version 1.2.0 **
+  * Major change in the way particle data is stored and accessed by Scene. The result is a significant speed up of the code
+  * Particles data must be of shape [N,3], in constrast with [3,N] that was used in earlier versions.
+
 - **version 1.1.0**
 
   * Py-SPHViewer is now compatible with Python 3. We thank Elliott Sales de Andrade (@QuLogic) for making this possible.
