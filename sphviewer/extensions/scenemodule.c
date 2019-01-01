@@ -142,16 +142,6 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
     ymin = extent[2];
     ymax = extent[3];
 
-
-    for(i=0;i<n;i++){
-      if( (x[i] >= xmin) & (x[i] <= xmax) & 
-	  (y[i] >= ymin) & (y[i] <= ymax) ) {
-	
-	kview[idx] = i;
-	idx += 1;
-      }
-    }
-
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize)
     for(i=0;i<n;i++){
       x[i] = (x[i] - xmin) / (xmax-xmin) * xsize;
@@ -181,17 +171,6 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
       extent[3] = yfovmax;
 
       float zpart;
-      for(i=0;i<n;i++){
-	zpart = (z[i]-(-1.0*r));
-	if( (zpart > 0) & 
-	    (fabsf(x[i]) <= fabsf(zpart)*xmax/zoom) &
-	    (fabsf(y[i]) <= fabsf(zpart)*ymax/zoom) ) {
-	  
-	  kview[idx] = i;
-	  idx += 1;
-	}
-      }
-
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize,lbin,zoom,r,zpart)
       for(i=0;i<n;i++){
 	zpart = (z[i]-(-1.0*r))/zoom;
@@ -200,6 +179,15 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
 	hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * xsize;
       }
     }          
+
+      for(i=0;i<n;i++){
+	if( (x[i] >= -hsml[i]) & (x[i] <= xsize+hsml[i]) &
+	    (y[i] >= -hsml[i]) & (y[i] <= ysize+hsml[i]) ) { //this considers edge-particles with intersecting kernels
+	  
+	  kview[idx] = i;
+	  idx += 1;
+      }
+    }
   return idx;
 }
 
