@@ -96,7 +96,7 @@ void c_render(float *x, float *y, float *t, float *mass,
     }
   }
   
-
+  if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
   // Let's compute the local image 
   //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
   for(l=0;l<ppt;l++){
@@ -110,26 +110,6 @@ void c_render(float *x, float *y, float *t, float *mass,
     if(tt > size_lim) tt = size_lim;
     
     // Let's compute the convolution with the Kernel
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
-      }
-    }
-  }
-  
-  // Let's compute the image for the remainder particles...
-  if((r-thread_id) > 0){
-    i  = nth*ppt+thread_id;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt = (int) t[i];
-    mm = mass[i];
-    
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
-    
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
