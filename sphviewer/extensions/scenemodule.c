@@ -181,7 +181,8 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
     }          
 
       for(i=0;i<n;i++){
-	if( (x[i] >= -hsml[i]) & (x[i] <= xsize+hsml[i]) &
+	if( (hsml[i] > 0) &
+	    (x[i] >= -hsml[i]) & (x[i] <= xsize+hsml[i]) &
 	    (y[i] >= -hsml[i]) & (y[i] <= ysize+hsml[i]) ) { //this considers edge-particles with intersecting kernels
 	  
 	  kview[idx] = i;
