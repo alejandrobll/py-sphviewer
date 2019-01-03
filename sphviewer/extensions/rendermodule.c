@@ -77,7 +77,7 @@ void c_render(float *x, float *y, float *t, float *mass,
     float *local_image;
     int i,j,k,l;
     int xx, yy, tt;
-    float mm;
+    float tt_f, mm;
     int r, nth, ppt, thread_id;
 
   nth = omp_get_num_threads();                // Get number of threads
@@ -103,18 +103,19 @@ void c_render(float *x, float *y, float *t, float *mass,
     i = thread_id+nth*l;
     xx = (int) x[i];
     yy = (int) y[i];
-    tt = (int) t[i];
+    tt_f = t[i];
+    tt = (int) ceil(tt_f);
     mm = mass[i];
-
+    
     if(tt < 1) tt = 1;
     if(tt > size_lim) tt = size_lim;
-    
+      
     // Let's compute the convolution with the Kernel
     for(j=-tt; j<tt+1; j++){
       for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
+  	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
+  	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
+  	}
       }
     }
   }
