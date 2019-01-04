@@ -58,9 +58,19 @@ float cubic_kernel(float r, float h){
   return sigma*func/(h*h*h);
 }
 
+float sinc(float x){
+  float value;
+  
+  if(x==0)
+    value = 1.0;
+  else
+    value = sin(x)/x;
+  return value;
+}
+
 
 void c_render(float *x, float *y, float *t, float *mass, 
-	      int xsize, int ysize, int n, float *image){ 
+	      int xsize, int ysize, int n, int projection, float *extent, float *image){ 
   
   // C function calculating the image of the particles convolved with our kernel
   int size_lim;
@@ -95,27 +105,71 @@ void c_render(float *x, float *y, float *t, float *mass,
       local_image[k*xsize+j] = 0.0;
     }
   }
-  
-  if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
-  // Let's compute the local image 
-  //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
-  for(l=0;l<ppt;l++){
-    i = thread_id+nth*l;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt_f = t[i];
-    tt = (int) ceil(tt_f);
-    mm = mass[i];
-    
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
+  // Dome projection/Fish-eye camera : Azimuth Equidistant projection distortions
+  if(projection==2){
+    float xxrad, yyrad, ttrad, rho, sincrho, cosrho;
+    if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
+    // Let's compute the local image 
+    //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+    for(l=0;l<ppt;l++){
+      i = thread_id+nth*l;
+      xx = (int) x[i];
+      yy = (int) y[i];
+      xxrad = (((float)xx/(float)xsize)*(extent[1]-extent[0])+extent[0])*3.141592;
+      yyrad = (((float)yy/(float)ysize)*(extent[3]-extent[2])+extent[2])*3.141592;
+      rho = sqrt(xxrad*xxrad+yyrad*yyrad);
+      sincrho = sinc(rho);
+      cosrho = cos(rho);
+      tt_f = t[i];
+      ttrad = ((tt_f/(float)xsize)*(extent[1]-extent[0]))*3.141592;
+      tt = (int)ceil(tt_f/sincrho);
+      mm = mass[i];
       
-    // Let's compute the convolution with the Kernel
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
+      if(tt < 1) tt = 1;
+      if(tt > size_lim) tt = size_lim;
+      
+      int jxx,kyy;
+      float jxxrad, kyyrad, rhopix, cosd;
+      // Let's compute the convolution with the Kernel
+      for(j=-tt; j<tt+1; j++){
+        for(k=-tt; k<tt+1; k++){
+      jxx = j+xx;
+      kyy = k+yy;
+      jxxrad = ((((float)jxx)/(float)xsize)*(extent[1]-extent[0])+extent[0])*3.141592;
+      kyyrad = ((((float)kyy)/(float)ysize)*(extent[3]-extent[2])+extent[2])*3.141592;
+      rhopix = sqrt(jxxrad*jxxrad+kyyrad*kyyrad);
+  	if( (rhopix <= 3.141592) && (jxx>=0) && (jxx<xsize) && (kyy>=0) && (kyy<ysize) ){
+        cosd = (xxrad*jxxrad+yyrad*kyyrad)*sincrho*sinc(rhopix)+cosrho*cos(rhopix);
+      if(cosd>=1) cosd = 1; else if(cosd<=-1) cosd = -1;
+  	  local_image[kyy*xsize+jxx] += mm*cubic_kernel(acos(cosd), ttrad); //I should normalize here by the surface area
+  	}
+        }
+      }
+    }
+  }
+  //
+  else{
+    if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
+    // Let's compute the local image 
+    //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+    for(l=0;l<ppt;l++){
+      i = thread_id+nth*l;
+      xx = (int) x[i];
+      yy = (int) y[i];
+      tt_f = t[i];
+      tt = (int)ceil(tt_f);
+      mm = mass[i];
+      
+      if(tt < 1) tt = 1;
+      if(tt > size_lim) tt = size_lim;
+      
+      // Let's compute the convolution with the Kernel
+      for(j=-tt; j<tt+1; j++){
+        for(k=-tt; k<tt+1; k++){
   	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
   	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
   	}
+        }
       }
     }
   }
@@ -138,10 +192,10 @@ void c_render(float *x, float *y, float *t, float *mass,
 
 void test_C(){
   // This function if for testing purposes only. It writes a file called image_test.bin
-  int *x, *y, *t;
-  float *mass;
-  int xsize, ysize, n;
-  float *image;
+  int *x, *y;
+  float *t, *mass;
+  int xsize, ysize, n, projection;
+  float *extent, *image;
   int i;
 
   xsize = 1000;
@@ -150,8 +204,9 @@ void test_C(){
 
   x = (int *)malloc( n * sizeof(int) ); 
   y = (int *)malloc( n * sizeof(int) ); 
-  t = (int *)malloc( n * sizeof(int) ); 
+  t = (float *)malloc( n * sizeof(int) ); 
   mass = (float *)malloc( n * sizeof(float) ); 
+  image = (float *)malloc( 4 * sizeof(float) ); 
   image = (float *)malloc( xsize * ysize * sizeof(float) ); 
 
   srand( time(NULL) );
@@ -163,7 +218,7 @@ void test_C(){
     mass[i] = rand() % 499;
   }
 
-  c_render(x,y,t,mass,xsize,ysize,n,image);
+  c_render(x,y,t,mass,xsize,ysize,n,projection,extent,image);
 
   FILE *output;
 
@@ -176,15 +231,15 @@ void test_C(){
 
 static PyObject *rendermodule(PyObject *self, PyObject *args){
   PyArrayObject *x_obj, *y_obj, *t_obj;
-  PyArrayObject *m_obj;
+  PyArrayObject *m_obj, *extent_obj;
   float *x, *y, *t;
   float *mass;
   int xsize, ysize;
-  int n;
-  float *image;
+  int n, projection;
+  float *extent, *image;
   int DOUBLE = 0;
 
-  if(!PyArg_ParseTuple(args, "OOOOii",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize))
+  if(!PyArg_ParseTuple(args, "OOOOiiiO",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize, &projection, &extent_obj))
     return NULL;
     
   // Let's check the size of the 1-dimensions arrays.
@@ -209,6 +264,8 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
     return NULL;
   }
 
+  extent = (float *)extent_obj->data;
+
   image = (float *)malloc( xsize * ysize * sizeof(float) );
 
   int i, j;
@@ -219,7 +276,7 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   }
 
   // Here we do the work
-  c_render(x,y,t,mass,xsize,ysize,n,image);
+  c_render(x,y,t,mass,xsize,ysize,n,projection,extent,image);
 
   if(DOUBLE) free(mass);
   

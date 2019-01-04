@@ -27,11 +27,11 @@ import matplotlib.pylab as plt
 class Camera(object):
     def __init__(self, x = None, y = None, z = None, r = None, 
                  t = None, p = None, zoom  = None, roll = None,
-                 xsize = None, ysize = None, extent = None):
+                 xsize = None, ysize = None, extent = None, projection = None):
         self._name = 'CAMERA'        
         self.__params = {'x':x,'y':y,'z':z,'r':r,
                          't':t,'p':p,'zoom':zoom, 'roll':roll,
-                         'xsize':xsize, 'ysize':ysize, 'extent':extent}
+                         'xsize':xsize, 'ysize':ysize, 'extent':extent, 'projection': projection}
 
     def get_params(self):
         return self.__params
@@ -115,4 +115,4 @@ class Camera(object):
 
         self.__params = {'x':xmean,'y':ymean,'z':zmean,'r':r,
                          't':0,'p':0,'zoom':1, 'roll':0,
-                         'xsize':500, 'ysize':500, 'extent':None}
+                         'xsize':500, 'ysize':500, 'extent':None, 'projection': None}

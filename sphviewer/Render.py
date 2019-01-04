@@ -86,9 +86,15 @@ class Render(object):
 
     def __make_render(self,x,y,t,kview,xsize,ysize):
         from .extensions import render
-
+        
+        if(self.Scene.Camera.get_params()['r'] == 'infinity'):
+            projection = 0
+        elif(self.Scene.Camera.get_params()['projection'] == 'fisheye'):
+            projection = 2
+        else:
+            projection = 1
         image = render.render(self.Scene._x, self.Scene._y, self.Scene._hsml, 
-                              self.Scene._m,np.int32(xsize),np.int32(ysize))
+                              self.Scene._m,np.int32(xsize),np.int32(ysize),np.int32(projection),np.float32(self.Scene.get_extent()))
         return np.reshape(image,[ysize,xsize])
 
 

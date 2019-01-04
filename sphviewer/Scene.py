@@ -188,9 +188,39 @@ class Scene(object):
             else:
                 self.__extent = np.float32(self._camera_params['extent'])
         else:
-            projection = 1
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0,0,0,0],dtype=np.float32)
+            if(isinstance(self._camera_params['projection'],str)):
+                if('fisheye' in self._camera_params['projection']):
+                    projection = 2
+                    try:
+                        shift = float(self._camera_params['projection'][7:])
+                        theta_rad=np.pi*np.array(theta)/180.
+                        phi_rad=np.pi*np.array(phi)/180.
+                        roll_rad=np.pi*np.array(roll)/180.
+                        kaxis = np.array([np.cos(phi_rad)*np.cos(roll_rad),
+                                          np.cos(theta_rad)*np.sin(roll_rad)+np.sin(theta_rad)*np.sin(phi_rad)*np.cos(roll_rad),
+                                          np.sin(theta_rad)*np.sin(roll_rad)-np.cos(theta_rad)*np.sin(phi_rad)*np.cos(roll_rad)]).T
+                        Kchange = np.cross(kaxis,np.eye(3))
+                        Rchange = np.eye(3)-np.sin(shift*np.pi/180)*Kchange+(1-np.cos(shift*np.pi/180))*np.dot(Kchange,Kchange)
+                        zaxis = np.array([np.sin(phi_rad),-np.sin(theta_rad)*np.cos(phi_rad),np.cos(theta_rad)*np.cos(phi_rad)]).T
+                        jaxis = np.matmul(Rchange,zaxis)
+                        xcopy,ycopy,zcopy = np.array([xcam,ycam,zcam])-rcam*(zaxis-jaxis)
+                        iaxis = np.cross(jaxis,kaxis)
+                        tcopy_rad = np.arctan2(-jaxis[1],jaxis[2]); tcopy = tcopy_rad/np.pi*180
+                        cossintcopy=np.array([np.cos(tcopy_rad),np.sin(tcopy_rad)])
+                        rollcopy_rad = np.arctan2(-iaxis[0],kaxis[0]); rollcopy = rollcopy_rad/np.pi*180
+                        cossinrollcopy=np.array([np.cos(rollcopy_rad),np.sin(rollcopy_rad)])
+                        pcopy_rad=np.arctan2(jaxis[0],np.nanmean([([kaxis[0],-iaxis[0]]/cossinrollcopy)[np.argmax(np.abs(cossintcopy))],
+                                                                  ([jaxis[2],-jaxis[1]]/cossintcopy)[np.argmax(np.abs(cossintcopy))]]))
+                        pcopy=pcopy_rad/np.pi*180
+                        xcam,ycam,zcam,theta,phi,roll = xcopy,ycopy,zcopy,tcopy,pcopy,rollcopy
+                    except:
+                        None
+                else:
+                    raise ValueError("'"+self._camera_params['projection']+"' isn't a valid projection type")
+            else:
+                projection = 1
 
         xx,yy,hh,kk = scene.scene(pos[:,0],pos[:,1],
                                   pos[:,2],hsml,
