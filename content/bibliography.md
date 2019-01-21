@@ -3,6 +3,16 @@
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
 
+* vas Son et al. (2019), Galaxies with monstrous black holes in galaxy cluster environments, arXiv:1901.03156 [(Link)](https://arxiv.org/abs/1901.03156)
+
+* Trayford & Schaye (2018), Resolved galaxy scaling relations in the EAGLE simulation: star formation, metallicity and stellar mass on kpc scales, arXiv:1812.06984 [(Link)](https://arxiv.org/abs/1812.06984)
+
+* Genina et al. (2018), The distinct stellar metallicity populations of simulated Local Group dwarfs, arXiv:1812.04839 [(Link)](https://arxiv.org/abs/1812.04839)
+
+* Bose et al. (2018), ETHOS - an Effective Theory of Structure Formation: detecting dark matter interactions through the Lyman-alpha forest, arXiv:1811.10630 [(Link)](https://arxiv.org/abs/1811.10630)
+
+* Benitez-Llambay et al. (2018), Baryon-induced dark matter cores in the EAGLE simulations, arXiv:1810.04186 [(Link)](https://arxiv.org/abs/1810.04186)
+
 * Cui et al. (2018), The Three Hundred project: a large catalogue of theoretically modelled galaxy clusters for cosmological and astrophysical applications, MNRAS 480, 2898. [(Link)](https://academic.oup.com/mnras/article-abstract/480/3/2898/5066184?redirectedFrom=fulltext)
 
 * Barber et al. (2018), Calibrated, cosmological hydrodynamical simulations with variable IMFs III: Spatially-resolved properties and evolution, arXiv:1807.11310 [(Link)](https://arxiv.org/abs/1807.11310)
