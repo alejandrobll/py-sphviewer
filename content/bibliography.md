@@ -2,8 +2,10 @@
 
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
-* Benitez-Llambay et al. (2019), Baryon-induced dark matter cores in the EAGLE simulations, arXiv:1810.04186 [(Link)](https://arxiv.org/abs/1810.04186)
+* Trayford et al. (2019), Fade to grey: systematic variation of the galaxy
+attenuation curves with galaxy properties in EAGLE, arXiv:1908.08956 [(Link)](https://arxiv.org/abs/1908.08956)
 
+* Benitez-Llambay et al. (2019), Baryon-induced dark matter cores in the EAGLE simulations, arXiv:1810.04186 [(Link)](https://arxiv.org/abs/1810.04186)
 
 * Pearson et al. (2019), Identifying Galaxy Mergers in Observations and Simulations with Deep Learning, arXiv:1902.10626 [(Link)](https://arxiv.org/abs/1902.10626)
 
