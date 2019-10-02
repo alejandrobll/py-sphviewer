@@ -128,13 +128,13 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
         /* Need to check if we live within the bounds of the image */
         if (((x_cell + j) >= 0) && ((x_cell + j) < xsize)) {
           /* Compute x-only properties that will stay constant for y loop */
-          const float distance_x = ((float)x_cell + (float)j - 0.5f) - x_float;
+          const float distance_x = ((float)x_cell + (float)j + 0.5f) - x_float;
           const float distance_x_2 = distance_x * distance_x;
 
           for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1; k++) {
             if (((y_cell + k) >= 0) && ((y_cell + k) < ysize)) {
               const float distance_y =
-                  ((float)y_cell + (float)k - 0.5f) - y_float;
+                  ((float)y_cell + (float)k + 0.5f) - y_float;
               const float distance_y_2 = distance_y * distance_y;
 
               const float radius = sqrtf(distance_y_2 + distance_x_2);
@@ -185,7 +185,7 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
             /* Compute x-only properties that will stay constant for y loop */
             /* Distance from particle to center of cell */
             const float distance_x =
-                ((float)x_cell + (float)j - 0.5f) - x_float;
+                ((float)x_cell + (float)j + 0.5f) - x_float;
             const float distance_x_2 = distance_x * distance_x;
 
             for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1;
@@ -200,6 +200,7 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
                 /* Can call the kernel! Woo! */
                 const float kernel = cubic_kernel(radius, smoothing_length);
 
+                printf("%e %e %e\n", kernel, radius, smoothing_length);
                 /* Now add onto the correct cell */
                 const int pixel = (y_cell + k) * xsize + (x_cell + j);
                 local_image[pixel] += particle_mass * kernel;
