@@ -34,111 +34,192 @@
 /* Kernel choice */
 #include "../sph_kernel.h"
 
-float *get_double_array(PyArrayObject *array_obj, int n){
+/* Simple definition of min and max */
+/**
+ * @brief Minimum of two numbers
+ *
+ * This macro evaluates its arguments exactly once.
+ */
+#define min(a, b)                                                              \
+  ({                                                                           \
+    const __typeof__(a) _a = (a);                                              \
+    const __typeof__(b) _b = (b);                                              \
+    _a < _b ? _a : _b;                                                         \
+  })
+
+/**
+ * @brief Maximum of two numbers
+ *
+ * This macro evaluates its arguments exactly once.
+ */
+#define max(a, b)                                                              \
+  ({                                                                           \
+    const __typeof__(a) _a = (a);                                              \
+    const __typeof__(b) _b = (b);                                              \
+    _a > _b ? _a : _b;                                                         \
+  })
+
+float *get_double_array(PyArrayObject *array_obj, int n) {
   /* This function returns the data stored in a double PyArrayObject*/
   double *local_array = (double *)array_obj->data;  
   float *output = (float *)malloc( n * sizeof(float) );
 
 #pragma omp parallel for firstprivate(n)
   for(int i=0;i<n;i++){
+  for (int i = 0; i < n; i++) {
     output[i] = local_array[i];
   }
 
   return output;
 }
 
+void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
+              int n, float *image) {
 
-void c_render(float *x, float *y, float *t, float *mass, 
-	      int xsize, int ysize, int n, float *image){ 
-  
-  // C function calculating the image of the particles convolved with our kernel
-  int size_lim;
- 
-  if(xsize >= ysize){
-    size_lim = xsize;
-  }
-  else{
-    size_lim = ysize;
-  }
-  
+  /* What's the largest dimension? */
+  const float size_lim = (float)(xsize > ysize ? xsize : ysize);
+
+/* Parallel loop; each thread has its own thread-local image that are combined
+ * at the end. Note that everything here is done in terms of the pixel grid
+ * co-ordinates. */
 #pragma omp parallel
   {
-    float *local_image;
-    int i,j,k,l;
-    int xx, yy, tt;
-    float mm;
-    int r, nth, ppt, thread_id;
+    int n_threads = omp_get_num_threads();
+    int thread_id = omp_get_thread_num();
+    /* Particles per thread, n is total number of particles. */
+    const int particles_per_thread = n / n_threads;
+    const int remainder_particles = n - particles_per_thread * n_threads;
 
-  nth = omp_get_num_threads();                // Get number of threads
-  thread_id = omp_get_thread_num();           // Get thread id
-  ppt = n/nth;                                //  Number or Particles per thread (ppt)
-  r = n-ppt*nth;                              // Remainder
+    /* Allocate the local image that we'll spread our particles onto */
+    float *local_image = (float *)malloc(xsize * ysize * sizeof(float));
+    bzero(local_image, xsize * ysize * sizeof(float));
 
-  
-  local_image = (float *)malloc( xsize * ysize * sizeof(float) ); 
+    /* Loop over the particles only belonging to our thread */
+    for (int i = (thread_id * particles_per_thread);
+         i < (thread_id + 1) * particles_per_thread; i++) {
 
-  // Let's initialize the image to zero
+      const float x_float = x[i];
+      const float y_float = y[i];
+      const int x_cell = (int)x_float;
+      const int y_cell = (int)y_float;
 
-  for(j=0;j<xsize;j++){
-    for(k=0;k<ysize;k++){
-      local_image[k*xsize+j] = 0.0;
-    }
-  }
-  
+      const float particle_mass = mass[i];
+      /* Curtail the smoothing length if it is to large */
+      const float smoothing_length = min(t[i], size_lim);
 
-  // Let's compute the local image 
-  //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
-  for(l=0;l<ppt;l++){
-    i = thread_id+nth*l;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt = (int) t[i];
-    mm = mass[i];
+      if (smoothing_length < 0.5f) {
+        /* If the smoothing length is less than half of a pixels width, we
+         * can contribute in a very simplistic way to the density of the pixel
+         * which we know has area A = 1. */
 
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
-    
-    // Let's compute the convolution with the Kernel
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
+        const int pixel = y_cell * xsize + x_cell;
+        local_image[pixel] += particle_mass; /* I.e. mass / A with A=1 */
+
+        /* We're done! */
+        continue;
+      }
+
+      /* Cast the smoothing length to an integer so we can loop over the pixel
+       * square cast by it */
+      const int pixels_to_loop_over = (int)smoothing_length;
+
+      /* Loop over the pixels that our kernel covers. */
+      for (int j = -pixels_to_loop_over; j < pixels_to_loop_over + 1; j++) {
+        /* Need to check if we live within the bounds of the image */
+        if (((x_cell + j) >= 0) && ((x_cell + j) < xsize)) {
+          /* Compute x-only properties that will stay constant for y loop */
+          const float distance_x = ((float)x_cell + (float)j - 0.5f) - x_float;
+          const float distance_x_2 = distance_x * distance_x;
+
+          for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1; k++) {
+            if (((y_cell + k) >= 0) && ((y_cell + k) < ysize)) {
+              const float distance_y =
+                  ((float)y_cell + (float)k - 0.5f) - y_float;
+              const float distance_y_2 = distance_y * distance_y;
+
+              const float radius = sqrtf(distance_y_2 + distance_x_2);
+              /* Can call the kernel! Woo! */
+              const float kernel = cubic_kernel(radius, smoothing_length);
+
+              /* Now add onto the correct cell */
+              const int pixel = (y_cell + k) * xsize + (x_cell + j);
+              local_image[pixel] += particle_mass * kernel;
+            }
+          }
+        }
       }
     }
-  }
-  
-  // Let's compute the image for the remainder particles...
-  if((r-thread_id) > 0){
-    i  = nth*ppt+thread_id;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt = (int) t[i];
-    mm = mass[i];
-    
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
-    
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
-      }
-    }
-  }
-  // Let's merge the local images
-  
 
-  #pragma omp critical
-  {
-    for(j=0;j<xsize;j++){
-      for(k=0;k<ysize;k++){
-	image[k*xsize+j] += local_image[k*xsize+j];
+    /* Let's compute the image for the remainder particles... */
+    if ((remainder - thread_id) > 0) {
+      const int i = n_threads * particles_per_thread + thread_id;
+      const float x_float = x[i];
+      const float y_float = y[i];
+      const int x_cell = (int)x_float;
+      const int y_cell = (int)y_float;
+
+      const float particle_mass = mass[i];
+      /* Curtail the smoothing length if it is to large */
+      const float smoothing_length = min(t[i], size_lim);
+
+      if (smoothing_length < 0.5f) {
+        /* If the smoothing length is less than half of a pixels width, we
+         * can contribute in a very simplistic way to the density of the pixel
+         * which we know has area A = 1. */
+
+        const int pixel = y_cell * xsize + x_cell;
+        local_image[pixel] += particle_mass; /* I.e. mass / A with A=1 */
+
+        /* We're done! */
+      } else {
+        /* Gotta do the smoothing as usual */
+
+        /* Cast the smoothing length to an integer so we can loop over the pixel
+         * square cast by it */
+        const int pixels_to_loop_over = (int)smoothing_length;
+
+        /* Loop over the pixels that our kernel covers. */
+        for (int j = -pixels_to_loop_over; j < pixels_to_loop_over + 1; j++) {
+          /* Need to check if we live within the bounds of the image */
+          if (((x_cell + j) >= 0) && ((x_cell + j) < xsize)) {
+            /* Compute x-only properties that will stay constant for y loop */
+            /* Distance from particle to center of cell */
+            const float distance_x =
+                ((float)x_cell + (float)j - 0.5f) - x_float;
+            const float distance_x_2 = distance_x * distance_x;
+
+            for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1;
+                 k++) {
+              if (((y_cell + k) >= 0) && ((y_cell + k) < ysize)) {
+                /* Distance from particle to center of cell */
+                const float distance_y =
+                    ((float)y_cell + (float)k + 0.5f) - y_float;
+                const float distance_y_2 = distance_y * distance_y;
+
+                const float radius = sqrtf(distance_y_2 + distance_x_2);
+                /* Can call the kernel! Woo! */
+                const float kernel = cubic_kernel(radius, smoothing_length);
+
+                /* Now add onto the correct cell */
+                const int pixel = (y_cell + k) * xsize + (x_cell + j);
+                local_image[pixel] += particle_mass * kernel;
+              }
+            }
+          }
+        }
       }
     }
-    free(local_image);
-  }
+#pragma omp critical
+    /* Send everyone back home and merge our threadlocal image with the
+     * full one in main memory. */
+    {
+      for (int j = 0; j < xsize; j++) {
+        for (int k = 0; k < ysize; k++) {
+          image[k * xsize + j] += local_image[k * xsize + j];
+        }
+      }
+      free(local_image);
+    }
   }
   return;
 }
@@ -274,10 +355,7 @@ PyMODINIT_FUNC initrender(void) {
 
 
 // Uncomment the following lines for doing some test.
-//void main()
-//{
+// void main()
+// {
 //  test_C();
-//}
-
-
-
+// }
