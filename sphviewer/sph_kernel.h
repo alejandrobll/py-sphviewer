@@ -13,7 +13,7 @@
  * 1. Cubic spline (Monaghan & Lattanzio 1985)
  * 2. Cubic spline (Monaghan & Lattanzio 1985) in a smaller domain
  * 3. 2D dome-shaped quadratic kernel (old default)
- * 4.
+ * 4. 2D dome-shaped quadratic kernel (simplified, only for fancy stuff)
  */
 #define SPH_VISUALISATION_KERNEL_CHOICE 3
 
@@ -132,6 +132,9 @@ float cubic_kernel(float r, float h)
   {
     func = 1.f - ratio * ratio;
   }
+
+  return func;
+}
 
 #else
 #error "Invalid choice of SPH kernel, see sph_kernel.h"
