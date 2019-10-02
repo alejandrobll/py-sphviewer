@@ -10,7 +10,7 @@
 
 /* Choose now, or forever hold your peace:
  * 
- * 1. Cubic spline (Monaghan & Lattanzio 1985)
+ * 1. Cubic spline (Monaghan & Lattanzio 1985) (assumes maximal radius is 2h)
  * 2. Cubic spline (Monaghan & Lattanzio 1985) in a smaller domain
  * 3. 2D dome-shaped quadratic kernel (old default)
  * 4. 2D dome-shaped quadratic kernel (simplified, only for fancy stuff)
@@ -95,7 +95,7 @@ float cubic_kernel(float r, float h)
   const float h_inv = 1.f / h;
   const float h_inv_2 = h_inv * h_inv;
   const float ratio = r * h_inv;
-  const float sigma = 15.0 / (8.0 * 3.141592);
+  const float sigma = 0.795774729f; /* 5 / (2 * pi) */
 
   float func = 0.f;
 
@@ -107,7 +107,7 @@ float cubic_kernel(float r, float h)
      * argument_3_2 = argument * argument / sqrtf(argument)
      * (this didn't work for gcc9.1.0 or gcc7.x) */
     const float argument_3_2 = argument * sqrtf(argument);
-    func = (4.f / 3.f) * h_inv_2 * argument_3_2;
+    func = sigma * h_inv_2 * argument_3_2;
   }
 
   return func;
@@ -126,11 +126,14 @@ float cubic_kernel(float r, float h)
 float cubic_kernel(float r, float h)
 {
   float func = 0.f;
-  float ratio = r / h;
+  const float h_inv = 1.f / h;
+  const float h_inv_2 = h_inv * h_inv;
+  const float ratio = r / h;
+  const float sigma = 0.63662031f; /* 2 / pi */
 
   if (ratio < 1.f)
   {
-    func = 1.f - ratio * ratio;
+    func = sigma * h_inv_2 * (1.f - ratio * ratio);
   }
 
   return func;
