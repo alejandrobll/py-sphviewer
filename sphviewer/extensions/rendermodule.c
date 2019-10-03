@@ -59,20 +59,22 @@
     _a > _b ? _a : _b;                                                         \
   })
 
-float *get_double_array(PyArrayObject *array_obj, int n) {
-  /* This function returns the data stored in a double PyArrayObject*/
-  double *local_array = (double *)array_obj->data;  
-  float *output = (float *)malloc( n * sizeof(float) );
-
-#pragma omp parallel for firstprivate(n)
-  for(int i=0;i<n;i++){
-  for (int i = 0; i < n; i++) {
-    output[i] = local_array[i];
-  }
-
-  return output;
-}
-
+/**
+ * @brief Main rendering function. Takes in arrays cooresponding to SPH
+ *        particles, and an image, and (in parallel) smooths the data onto
+ *        the grid. All input properties should be in grid units, so if
+ *        it's a 128 x 128 grid, x, y, h should all be bounded within [0, 128].
+ *
+ *
+ * @param *x, pointer to the array of x positions
+ * @param *y, pointer to the array of y positions
+ * @param *t, pointer to the array of smoothing lengths
+ * @param *mass, ponter to the array of particle masses
+ * @param xsize, ysize, sizes of the image grid
+ * @param n, number of particles
+ * @param *image, pointer to the image array of size xsize * ysize.
+ *
+ */
 void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
               int n, float *image) {
 
@@ -224,46 +226,40 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
   return;
 }
 
+/* Below this point we have the python interface funuctions */
+/* ---------------------- P Y T H O N ----------------------*/
 
-void test_C(){
-  // This function if for testing purposes only. It writes a file called image_test.bin
-  int *x, *y, *t;
-  float *mass;
-  int xsize, ysize, n;
-  float *image;
-  int i;
+/**
+ * @brief: Returns the data sotred in a double PyArrayObject.
+ *
+ * @param[in] *array_obj, the python array object
+ * @param[in] n, size of the object
+ * @param[out] output, a pointer to a C array containing the same stuff
+ *             as (double precision floating point numbers) as the
+ *             python object array
+ */
+float *get_double_array(PyArrayObject *array_obj, int n) {
+  double *local_array = (double *)array_obj->data;
+  float *output = (float *)malloc(n * sizeof(float));
 
-  xsize = 1000;
-  ysize = 1000;
-  n = 10000;
-
-  x = (int *)malloc( n * sizeof(int) ); 
-  y = (int *)malloc( n * sizeof(int) ); 
-  t = (int *)malloc( n * sizeof(int) ); 
-  mass = (float *)malloc( n * sizeof(float) ); 
-  image = (float *)malloc( xsize * ysize * sizeof(float) ); 
-
-  srand( time(NULL) );
-  
-  for(i=0;i<n;i++){
-    x[i] = rand() % xsize;
-    y[i] = rand() % ysize;
-    t[i] = rand() % 50;
-    mass[i] = rand() % 499;
+#pragma omp parallel for firstprivate(n)
+  for (int i = 0; i < n; i++) {
+    output[i] = local_array[i];
   }
 
-  c_render(x,y,t,mass,xsize,ysize,n,image);
-
-  FILE *output;
-
-  output = fopen("image_test.bin","wb");
-  fwrite(image, sizeof(float), xsize*ysize, output);   
-  fclose(output);
+  return output;
 }
 
-//Let's start with Python
-
-static PyObject *rendermodule(PyObject *self, PyObject *args){
+/**
+ * @brief Main python object that interfaces the c_render function
+ *        with the internal python code.
+ *
+ * @param *self, own python object
+ * @param *args, list of arguments to the intialiser
+ *
+ * Returns a copy of the PyObject it instantiates.
+ */
+static PyObject *rendermodule(PyObject *self, PyObject *args) {
   PyArrayObject *x_obj, *y_obj, *t_obj;
   PyArrayObject *m_obj;
   float *x, *y, *t;
@@ -273,18 +269,18 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   float *image;
   int DOUBLE = 0;
 
-  if(!PyArg_ParseTuple(args, "OOOOii",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize))
+  if (!PyArg_ParseTuple(args, "OOOOii", &x_obj, &y_obj, &t_obj, &m_obj, &xsize,
+                        &ysize))
     return NULL;
     
   // Let's check the size of the 1-dimensions arrays.
   n = (int) m_obj->dimensions[0];
 
   // Let's point the C arrays to the numpy arrays
-  x    = (float *)x_obj->data;
-  y    = (float *)y_obj->data; 
-  t    = (float *)t_obj->data; /* These are always floats, as they come from Scene */
-
-
+  x = (float *)x_obj->data;
+  y = (float *)y_obj->data;
+  t = (float *)
+          t_obj->data; /* These are always floats, as they come from Scene */
 
   /* Let's check the type of mass, which could be either double or float */
   int type = PyArray_TYPE(m_obj);
@@ -321,10 +317,11 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
 		       
 }
 
+/*! Global variable that registers the rendermodule method internally
+    in python */
 static PyMethodDef RenderMethods[] = {
-  {"render", rendermodule, METH_VARARGS, "Method for rendering the image."},
-  {NULL, NULL, 0, NULL}
-};
+    {"render", rendermodule, METH_VARARGS, "Method for rendering the image."},
+    {NULL, NULL, 0, NULL}};
 
 #if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
@@ -353,9 +350,49 @@ PyMODINIT_FUNC initrender(void) {
 }
 #endif
 
+/* Set me to 128 to run C debugging */
+#define C_DEBUG_MODE_NO_PYTHON 0
+#if C_DEBUG_MODE_NO_PYTHON == 128
+/**
+ * @brief Function for testing, not used in production code
+ */
+void test_C() {
+  // This function if for testing purposes only. It writes a file called
+  // image_test.bin
+  int *x, *y, *t;
+  float *mass;
+  int xsize, ysize, n;
+  float *image;
+  int i;
 
-// Uncomment the following lines for doing some test.
-// void main()
-// {
-//  test_C();
-// }
+  xsize = 1000;
+  ysize = 1000;
+  n = 10000;
+
+  x = (int *)malloc(n * sizeof(int));
+  y = (int *)malloc(n * sizeof(int));
+  t = (int *)malloc(n * sizeof(int));
+  mass = (float *)malloc(n * sizeof(float));
+  image = (float *)malloc(xsize * ysize * sizeof(float));
+
+  srand(time(NULL));
+
+  for (i = 0; i < n; i++) {
+    x[i] = rand() % xsize;
+    y[i] = rand() % ysize;
+    t[i] = rand() % 50;
+    mass[i] = rand() % 499;
+  }
+
+  c_render(x, y, t, mass, xsize, ysize, n, image);
+
+  FILE *output;
+
+  output = fopen("image_test.bin", "wb");
+  fwrite(image, sizeof(float), xsize * ysize, output);
+  fclose(output);
+}
+
+/* Main function for testing in C-only mode */
+void main() { test_C(); }
+#endif /*C_DEBUG_MODE_NO_PYTHON*/
