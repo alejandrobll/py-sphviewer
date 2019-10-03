@@ -1,27 +1,27 @@
-#This file is part of Py-SPHViewer
+# This file is part of Py-SPHViewer
 
-#<Py-SPHVIewer is a framework for rendering particles in Python
-#using the SPH interpolation scheme.>
-#Copyright (C) <2013>  <Alejandro Benitez Llambay>
+# <Py-SPHVIewer is a framework for rendering particles in Python
+# using the SPH interpolation scheme.>
+# Copyright (C) <2013>  <Alejandro Benitez Llambay>
 
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 from __future__ import absolute_import, division, print_function
 
-#from scipy import weave
-#from scipy.weave import converters
+# from scipy import weave
+# from scipy.weave import converters
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -29,17 +29,18 @@ import colorsys
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
+
 def import_code(filename):
-    #naive function to import c code
-    string = ''
-    fi = open(filename, 'r').readlines()
+    # naive function to import c code
+    string = ""
+    fi = open(filename, "r").readlines()
     for i in fi:
         string += i
     return string
 
 
 class Render(object):
-    def __init__(self,Scene):
+    def __init__(self, Scene):
         """
         Produces a render of the Scene. It uses a kernel interpolation 
         method. Its setting and getting methods are:
@@ -69,51 +70,71 @@ class Render(object):
         except AttributeError:
             print("ERROR: use a valid class...")
             return
-        if(class_name != 'SCENE'):
+        if class_name != "SCENE":
             print("ERROR: use a valid class...")
             return
 
         self.Scene = Scene
 
-        xsize = Scene.Camera.get_params()['xsize']
-        ysize = Scene.Camera.get_params()['ysize']
+        xsize = Scene.Camera.get_params()["xsize"]
+        ysize = Scene.Camera.get_params()["ysize"]
 
-        self.__image = self.__make_render(Scene._x,Scene._y,Scene._hsml,
-                                          Scene._kview,xsize,ysize)
-        #lets define some flags
-        self.__logscale_flag = False;
+        # We need to correct the image by 1 / pixel area
+        # as all calculations are done in grid pixel units.
 
+        extent = Scene.get_extent()
+        x_extent = extent[1] - extent[0]
+        y_extent = extent[3] - extent[2]
 
-    def __make_render(self,x,y,t,kview,xsize,ysize):
+        pixel_area = (x_extent / xsize) * (y_extent / ysize)
+
+        self.__image = (
+            self.__make_render(
+                Scene._x, Scene._y, Scene._hsml, Scene._kview, xsize, ysize
+            )
+            / pixel_area
+        )
+
+        # lets define some flags
+        self.__logscale_flag = False
+
+    def __make_render(self, x, y, t, kview, xsize, ysize):
         from .extensions import render
 
-        image = render.render(self.Scene._x, self.Scene._y, self.Scene._hsml, 
-                              self.Scene._m,np.int32(xsize),np.int32(ysize))
-        return np.reshape(image,[ysize,xsize])
+        image = render.render(
+            self.Scene._x,
+            self.Scene._y,
+            self.Scene._hsml,
+            self.Scene._m,
+            np.int32(xsize),
+            np.int32(ysize),
+        )
+        return np.reshape(image, [ysize, xsize])
 
+    def __make_render_old(self, x, y, t, kview, xsize, ysize):
+        # Old function using weave for rendering the images.
 
-    def __make_render_old(self,x,y,t,kview,xsize,ysize):
-        #Old function using weave for rendering the images. 
-
-        n=int(len(x))
+        n = int(len(x))
         mass = self.Scene._Particles.get_mass()[kview]
-        image = np.zeros([ysize,xsize],dtype=(np.float32))
+        image = np.zeros([ysize, xsize], dtype=(np.float32))
 
-            # C code for making the images
-        code = import_code(os.path.join(PROJECT_ROOT, '.','c_code.c'))
-        shared     = (['x','y', 'xsize', 'ysize',  
-                       't','n', 'mass','image'])
+        # C code for making the images
+        code = import_code(os.path.join(PROJECT_ROOT, ".", "c_code.c"))
+        shared = ["x", "y", "xsize", "ysize", "t", "n", "mass", "image"]
         # interpolation kernel
 
-        extra_code = import_code(os.path.join(PROJECT_ROOT, '.','extra_code.c'))            
-        weave.inline(code,shared,
-                     support_code=extra_code,
-                     type_converters=converters.blitz,
-                     compiler='gcc',
-                     headers=["<omp.h>"],
-                     extra_compile_args=[' -O3 -fopenmp'],
-                     extra_link_args=['-lgomp'])
-        return image 
+        extra_code = import_code(os.path.join(PROJECT_ROOT, ".", "extra_code.c"))
+        weave.inline(
+            code,
+            shared,
+            support_code=extra_code,
+            type_converters=converters.blitz,
+            compiler="gcc",
+            headers=["<omp.h>"],
+            extra_compile_args=[" -O3 -fopenmp"],
+            extra_link_args=["-lgomp"],
+        )
+        return image
 
     def get_image(self):
         """
@@ -141,19 +162,19 @@ class Render(object):
         """
         return self.Scene.get_extent()
 
-    def set_logscale(self,t=True):
+    def set_logscale(self, t=True):
         """
         - set_logscale(): If M is the matrix of the image, it defines the image M as log10(M+1).
         """
-        if(t == self.get_logscale()):
+        if t == self.get_logscale():
             return
         else:
-            if(t):
-                self.__image = np.log10(self.__image+1)
-                self.__logscale_flag = True;
+            if t:
+                self.__image = np.log10(self.__image + 1)
+                self.__logscale_flag = True
             else:
-                self.__image = 10**self.__image-1.
-                self.__logscale_flag = False;
+                self.__image = 10 ** self.__image - 1.0
+                self.__logscale_flag = False
 
     def get_logscale(self):
         """
@@ -161,7 +182,7 @@ class Render(object):
         """
         return self.__logscale_flag
 
-    def histogram(self,axis=None, **kargs):
+    def histogram(self, axis=None, **kargs):
         """
         - histogram(axis=None, **kargs): It computes and shows the histogram of the image. This is 
         usefull for choosing a proper scale to the output, or for clipping some values. If 
@@ -309,11 +330,11 @@ class Render(object):
         visible: [True | False]         
         zorder: any number 
         """
-        if(axis == None):
+        if axis == None:
             axis = plt.gca()
         axis.hist(self.__image.ravel(), **kargs)
-        
-    def save(self,outputfile,**kargs):
+
+    def save(self, outputfile, **kargs):
         """
         - Save the image in some common image formats. It uses the pyplot.save 
         method.  
@@ -342,6 +363,4 @@ class Render(object):
         resolution of the output image.
         """
         plt.imsave(outputfile, self.__image, **kargs)
-
-        
 
