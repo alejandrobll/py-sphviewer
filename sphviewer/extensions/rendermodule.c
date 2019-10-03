@@ -200,7 +200,6 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
                 /* Can call the kernel! Woo! */
                 const float kernel = cubic_kernel(radius, smoothing_length);
 
-                printf("%e %e %e\n", kernel, radius, smoothing_length);
                 /* Now add onto the correct cell */
                 const int pixel = (y_cell + k) * xsize + (x_cell + j);
                 local_image[pixel] += particle_mass * kernel;
