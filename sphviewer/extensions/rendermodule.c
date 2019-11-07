@@ -31,169 +31,235 @@
 #include <stdio.h>
 #include <time.h>
 
-float *get_double_array(PyArrayObject *array_obj, int n){
-  /* This function returns the data stored in a double PyArrayObject*/
-  double *local_array = (double *)array_obj->data;  
-  float *output = (float *)malloc( n * sizeof(float) );
+/* Kernel choice */
+#include "../sph_kernel.h"
+
+/* Simple definition of min and max */
+/**
+ * @brief Minimum of two numbers
+ *
+ * This macro evaluates its arguments exactly once.
+ */
+#define min(a, b)                                                              \
+  ({                                                                           \
+    const __typeof__(a) _a = (a);                                              \
+    const __typeof__(b) _b = (b);                                              \
+    _a < _b ? _a : _b;                                                         \
+  })
+
+/**
+ * @brief Maximum of two numbers
+ *
+ * This macro evaluates its arguments exactly once.
+ */
+#define max(a, b)                                                              \
+  ({                                                                           \
+    const __typeof__(a) _a = (a);                                              \
+    const __typeof__(b) _b = (b);                                              \
+    _a > _b ? _a : _b;                                                         \
+  })
+
+/**
+ * @brief Main rendering function. Takes in arrays cooresponding to SPH
+ *        particles, and an image, and (in parallel) smooths the data onto
+ *        the grid. All input properties should be in grid units, so if
+ *        it's a 128 x 128 grid, x, y, h should all be bounded within [0, 128].
+ *
+ *
+ * @param *x, pointer to the array of x positions
+ * @param *y, pointer to the array of y positions
+ * @param *t, pointer to the array of smoothing lengths
+ * @param *mass, ponter to the array of particle masses
+ * @param xsize, ysize, sizes of the image grid
+ * @param n, number of particles
+ * @param *image, pointer to the image array of size xsize * ysize.
+ *
+ */
+void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
+              int n, float *image) {
+
+  /* What's the largest dimension? */
+  const float size_lim = (float)(xsize > ysize ? xsize : ysize);
+
+/* Parallel loop; each thread has its own thread-local image that are combined
+ * at the end. Note that everything here is done in terms of the pixel grid
+ * co-ordinates. */
+#pragma omp parallel
+  {
+    int n_threads = omp_get_num_threads();
+    int thread_id = omp_get_thread_num();
+    /* Particles per thread, n is total number of particles. */
+    const int particles_per_thread = n / n_threads;
+    const int remainder_particles = n - particles_per_thread * n_threads;
+
+    /* Allocate the local image that we'll spread our particles onto */
+    float *local_image = (float *)malloc(xsize * ysize * sizeof(float));
+    bzero(local_image, xsize * ysize * sizeof(float));
+
+    /* Loop over the particles only belonging to our thread */
+    for (int i = (thread_id * particles_per_thread);
+         i < (thread_id + 1) * particles_per_thread; i++) {
+
+      const float x_float = x[i];
+      const float y_float = y[i];
+      const int x_cell = (int)x_float;
+      const int y_cell = (int)y_float;
+
+      const float particle_mass = mass[i];
+      /* Curtail the smoothing length if it is to large */
+      const float smoothing_length = min(t[i], size_lim);
+
+      if (smoothing_length < 0.5f) {
+        /* If the smoothing length is less than half of a pixels width, we
+         * can contribute in a very simplistic way to the density of the pixel
+         * which we know has area A = 1. */
+
+        const int pixel = y_cell * xsize + x_cell;
+        local_image[pixel] += particle_mass; /* I.e. mass / A with A=1 */
+
+        /* We're done! */
+        continue;
+      }
+
+      /* Cast the smoothing length to an integer so we can loop over the pixel
+       * square cast by it */
+      const int pixels_to_loop_over = (int)smoothing_length;
+
+      /* Loop over the pixels that our kernel covers. */
+      for (int j = -pixels_to_loop_over; j < pixels_to_loop_over + 1; j++) {
+        /* Need to check if we live within the bounds of the image */
+        if (((x_cell + j) >= 0) && ((x_cell + j) < xsize)) {
+          /* Compute x-only properties that will stay constant for y loop */
+          const float distance_x = ((float)x_cell + (float)j + 0.5f) - x_float;
+          const float distance_x_2 = distance_x * distance_x;
+
+          for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1; k++) {
+            if (((y_cell + k) >= 0) && ((y_cell + k) < ysize)) {
+              const float distance_y =
+                  ((float)y_cell + (float)k + 0.5f) - y_float;
+              const float distance_y_2 = distance_y * distance_y;
+
+              const float radius = sqrtf(distance_y_2 + distance_x_2);
+              /* Can call the kernel! Woo! */
+              const float kernel = cubic_kernel(radius, smoothing_length);
+
+              /* Now add onto the correct cell */
+              const int pixel = (y_cell + k) * xsize + (x_cell + j);
+              local_image[pixel] += particle_mass * kernel;
+            }
+          }
+        }
+      }
+    }
+
+    /* Let's compute the image for the remainder particles... */
+    if ((remainder - thread_id) > 0) {
+      const int i = n_threads * particles_per_thread + thread_id;
+      const float x_float = x[i];
+      const float y_float = y[i];
+      const int x_cell = (int)x_float;
+      const int y_cell = (int)y_float;
+
+      const float particle_mass = mass[i];
+      /* Curtail the smoothing length if it is to large */
+      const float smoothing_length = min(t[i], size_lim);
+
+      if (smoothing_length < 0.5f) {
+        /* If the smoothing length is less than half of a pixels width, we
+         * can contribute in a very simplistic way to the density of the pixel
+         * which we know has area A = 1. */
+
+        const int pixel = y_cell * xsize + x_cell;
+        local_image[pixel] += particle_mass; /* I.e. mass / A with A=1 */
+
+        /* We're done! */
+      } else {
+        /* Gotta do the smoothing as usual */
+
+        /* Cast the smoothing length to an integer so we can loop over the pixel
+         * square cast by it */
+        const int pixels_to_loop_over = (int)smoothing_length;
+
+        /* Loop over the pixels that our kernel covers. */
+        for (int j = -pixels_to_loop_over; j < pixels_to_loop_over + 1; j++) {
+          /* Need to check if we live within the bounds of the image */
+          if (((x_cell + j) >= 0) && ((x_cell + j) < xsize)) {
+            /* Compute x-only properties that will stay constant for y loop */
+            /* Distance from particle to center of cell */
+            const float distance_x =
+                ((float)x_cell + (float)j + 0.5f) - x_float;
+            const float distance_x_2 = distance_x * distance_x;
+
+            for (int k = -pixels_to_loop_over; k < pixels_to_loop_over + 1;
+                 k++) {
+              if (((y_cell + k) >= 0) && ((y_cell + k) < ysize)) {
+                /* Distance from particle to center of cell */
+                const float distance_y =
+                    ((float)y_cell + (float)k + 0.5f) - y_float;
+                const float distance_y_2 = distance_y * distance_y;
+
+                const float radius = sqrtf(distance_y_2 + distance_x_2);
+                /* Can call the kernel! Woo! */
+                const float kernel = cubic_kernel(radius, smoothing_length);
+
+                /* Now add onto the correct cell */
+                const int pixel = (y_cell + k) * xsize + (x_cell + j);
+                local_image[pixel] += particle_mass * kernel;
+              }
+            }
+          }
+        }
+      }
+    }
+#pragma omp critical
+    /* Send everyone back home and merge our threadlocal image with the
+     * full one in main memory. */
+    {
+      for (int j = 0; j < xsize; j++) {
+        for (int k = 0; k < ysize; k++) {
+          image[k * xsize + j] += local_image[k * xsize + j];
+        }
+      }
+      free(local_image);
+    }
+  }
+  return;
+}
+
+/* Below this point we have the python interface funuctions */
+/* ---------------------- P Y T H O N ----------------------*/
+
+/**
+ * @brief: Returns the data sotred in a double PyArrayObject.
+ *
+ * @param[in] *array_obj, the python array object
+ * @param[in] n, size of the object
+ * @param[out] output, a pointer to a C array containing the same stuff
+ *             as (double precision floating point numbers) as the
+ *             python object array
+ */
+float *get_double_array(PyArrayObject *array_obj, int n) {
+  double *local_array = (double *)array_obj->data;
+  float *output = (float *)malloc(n * sizeof(float));
 
 #pragma omp parallel for firstprivate(n)
-  for(int i=0;i<n;i++){
+  for (int i = 0; i < n; i++) {
     output[i] = local_array[i];
   }
 
   return output;
 }
 
-
-float cubic_kernel(float r, float h){
-  //2D Dome-shapeed quadratic Kernel (1-R^2) (Hicks and Liebrock 2000).
-  float func;
-  float sigma;
-  
-  sigma = 15.0/(8.0*3.141592);
-  if(r/h <= 1.0)  
-    func = 4.0/3.0*h*pow(sqrt(1.0-(r/h)*(r/h)),3);
-  if(r/h > 1.0)  
-    func = 0;
-  return sigma*func/(h*h*h);
-}
-
-
-void c_render(float *x, float *y, float *t, float *mass, 
-	      int xsize, int ysize, int n, float *image){ 
-  
-  // C function calculating the image of the particles convolved with our kernel
-  int size_lim;
- 
-  if(xsize >= ysize){
-    size_lim = xsize;
-  }
-  else{
-    size_lim = ysize;
-  }
-  
-#pragma omp parallel
-  {
-    float *local_image;
-    int i,j,k,l;
-    int xx, yy, tt;
-    float mm;
-    int r, nth, ppt, thread_id;
-
-  nth = omp_get_num_threads();                // Get number of threads
-  thread_id = omp_get_thread_num();           // Get thread id
-  ppt = n/nth;                                //  Number or Particles per thread (ppt)
-  r = n-ppt*nth;                              // Remainder
-
-  
-  local_image = (float *)malloc( xsize * ysize * sizeof(float) ); 
-
-  // Let's initialize the image to zero
-
-  for(j=0;j<xsize;j++){
-    for(k=0;k<ysize;k++){
-      local_image[k*xsize+j] = 0.0;
-    }
-  }
-  
-
-  // Let's compute the local image 
-  //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
-  for(l=0;l<ppt;l++){
-    i = thread_id+nth*l;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt = (int) t[i];
-    mm = mass[i];
-
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
-    
-    // Let's compute the convolution with the Kernel
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
-      }
-    }
-  }
-  
-  // Let's compute the image for the remainder particles...
-  if((r-thread_id) > 0){
-    i  = nth*ppt+thread_id;
-    xx = (int) x[i];
-    yy = (int) y[i];
-    tt = (int) t[i];
-    mm = mass[i];
-    
-    if(tt < 1) tt = 1;
-    if(tt > size_lim) tt = size_lim;
-    
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
-	}
-      }
-    }
-  }
-  // Let's merge the local images
-  
-
-  #pragma omp critical
-  {
-    for(j=0;j<xsize;j++){
-      for(k=0;k<ysize;k++){
-	image[k*xsize+j] += local_image[k*xsize+j];
-      }
-    }
-    free(local_image);
-  }
-  }
-  return;
-}
-
-
-void test_C(){
-  // This function if for testing purposes only. It writes a file called image_test.bin
-  int *x, *y, *t;
-  float *mass;
-  int xsize, ysize, n;
-  float *image;
-  int i;
-
-  xsize = 1000;
-  ysize = 1000;
-  n = 10000;
-
-  x = (int *)malloc( n * sizeof(int) ); 
-  y = (int *)malloc( n * sizeof(int) ); 
-  t = (int *)malloc( n * sizeof(int) ); 
-  mass = (float *)malloc( n * sizeof(float) ); 
-  image = (float *)malloc( xsize * ysize * sizeof(float) ); 
-
-  srand( time(NULL) );
-  
-  for(i=0;i<n;i++){
-    x[i] = rand() % xsize;
-    y[i] = rand() % ysize;
-    t[i] = rand() % 50;
-    mass[i] = rand() % 499;
-  }
-
-  c_render(x,y,t,mass,xsize,ysize,n,image);
-
-  FILE *output;
-
-  output = fopen("image_test.bin","wb");
-  fwrite(image, sizeof(float), xsize*ysize, output);   
-  fclose(output);
-}
-
-//Let's start with Python
-
-static PyObject *rendermodule(PyObject *self, PyObject *args){
+/**
+ * @brief Main python object that interfaces the c_render function
+ *        with the internal python code.
+ *
+ * @param *self, own python object
+ * @param *args, list of arguments to the intialiser
+ *
+ * Returns a copy of the PyObject it instantiates.
+ */
+static PyObject *rendermodule(PyObject *self, PyObject *args) {
   PyArrayObject *x_obj, *y_obj, *t_obj;
   PyArrayObject *m_obj;
   float *x, *y, *t;
@@ -203,18 +269,18 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   float *image;
   int DOUBLE = 0;
 
-  if(!PyArg_ParseTuple(args, "OOOOii",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize))
+  if (!PyArg_ParseTuple(args, "OOOOii", &x_obj, &y_obj, &t_obj, &m_obj, &xsize,
+                        &ysize))
     return NULL;
     
   // Let's check the size of the 1-dimensions arrays.
   n = (int) m_obj->dimensions[0];
 
   // Let's point the C arrays to the numpy arrays
-  x    = (float *)x_obj->data;
-  y    = (float *)y_obj->data; 
-  t    = (float *)t_obj->data; /* These are always floats, as they come from Scene */
-
-
+  x = (float *)x_obj->data;
+  y = (float *)y_obj->data;
+  t = (float *)
+          t_obj->data; /* These are always floats, as they come from Scene */
 
   /* Let's check the type of mass, which could be either double or float */
   int type = PyArray_TYPE(m_obj);
@@ -251,10 +317,11 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
 		       
 }
 
+/*! Global variable that registers the rendermodule method internally
+    in python */
 static PyMethodDef RenderMethods[] = {
-  {"render", rendermodule, METH_VARARGS, "Method for rendering the image."},
-  {NULL, NULL, 0, NULL}
-};
+    {"render", rendermodule, METH_VARARGS, "Method for rendering the image."},
+    {NULL, NULL, 0, NULL}};
 
 #if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
@@ -283,12 +350,49 @@ PyMODINIT_FUNC initrender(void) {
 }
 #endif
 
+/* Set me to 128 to run C debugging */
+#define C_DEBUG_MODE_NO_PYTHON 0
+#if C_DEBUG_MODE_NO_PYTHON == 128
+/**
+ * @brief Function for testing, not used in production code
+ */
+void test_C() {
+  // This function if for testing purposes only. It writes a file called
+  // image_test.bin
+  int *x, *y, *t;
+  float *mass;
+  int xsize, ysize, n;
+  float *image;
+  int i;
 
-// Uncomment the following lines for doing some test.
-//void main()
-//{
-//  test_C();
-//}
+  xsize = 1000;
+  ysize = 1000;
+  n = 10000;
 
+  x = (int *)malloc(n * sizeof(int));
+  y = (int *)malloc(n * sizeof(int));
+  t = (int *)malloc(n * sizeof(int));
+  mass = (float *)malloc(n * sizeof(float));
+  image = (float *)malloc(xsize * ysize * sizeof(float));
 
+  srand(time(NULL));
 
+  for (i = 0; i < n; i++) {
+    x[i] = rand() % xsize;
+    y[i] = rand() % ysize;
+    t[i] = rand() % 50;
+    mass[i] = rand() % 499;
+  }
+
+  c_render(x, y, t, mass, xsize, ysize, n, image);
+
+  FILE *output;
+
+  output = fopen("image_test.bin", "wb");
+  fwrite(image, sizeof(float), xsize * ysize, output);
+  fclose(output);
+}
+
+/* Main function for testing in C-only mode */
+void main() { test_C(); }
+#endif /*C_DEBUG_MODE_NO_PYTHON*/
