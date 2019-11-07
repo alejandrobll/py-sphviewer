@@ -20,8 +20,8 @@
 
 from __future__ import absolute_import, division, print_function
 
-#from scipy import weave
-#from scipy.weave import converters
+# from scipy import weave
+# from scipy.weave import converters
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -70,50 +70,46 @@ class Render(object):
         except AttributeError:
             print("ERROR: use a valid class...")
             return
-        if(class_name != 'SCENE'):
+        if class_name != "SCENE":
             print("ERROR: use a valid class...")
             return
 
         self.Scene = Scene
 
-        xsize = Scene.Camera.get_params()['xsize']
-        ysize = Scene.Camera.get_params()['ysize']
+        xsize = Scene.Camera.get_params()["xsize"]
+        ysize = Scene.Camera.get_params()["ysize"]
 
-        self.__image = self.__make_render(Scene._x, Scene._y, Scene._hsml,
-                                          Scene._kview, xsize, ysize)
+        # We need to correct the image by 1 / pixel area
+        # as all calculations are done in grid pixel units.
+
+        extent = Scene.get_extent()
+        x_extent = extent[1] - extent[0]
+        y_extent = extent[3] - extent[2]
+
+        pixel_area = (x_extent / xsize) * (y_extent / ysize)
+
+        self.__image = (
+            self.__make_render(
+                Scene._x, Scene._y, Scene._hsml, Scene._kview, xsize, ysize
+            )
+            / pixel_area
+        )
+
         # lets define some flags
         self.__logscale_flag = False
 
     def __make_render(self, x, y, t, kview, xsize, ysize):
         from .extensions import render
 
-        image = render.render(self.Scene._x, self.Scene._y, self.Scene._hsml,
-                              self.Scene._m, np.int32(xsize), np.int32(ysize))
+        image = render.render(
+            self.Scene._x,
+            self.Scene._y,
+            self.Scene._hsml,
+            self.Scene._m,
+            np.int32(xsize),
+            np.int32(ysize),
+        )
         return np.reshape(image, [ysize, xsize])
-
-    def __make_render_old(self, x, y, t, kview, xsize, ysize):
-        # Old function using weave for rendering the images.
-
-        n = int(len(x))
-        mass = self.Scene._Particles.get_mass()[kview]
-        image = np.zeros([ysize, xsize], dtype=(np.float32))
-
-        # C code for making the images
-        code = import_code(os.path.join(PROJECT_ROOT, '.', 'c_code.c'))
-        shared = (['x', 'y', 'xsize', 'ysize',
-                   't', 'n', 'mass', 'image'])
-        # interpolation kernel
-
-        extra_code = import_code(os.path.join(
-            PROJECT_ROOT, '.', 'extra_code.c'))
-        weave.inline(code, shared,
-                     support_code=extra_code,
-                     type_converters=converters.blitz,
-                     compiler='gcc',
-                     headers=["<omp.h>"],
-                     extra_compile_args=[' -O3 -fopenmp'],
-                     extra_link_args=['-lgomp'])
-        return image
 
     def get_image(self):
         """
@@ -145,7 +141,7 @@ class Render(object):
         """
         - set_logscale(): If M is the matrix of the image, it defines the image M as log10(M+1).
         """
-        if(t == self.get_logscale()):
+        if t == self.get_logscale():
             return
         else:
             if(t):
@@ -309,7 +305,7 @@ class Render(object):
         visible: [True | False]         
         zorder: any number 
         """
-        if(axis == None):
+        if axis == None:
             axis = plt.gca()
         axis.hist(self.__image.ravel(), **kargs)
 
