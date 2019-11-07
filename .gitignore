@@ -1,0 +1,14 @@
+# Compiled files
+*.so
+*.o
+
+# Packaging files
+py_sphviewer.egg_info/*
+dependency_links.txt
+PKG-INFO
+requires.txt
+SOURCES.txt
+top_level.txt
+
+# Python bytecode
+*.pyc

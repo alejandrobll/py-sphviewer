@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <time.h>
 
-float hsv_to_rgb(float h, float s, float v,
+void hsv_to_rgb(float h, float s, float v,
 		 float *r, float *g, float *b)
 //Function to convert from hsv to rgb color space.
 //Coded by Alejandro Benitez-Llambay as a tool for py-sphviewer. The implementation 
