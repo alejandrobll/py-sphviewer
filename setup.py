@@ -32,13 +32,11 @@ def has_flags(compiler, flags):
 
 # Build a build extension class that allows for finer selection of flags.
 
-
 class BuildExt(build_ext):
     # Never check these; they're always added.
     # Note that we don't support MSVC here.
-    compile_flags = {
-        "unix": ["-std=c99", "-w", "-ffast-math", "-I{:s}".format(np.get_include())]
-    }
+    compile_flags = {"unix": ["-std=c99", "-w",
+                              "-ffast-math", "-I{:s}".format(np.get_include())]}
 
     def build_extensions(self):
         ct = self.compiler.compiler_type
@@ -50,36 +48,32 @@ class BuildExt(build_ext):
             # Generic case, this is what GCC accepts
             opts += ["-fopenmp"]
             links += ["-lgomp"]
+
         elif has_flags(self.compiler, ["-Xpreprocessor", "-fopenmp", "-lomp"]):
             # Hope that clang accepts this
             opts += ["-Xpreprocessor", "-fopenmp", "-lomp"]
             links += ["-lomp"]
-        elif has_flags(
-            self.compiler,
-            [
-                "-Xpreprocessor",
-                "-fopenmp",
-                "-lomp",
-                '-I"$(brew --prefix libomp)/include"',
-                '-L"$(brew --prefix libomp)/lib"',
-            ],
-        ):
+
+        elif has_flags(self.compiler, ["-Xpreprocessor",
+                                       "-fopenmp",
+                                       "-lomp",
+                                       '-I"$(brew --prefix libomp)/include"',
+                                       '-L"$(brew --prefix libomp)/lib"']):
             # Case on MacOS where somebody has installed libomp using homebrew
-            opts += [
-                "-Xpreprocessor",
-                "-fopenmp",
-                "-lomp",
-                '-I"$(brew --prefix libomp)/include"',
-                '-L"$(brew --prefix libomp)/lib"',
-            ]
+            opts += ["-Xpreprocessor",
+                     "-fopenmp",
+                     "-lomp",
+                     '-I"$(brew --prefix libomp)/include"',
+                     '-L"$(brew --prefix libomp)/lib"']
+
             links += ["-lomp"]
+
         else:
-            raise CompileError(
-                "Unable to compile C extensions on your machine, as we can't find OpenMP. "
-                "If you are on MacOS, try `brew install libomp` and try again. "
-                "If you are on Windows, please reach out on the GitHub and we can try "
-                "to find a solution."
-            )
+
+            raise CompileError("Unable to compile C extensions on your machine, as we can't find OpenMP. "
+                               "If you are on MacOS, try `brew install libomp` and try again. "
+                               "If you are on Windows, please reach out on the GitHub and we can try "
+                               "to find a solution.")
 
         for ext in self.extensions:
             ext.extra_compile_args = opts
