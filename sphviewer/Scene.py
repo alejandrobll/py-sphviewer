@@ -1,21 +1,21 @@
-#This file is part of Py-SPHViewer
+# This file is part of Py-SPHViewer
 
-#<Py-SPHVIewer is a framework for rendering particles in Python
-#using the SPH interpolation scheme.>
-#Copyright (C) <2013>  <Alejandro Benitez Llambay>
+# <Py-SPHVIewer is a framework for rendering particles in Python
+# using the SPH interpolation scheme.>
+# Copyright (C) <2013>  <Alejandro Benitez Llambay>
 
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, either version 3 of the License, or
-#(at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 from __future__ import absolute_import, division, print_function
@@ -23,21 +23,22 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def rotate(angle, axis, pos):
     angle *= np.pi/180.0
     if axis == 'x':
-        R = np.array([[1,0,0],
-                      [0,np.cos(angle),np.sin(angle)],
-                      [0,-np.sin(angle),np.cos(angle)]])
+        R = np.array([[1, 0, 0],
+                      [0, np.cos(angle), np.sin(angle)],
+                      [0, -np.sin(angle), np.cos(angle)]])
     elif axis == 'y':
-        R = np.array([[np.cos(angle),0,-np.sin(angle)],
-                      [0,1,0],
-                      [np.sin(angle),0,np.cos(angle)]])
+        R = np.array([[np.cos(angle), 0, -np.sin(angle)],
+                      [0, 1, 0],
+                      [np.sin(angle), 0, np.cos(angle)]])
     elif axis == 'z':
-        R = np.array([[np.cos(angle),np.sin(angle),0],
-                      [-np.sin(angle),np.cos(angle),0],
-                      [0,0,1]])
-    return np.dot(R,pos)
+        R = np.array([[np.cos(angle), np.sin(angle), 0],
+                      [-np.sin(angle), np.cos(angle), 0],
+                      [0, 0, 1]])
+    return np.dot(R, pos)
 
 
 class Scene(object):
@@ -82,15 +83,15 @@ class Scene(object):
         self._name = 'SCENE'
         self._Particles = Particles
 
-        #I use the autocamera by default
-        if(Camera==None):
+        # I use the autocamera by default
+        if(Camera == None):
             from .Camera import Camera
             self.Camera = Camera()
             self.Camera.set_autocamera(Particles)
             self._camera_params = self.Camera.get_params()
 
         else:
-            try: 
+            try:
                 camera_name = Camera._name
                 if(camera_name != 'CAMERA'):
                     print("You must use a valid Camera class...")
@@ -113,7 +114,7 @@ class Scene(object):
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
-    def set_autocamera(self,mode='density'):
+    def set_autocamera(self, mode='density'):
         """
         - set_autocamera(mode='density'): By default, Scene defines its 
         own Camera. However, there is no a general way for doing so. Scene 
@@ -122,7 +123,7 @@ class Scene(object):
         |'minmax'|'density'|'median'|'mean'|. If None of the previous methods
         work well, you may define the camera params by yourself.
         """
-        self.Camera.set_autocamera(self._Particles,mode=mode)
+        self.Camera.set_autocamera(self._Particles, mode=mode)
         self._camera_params = self.Camera.get_params()
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
@@ -145,7 +146,7 @@ class Scene(object):
         """
         return self.__extent
 
-    def update_camera(self,**kargs):
+    def update_camera(self, **kargs):
         """
         - update_camera(**kwarg): By using this method you can define all 
         the new paramenters of the camera. Read the available **kwarg in 
@@ -154,79 +155,77 @@ class Scene(object):
         self.Camera.set_params(**kargs)
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
-        
+
     def __compute_scene(self):
         from .extensions import scene
 
         pos = self._Particles._pos
         hsml = self._Particles._hsml
 
-        #I recast the variables just in case
-        xcam  = np.float32(self._camera_params['x'])
-        ycam  = np.float32(self._camera_params['y'])
-        zcam  = np.float32(self._camera_params['z'])
+        # I recast the variables just in case
+        xcam = np.float32(self._camera_params['x'])
+        ycam = np.float32(self._camera_params['y'])
+        zcam = np.float32(self._camera_params['z'])
         theta = np.float32(self._camera_params['t'])
-        phi   = np.float32(self._camera_params['p'])
-        roll  = np.float32(self._camera_params['roll'])
-        zoom  = np.float32(self._camera_params['zoom'])
+        phi = np.float32(self._camera_params['p'])
+        roll = np.float32(self._camera_params['roll'])
+        zoom = np.float32(self._camera_params['zoom'])
         xsize = np.int32(self._camera_params['xsize'])
         ysize = np.int32(self._camera_params['ysize'])
-                
+
         if(self._camera_params['r'] == 'infinity'):
             projection = 0
             rcam = np.float32(0)
             if(self._camera_params['extent'] == None):
-                xmin = np.min(pos[:,0]).astype(np.float32)
-                xmax = np.max(pos[:,0]).astype(np.float32)
-                ymin = np.min(pos[:,1]).astype(np.float32)
-                ymax = np.max(pos[:,1]).astype(np.float32)
+                xmin = np.min(pos[:, 0]).astype(np.float32)
+                xmax = np.max(pos[:, 0]).astype(np.float32)
+                ymin = np.min(pos[:, 1]).astype(np.float32)
+                ymax = np.max(pos[:, 1]).astype(np.float32)
 
                 self.__extent = np.array([xmin-xcam,
                                           xmax-xcam,
                                           ymin-ycam,
-                                          ymax-ycam],dtype=np.float32)
+                                          ymax-ycam], dtype=np.float32)
             else:
                 self.__extent = np.float32(self._camera_params['extent'])
         else:
             projection = 1
             rcam = np.float32(self._camera_params['r'])
-            self.__extent = np.array([0,0,0,0],dtype=np.float32)
+            self.__extent = np.array([0, 0, 0, 0], dtype=np.float32)
 
-        xx,yy,hh,kk = scene.scene(pos[:,0],pos[:,1],
-                                  pos[:,2],hsml,
-                                  xcam, ycam, zcam, rcam, theta, phi, roll,
-                                  zoom, self.__extent, xsize, ysize, projection)
+        xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
+                                     pos[:, 2], hsml,
+                                     xcam, ycam, zcam, rcam, theta, phi, roll,
+                                     zoom, self.__extent, xsize, ysize, projection)
 
-        return xx,yy,hh,kk
-
-
+        return xx, yy, hh, kk
 
     def __compute_scene_old(self):
-        
+
         pos = (1.0*self._Particles.get_pos()).astype(np.float32)
-        
-        pos[0,:] -= np.array([self._camera_params['x']])
-        pos[1,:] -= np.array([self._camera_params['y']])
-        pos[2,:] -= np.array([self._camera_params['z']])
+
+        pos[0, :] -= np.array([self._camera_params['x']])
+        pos[1, :] -= np.array([self._camera_params['y']])
+        pos[2, :] -= np.array([self._camera_params['z']])
 
         if self._camera_params['t'] != 0:
-            pos = rotate(self._camera_params['t'],'x',pos)
+            pos = rotate(self._camera_params['t'], 'x', pos)
         if self._camera_params['p'] != 0:
-            pos = rotate(self._camera_params['p'],'y',pos)
+            pos = rotate(self._camera_params['p'], 'y', pos)
         if self._camera_params['roll'] != 0:
-            pos = rotate(self._camera_params['roll'],'z',pos)
+            pos = rotate(self._camera_params['roll'], 'z', pos)
 
         if(self._camera_params['r'] == 'infinity'):
             try:
                 extent = self._camera_params['extent']
                 if(extent == None):
-                    xmax = np.max(pos[0,:])
-                    xmin = np.min(pos[0,:])
-                    ymax = np.max(pos[1,:])
-                    ymin = np.min(pos[1,:])
+                    xmax = np.max(pos[0, :])
+                    xmin = np.min(pos[0, :])
+                    ymax = np.max(pos[1, :])
+                    ymin = np.min(pos[1, :])
 
-                    lmax = max(xmax,ymax)
-                    lmin = min(ymax,ymin)
+                    lmax = max(xmax, ymax)
+                    lmin = min(ymax, ymin)
 
                     xmin = ymin = lmin
                     xmax = ymax = ymax
@@ -236,7 +235,6 @@ class Scene(object):
                     ymin = float(extent[2])
                     ymax = float(extent[3])
 
-
                 self.__extent = np.array([xmin+self._camera_params['x'],
                                           xmax+self._camera_params['x'],
                                           ymin+self._camera_params['y'],
@@ -244,59 +242,61 @@ class Scene(object):
 
                 lbin = 2*xmax/self._camera_params['xsize']
 
-                kview, = np.where( (pos[0,:] > xmin) & (pos[0,:] < xmax) &
-                                   (pos[1,:] > ymin) & (pos[1,:] < ymax) )
+                kview, = np.where((pos[0, :] > xmin) & (pos[0, :] < xmax) &
+                                  (pos[1, :] > ymin) & (pos[1, :] < ymax))
 
-                pos   = pos[kview,:]
-                hsml  = self._Particles.get_hsml()[kview]/lbin
+                pos = pos[kview, :]
+                hsml = self._Particles.get_hsml()[kview]/lbin
 
-                pos[:,0] = (pos[0,:]-xmin)/(xmax-xmin)*self._camera_params['xsize']
-                pos[:,1] = (pos[1,:]-ymin)/(ymax-ymin)*self._camera_params['ysize']
-            
+                pos[:, 0] = (pos[0, :]-xmin)/(xmax-xmin) * \
+                    self._camera_params['xsize']
+                pos[:, 1] = (pos[1, :]-ymin)/(ymax-ymin) * \
+                    self._camera_params['ysize']
+
             except AttributeError:
                 print("There was an error with the extent of the Camera")
                 return
-                    
-            return pos[0,:], pos[1,:], hsml, kview
+
+            return pos[0, :], pos[1, :], hsml, kview
 
         else:
-            pos[2,:] -= (-1.0*self._camera_params['r'])
-        
-            FOV  = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
-        
+            pos[2, :] -= (-1.0*self._camera_params['r'])
+
+            FOV = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
+
             xmax = self._camera_params['zoom']*np.tan(FOV/2.)
             xmin = -xmax
-            ymax = 0.5*(xmax-xmin)*self._camera_params['ysize']/self._camera_params['xsize']
+            ymax = 0.5*(xmax-xmin) * \
+                self._camera_params['ysize']/self._camera_params['xsize']
             ymin = -ymax
-            xfovmax =  FOV/2.*180./np.pi
-            xfovmin =  -FOV/2.*180./np.pi
+            xfovmax = FOV/2.*180./np.pi
+            xfovmin = -FOV/2.*180./np.pi
             # in order to have symmetric y limits
-            yfovmax = 0.5*((xfovmax-xfovmin)*
+            yfovmax = 0.5*((xfovmax-xfovmin) *
                            self._camera_params['ysize']/self._camera_params['xsize'])
             yfovmin = -yfovmax
-            self.__extent = np.array([xfovmin,xfovmax,yfovmin,yfovmax])
+            self.__extent = np.array([xfovmin, xfovmax, yfovmin, yfovmax])
             lbin = 2*xmax/self._camera_params['xsize']
-            
-            kview, = np.where((pos[2,:] > 0.) & 
-                              (np.abs(pos[1,:])<=(np.abs(pos[2,:])* 
-                                                  np.tan(FOV/2.))) &
-                              (np.abs(pos[1,:]) <= (np.abs(pos[2,:])*
-                                                    np.tan(FOV/2.))))
-            pos   = pos[kview,:]
-            hsml  = self._Particles.get_hsml()[kview]
-        
-            pos[:,0] = ((pos[0,:]*self._camera_params['zoom']/ 
-                         pos[2,:]-xmin)/(xmax-xmin)*
-                        (self._camera_params['xsize']-1.))
-            pos[:,1] = ((pos[1,:]*self._camera_params['zoom']/ 
-                         pos[2,:]-ymin)/(ymax-ymin)*
-                        (self._camera_params['ysize']-1.))
-            hsml = (hsml*self._camera_params['zoom']/pos[2,:]/lbin)
-            
-            return pos[0,:], pos[1,:], hsml, kview
 
-    
-    def plot(self,axis=None,**kargs):
+            kview, = np.where((pos[2, :] > 0.) &
+                              (np.abs(pos[1, :]) <= (np.abs(pos[2, :]) *
+                                                     np.tan(FOV/2.))) &
+                              (np.abs(pos[1, :]) <= (np.abs(pos[2, :]) *
+                                                     np.tan(FOV/2.))))
+            pos = pos[kview, :]
+            hsml = self._Particles.get_hsml()[kview]
+
+            pos[:, 0] = ((pos[0, :]*self._camera_params['zoom'] /
+                          pos[2, :]-xmin)/(xmax-xmin) *
+                         (self._camera_params['xsize']-1.))
+            pos[:, 1] = ((pos[1, :]*self._camera_params['zoom'] /
+                          pos[2, :]-ymin)/(ymax-ymin) *
+                         (self._camera_params['ysize']-1.))
+            hsml = (hsml*self._camera_params['zoom']/pos[2, :]/lbin)
+
+            return pos[0, :], pos[1, :], hsml, kview
+
+    def plot(self, axis=None, **kargs):
         """
         - plot(axis=None, **kwarg): Finally, sphviewer.Scene class has its own plotting method. 
         It shows the scene as seen by the camera. It is to say, it plots the particles according
@@ -346,15 +346,14 @@ class Scene(object):
         xdata: 1D array         
         ydata: 1D array         
         zorder: any number         
-        
+
         kwargs *scalex* and *scaley*, if defined, are passed on to
         :meth:`~matplotlib.axes.Axes.autoscale_view` to determine
         whether the *x* and *y* axes are autoscaled; the default is
         *True*.
-        
+
         Additional kwargs: hold = [True|False] overrides default hold state
         """
         if(axis == None):
             axis = plt.gca()
         axis.plot(self.__x, self.__y, 'k.', **kargs)
-        

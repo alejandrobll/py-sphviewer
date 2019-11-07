@@ -1,6 +1,6 @@
-#This tool is part of sphviewer. It is intended to be used as a simple
-#way to get quick images of the simulations.
-#Author: Alejandro Benitez-Llambay
+# This tool is part of sphviewer. It is intended to be used as a simple
+# way to get quick images of the simulations.
+# Author: Alejandro Benitez-Llambay
 
 from __future__ import absolute_import, division, print_function
 
@@ -10,19 +10,19 @@ import numpy as np
 
 
 class QuickView(object):
-    def    __init__(self, pos, mass=None, hsml=None, nb=None,
-                    logscale=True, plot=True, min_hsml=None,
-                    max_hsml=None, **kwargs):
+    def __init__(self, pos, mass=None, hsml=None, nb=None,
+                 logscale=True, plot=True, min_hsml=None,
+                 max_hsml=None, **kwargs):
 
         if(mass is None):
             mass = np.ones(len(pos))
-                    
+
         if(nb == None):
             self._P = sph.Particles(pos, mass, hsml)
         else:
             self._P = sph.Particles(pos, mass, hsml, nb)
 
-        if( (min_hsml is not None) or (max_hsml is not None) ):
+        if((min_hsml is not None) or (max_hsml is not None)):
             hsml = self.get_hsml()
             if(min_hsml is not None):
                 min_hsml = min_hsml
@@ -37,7 +37,7 @@ class QuickView(object):
             print('Limiting smoothing length to the range '
                   '[%.3f,%.3f]' % (min_hsml, max_hsml))
             self._P.set_hsml(hsml)
-            
+
         self._S = sph.Scene(self._P)
         self._S.update_camera(**kwargs)
 
@@ -53,7 +53,7 @@ class QuickView(object):
             return
         else:
             return
-            
+
     def imshow(self, **kwargs):
         ax = plt.gca()
         ax.imshow(self._img, extent=self._extent, origin='lower', **kwargs)
@@ -75,12 +75,11 @@ class QuickView(object):
 
     def get_hsml(self):
         return self._P.get_hsml()
-        
-        
+
+
 if __name__ == '__main__':
     import h5py
     halo = h5py.File('../../examples/dm_halo.h5py', 'r')
-    pos  = halo['Coordinates'].value
+    pos = halo['Coordinates'].value
 
     qv = QuickView(pos, r='infinity', nb=8)
-    
