@@ -106,17 +106,24 @@ void c_render(float *x, float *y, float *t, float *mass,
     tt = (int) t[i];
     mm = mass[i];
 
-    if(tt < 1) tt = 1;
+    if(tt <= 1) {
+      local_image[yy*xsize+xx] += mm;      
+      continue;
+    }
+    
     if(tt > size_lim) tt = size_lim;
+
     
     // Let's compute the convolution with the Kernel
     for(j=-tt; j<tt+1; j++){
+      if(tt == 1) printf("%.3e, %d \n", cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt), thread_id);
       for(k=-tt; k<tt+1; k++){
 	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt); 
 	}
       }
     }
+    
   }
   
   // Let's compute the image for the remainder particles...
@@ -127,7 +134,10 @@ void c_render(float *x, float *y, float *t, float *mass,
     tt = (int) t[i];
     mm = mass[i];
     
-    if(tt < 1) tt = 1;
+    if(tt <= 1){
+      local_image[yy*xsize+xx] += mm;
+    }
+  
     if(tt > size_lim) tt = size_lim;
     
     for(j=-tt; j<tt+1; j++){
