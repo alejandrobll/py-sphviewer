@@ -153,7 +153,7 @@ void c_render(float *x, float *y, float *t, float *mass, int xsize, int ysize,
     }
 
     /* Let's compute the image for the remainder particles... */
-    if ((remainder - thread_id) > 0) {
+    if ((remainder_particles - thread_id) > 0) {
       const int i = n_threads * particles_per_thread + thread_id;
       const float x_float = x[i];
       const float y_float = y[i];
