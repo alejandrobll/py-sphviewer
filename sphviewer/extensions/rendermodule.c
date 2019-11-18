@@ -1,6 +1,6 @@
 /*////////////////////////////////////////////////////////////////////
     This file is part of Py-SPHViewer
-    
+
     <Py-SPHVIewer is a framework for rendering particles in Python
     using the SPH interpolation scheme.>
     Copyright (C) <2013>  <Alejandro Benitez Llambay>
@@ -33,7 +33,7 @@
 
 float *get_double_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a double PyArrayObject*/
-  double *local_array = (double *)array_obj->data;  
+  double *local_array = (double *)array_obj->data;
   float *output = (float *)malloc( n * sizeof(float) );
 
 #pragma omp parallel for firstprivate(n)
@@ -49,18 +49,18 @@ float cubic_kernel(float r, float h){
   //2D Dome-shapeed quadratic Kernel (1-R^2) (Hicks and Liebrock 2000).
   float func;
   float sigma;
-  
+
   sigma = 15.0/(8.0*3.141592);
-  if(r/h <= 1.0)  
+  if(r/h <= 1.0)
     func = 4.0/3.0*h*pow(sqrt(1.0-(r/h)*(r/h)),3);
-  if(r/h > 1.0)  
+  if(r/h > 1.0)
     func = 0;
   return sigma*func/(h*h*h);
 }
 
 float sinc(float x){
   float value;
-  
+
   if(x==0)
     value = 1.0;
   else
@@ -69,19 +69,19 @@ float sinc(float x){
 }
 
 
-void c_render(float *x, float *y, float *t, float *mass, 
-	      int xsize, int ysize, int n, int projection, float *extent, float *image){ 
-  
+void c_render(float *x, float *y, float *t, float *mass,
+	      int xsize, int ysize, int n, int projection, float *extent, float *image){
+
   // C function calculating the image of the particles convolved with our kernel
   int size_lim;
- 
+
   if(xsize >= ysize){
     size_lim = xsize;
   }
   else{
     size_lim = ysize;
   }
-  
+
 #pragma omp parallel
   {
     float *local_image;
@@ -95,8 +95,8 @@ void c_render(float *x, float *y, float *t, float *mass,
   ppt = n/nth;                                //  Number or Particles per thread (ppt)
   r = n-ppt*nth;                              // Remainder
 
-  
-  local_image = (float *)malloc( xsize * ysize * sizeof(float) ); 
+
+  local_image = (float *)malloc( xsize * ysize * sizeof(float) );
 
   // Let's initialize the image to zero
 
@@ -109,7 +109,7 @@ void c_render(float *x, float *y, float *t, float *mass,
   if(projection==2){
     float xxrad, yyrad, ttrad, rho, sincrho, cosrho;
     if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
-    // Let's compute the local image 
+    // Let's compute the local image
     //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
     for(l=0;l<ppt;l++){
       i = thread_id+nth*l;
@@ -124,10 +124,13 @@ void c_render(float *x, float *y, float *t, float *mass,
       ttrad = ((tt_f/(float)xsize)*(extent[1]-extent[0]))*3.141592;
       tt = (int)ceil(tt_f/sincrho);
       mm = mass[i];
-      
-      if(tt < 1) tt = 1;
+
+      if(tt <= 1) {
+        local_image[yy*xsize+xx] += mm;
+        continue;
+      }
       if(tt > size_lim) tt = size_lim;
-      
+
       int jxx,kyy;
       float jxxrad, kyyrad, rhopix, cosd;
       // Let's compute the convolution with the Kernel
@@ -144,37 +147,41 @@ void c_render(float *x, float *y, float *t, float *mass,
   	  local_image[kyy*xsize+jxx] += mm*cubic_kernel(acos(cosd), ttrad); //I should normalize here by the surface area
   	}
         }
-      }
-    }
-  }
-  //
-  else{
-    if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
-    // Let's compute the local image 
-    //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
-    for(l=0;l<ppt;l++){
-      i = thread_id+nth*l;
-      xx = (int) x[i];
-      yy = (int) y[i];
-      tt_f = t[i];
-      tt = (int)ceil(tt_f);
-      mm = mass[i];
-      
-      if(tt < 1) tt = 1;
-      if(tt > size_lim) tt = size_lim;
-      
-      // Let's compute the convolution with the Kernel
-      for(j=-tt; j<tt+1; j++){
-        for(k=-tt; k<tt+1; k++){
-  	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-  	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
-  	}
-        }
+              }
+            }
+
+          }
+          //
+          else{
+            if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
+            // Let's compute the local image
+            //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+            for(l=0;l<ppt;l++){
+              i = thread_id+nth*l;
+              xx = (int) x[i];
+              yy = (int) y[i];
+              tt_f = t[i];
+              tt = (int)ceil(tt_f);
+              mm = mass[i];
+
+              if(tt <= 1) {
+                local_image[yy*xsize+xx] += mm;
+                continue;
+              }
+              if(tt > size_lim) tt = size_lim;
+
+              // Let's compute the convolution with the Kernel
+              for(j=-tt; j<tt+1; j++){
+                for(k=-tt; k<tt+1; k++){
+          	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
+          	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
+          	}
+                }
       }
     }
   }
   // Let's merge the local images
-  
+
 
   #pragma omp critical
   {
@@ -202,15 +209,15 @@ void test_C(){
   ysize = 1000;
   n = 10000;
 
-  x = (int *)malloc( n * sizeof(int) ); 
-  y = (int *)malloc( n * sizeof(int) ); 
-  t = (float *)malloc( n * sizeof(int) ); 
-  mass = (float *)malloc( n * sizeof(float) ); 
-  image = (float *)malloc( 4 * sizeof(float) ); 
-  image = (float *)malloc( xsize * ysize * sizeof(float) ); 
+  x = (int *)malloc( n * sizeof(int) );
+  y = (int *)malloc( n * sizeof(int) );
+  t = (float *)malloc( n * sizeof(int) );
+  mass = (float *)malloc( n * sizeof(float) );
+  image = (float *)malloc( 4 * sizeof(float) );
+  image = (float *)malloc( xsize * ysize * sizeof(float) );
 
   srand( time(NULL) );
-  
+
   for(i=0;i<n;i++){
     x[i] = rand() % xsize;
     y[i] = rand() % ysize;
@@ -223,7 +230,7 @@ void test_C(){
   FILE *output;
 
   output = fopen("image_test.bin","wb");
-  fwrite(image, sizeof(float), xsize*ysize, output);   
+  fwrite(image, sizeof(float), xsize*ysize, output);
   fclose(output);
 }
 
@@ -241,13 +248,13 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
 
   if(!PyArg_ParseTuple(args, "OOOOiiiO",&x_obj, &y_obj, &t_obj, &m_obj, &xsize, &ysize, &projection, &extent_obj))
     return NULL;
-    
+
   // Let's check the size of the 1-dimensions arrays.
   n = (int) m_obj->dimensions[0];
 
   // Let's point the C arrays to the numpy arrays
   x    = (float *)x_obj->data;
-  y    = (float *)y_obj->data; 
+  y    = (float *)y_obj->data;
   t    = (float *)t_obj->data; /* These are always floats, as they come from Scene */
 
 
@@ -279,14 +286,14 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   c_render(x,y,t,mass,xsize,ysize,n,projection,extent,image);
 
   if(DOUBLE) free(mass);
-  
+
   // Let's build a numpy array
   npy_intp dims[1] = {xsize*ysize};
   PyArrayObject *image_obj = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, image);
   image_obj->flags = NPY_OWNDATA;
-  
+
   return Py_BuildValue("N", image_obj);
-		       
+
 }
 
 static PyMethodDef RenderMethods[] = {
@@ -327,6 +334,3 @@ PyMODINIT_FUNC initrender(void) {
 //{
 //  test_C();
 //}
-
-
-

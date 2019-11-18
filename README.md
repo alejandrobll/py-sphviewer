@@ -26,7 +26,11 @@ python setup.py install
 
 Py-SPHViewer is in active development. We often add new features and fix bugs. We list below the update notes:
 
-- ** version 1.2.0 **
+- **version 1.2.1**
+  * Bug with convergence for low-resolution images fixed. We thank Josh Borrow for pointing the fix. We note that there is still an ongoing issue that prevents image convergence to better than 3% for intermediate to low resolution (when the physical smoothing of most particles overlaps very few pixels). If you need to reconstruct the field to better than 3%, please perform a convergence test and indentify the resolution above which you feel safe.
+  * ``Render.get_image()`` now returns the actual surface density as in version 1.1.0 (this was dropped in v1.2).
+
+- **version 1.2.0**
   * Major change in the way particle data is stored and accessed by Scene. The result is a significant speed up of the code
   * Particles data must be of shape [N,3], in constrast with [3,N] that was used in earlier versions.
 
