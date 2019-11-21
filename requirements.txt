@@ -1,4 +1,2 @@
 py-sphviewer
 pykdtree
-numpy
-matplotlib
