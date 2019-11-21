@@ -1069,6 +1069,6 @@ def sunlight(Nbins=256):
               [0.95168443, 0.9154922, 0.95167893],
               [0.95588623, 0.91961077, 0.95812116]]
 
-    current_cmap = _mpl_c.LinearSegmentedColormap.from_list("sunlight", [colors[len(cm_data)//2:],
-                                                                         colors[:len(cm_data)//2]], N=Nbins)
+    current_cmap = _mpl_c.LinearSegmentedColormap.from_list(
+        "sunlight", colors, N=Nbins)
     return current_cmap
