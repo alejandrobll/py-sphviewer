@@ -13,6 +13,11 @@ The latest stable version of Py-SPHViewer is usually available in the Python Pac
 ```
 pip install py-sphviewer --user
 ```
+Py-SPHViewer can also be installed using conda:
+
+```
+conda install -c alejandrobll py-sphviewer
+```
 
 The development version can be cloned, compiled and installed using the lines below:
 
