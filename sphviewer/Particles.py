@@ -23,7 +23,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing
 from multiprocessing import Manager
-from scipy.spatial import cKDTree
 from pykdtree.kdtree import KDTree # pykdtree by Esben S. Nielsen 
 
 
@@ -185,6 +184,7 @@ class Particles(object):
         return hsml
 
     def __make_kdtree_old(self,pos):
+        from scipy.spatial import cKDTree
         return cKDTree(pos)
 
     def __nbsearch_old(self, pos, nb, tree, out_hsml, index):
