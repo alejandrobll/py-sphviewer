@@ -44,14 +44,14 @@ def rotate(angle, axis, pos):
 class Scene(object):
     def __init__(self, Particles, Camera=None):
         """
-        Scene class takes a sphviewer.Particles class and computes the 
-        coordinates of the particles as seen from a Camera. It is to say, 
-        for a given particle, whose coordinates are x,y and z, Scene 
-        computes a new set of coordinates x' and y', which are the aparent 
-        coordinates of the particles as seen from a camera. 
-        By default, Camera=None means that Scene have to use an autocamera. It 
+        Scene class takes a sphviewer.Particles class and computes the
+        coordinates of the particles as seen from a Camera. It is to say,
+        for a given particle, whose coordinates are x,y and z, Scene
+        computes a new set of coordinates x' and y', which are the aparent
+        coordinates of the particles as seen from a camera.
+        By default, Camera=None means that Scene have to use an autocamera. It
         will try to define a Camera whose parameters have some sence according
-        to your data set. In case you want to prevent Scene from using an autocamera, 
+        to your data set. In case you want to prevent Scene from using an autocamera,
         you should provide a valid Camera Class.
         As Particles class, Scene has its own getting and setting methods.
 
@@ -66,7 +66,7 @@ class Scene(object):
         - get_scene
         - get_extent
 
-        other methods are: 
+        other methods are:
 
         - plot
 
@@ -116,9 +116,9 @@ class Scene(object):
 
     def set_autocamera(self, mode='density'):
         """
-        - set_autocamera(mode='density'): By default, Scene defines its 
-        own Camera. However, there is no a general way for doing so. Scene 
-        uses a density criterion for getting the point of view. If this is 
+        - set_autocamera(mode='density'): By default, Scene defines its
+        own Camera. However, there is no a general way for doing so. Scene
+        uses a density criterion for getting the point of view. If this is
         not a good option for your problem, you can choose among:
         |'minmax'|'density'|'median'|'mean'|. If None of the previous methods
         work well, you may define the camera params by yourself.
@@ -130,27 +130,27 @@ class Scene(object):
 
     def get_scene(self):
         """
-        - get_scene(): It return the x and y position, the smoothing length 
-        of the particles and the index of the particles that are active in 
-        the scene. In principle this is an internal function and you don't 
-        need this data. 
+        - get_scene(): It return the x and y position, the smoothing length
+        of the particles and the index of the particles that are active in
+        the scene. In principle this is an internal function and you don't
+        need this data.
         """
         return self._x, self._y, self._hsml, self._m, self._kview
 
     def get_extent(self):
         """
-        - get_extent(): It returns the extent array needed for converting 
-        the image coordinates (given in pixels units) into physical coordinates. 
-        It is an array like the following one: [xmin,xmax,ymin,ymax]; it is to say, 
-        an array that contains the extreme values of the scene. 
+        - get_extent(): It returns the extent array needed for converting
+        the image coordinates (given in pixels units) into physical coordinates.
+        It is an array like the following one: [xmin,xmax,ymin,ymax]; it is to say,
+        an array that contains the extreme values of the scene.
         """
         return self.__extent
 
     def update_camera(self, **kargs):
         """
-        - update_camera(**kwarg): By using this method you can define all 
-        the new paramenters of the camera. Read the available **kwarg in 
-        the sphviewer.Camera documentation. 
+        - update_camera(**kwarg): By using this method you can define all
+        the new paramenters of the camera. Read the available **kwarg in
+        the sphviewer.Camera documentation.
         """
         self.Camera.set_params(**kargs)
         self._x, self._y, self._hsml, self._kview = self.__compute_scene()
@@ -189,9 +189,46 @@ class Scene(object):
             else:
                 self.__extent = np.float32(self._camera_params['extent'])
         else:
-            projection = 1
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0, 0, 0, 0], dtype=np.float32)
+            if(isinstance(self._camera_params['projection'],str)):
+                if('fisheye' in self._camera_params['projection']):
+                    projection = 2
+                    try:
+                        shift = float(self._camera_params['projection'][7:])
+                        theta_rad=np.pi*np.array(theta)/180.
+                        phi_rad=np.pi*np.array(phi)/180.
+                        roll_rad=np.pi*np.array(roll)/180.
+                        kaxis = np.array([np.cos(phi_rad)*np.cos(roll_rad),
+                                          np.cos(theta_rad)*np.sin(roll_rad)+np.sin(theta_rad)*np.sin(phi_rad)*np.cos(roll_rad),
+                                          np.sin(theta_rad)*np.sin(roll_rad)-np.cos(theta_rad)*np.sin(phi_rad)*np.cos(roll_rad)]).T
+                        Kchange = np.cross(kaxis,np.eye(3))
+                        Rchange = np.eye(3)-np.sin(shift*np.pi/180)*Kchange+(1-np.cos(shift*np.pi/180))*np.dot(Kchange,Kchange)
+                        zaxis = np.array([np.sin(phi_rad),-np.sin(theta_rad)*np.cos(phi_rad),np.cos(theta_rad)*np.cos(phi_rad)]).T
+                        jaxis = np.matmul(Rchange,zaxis)
+                        xcopy,ycopy,zcopy = np.array([xcam,ycam,zcam])-rcam*(zaxis-jaxis)
+                        iaxis = np.cross(jaxis,kaxis)
+                        tcopy_rad = np.arctan2(-jaxis[1],jaxis[2]); tcopy = tcopy_rad/np.pi*180
+                        cossintcopy=np.array([np.cos(tcopy_rad),np.sin(tcopy_rad)])
+                        rollcopy_rad = np.arctan2(-iaxis[0],kaxis[0]); rollcopy = rollcopy_rad/np.pi*180
+                        cossinrollcopy=np.array([np.cos(rollcopy_rad),np.sin(rollcopy_rad)])
+                        pcopy_rad=np.arctan2(jaxis[0],np.nanmean([([kaxis[0],-iaxis[0]]/cossinrollcopy)[np.argmax(np.abs(cossintcopy))],
+                                                                  ([jaxis[2],-jaxis[1]]/cossintcopy)[np.argmax(np.abs(cossintcopy))]]))
+                        pcopy=pcopy_rad/np.pi*180
+                        xcam,ycam,zcam,theta,phi,roll = xcopy,ycopy,zcopy,tcopy,pcopy,rollcopy
+                    except:
+                        None
+                else:
+                    raise ValueError("'"+self._camera_params['projection']+"' isn't a valid projection type")
+            else:
+                projection = 1
+
+        xx,yy,hh,kk = scene.scene(pos[:,0],pos[:,1],
+                                  pos[:,2],hsml,
+                                  xcam, ycam, zcam, rcam, theta, phi, roll,
+                                  zoom, self.__extent, xsize, ysize, projection)
+
+        return xx,yy,hh,kk
 
         xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
                                      pos[:, 2], hsml,
@@ -298,7 +335,7 @@ class Scene(object):
 
     def plot(self, axis=None, **kargs):
         """
-        - plot(axis=None, **kwarg): Finally, sphviewer.Scene class has its own plotting method. 
+        - plot(axis=None, **kwarg): Finally, sphviewer.Scene class has its own plotting method.
         It shows the scene as seen by the camera. It is to say, it plots the particles according
         to their aparent coordinates; axis makes a reference to an existing axis. In case axis is None,
         the plot is made on the current axis.
@@ -306,46 +343,46 @@ class Scene(object):
         The kwargs are :class:`~matplotlib.lines.Line2D` properties:
 
         agg_filter: unknown
-        alpha: float (0.0 transparent through 1.0 opaque)         
-        animated: [True | False]         
-        antialiased or aa: [True | False]         
-        axes: an :class:`~matplotlib.axes.Axes` instance         
-        clip_box: a :class:`matplotlib.transforms.Bbox` instance         
-        clip_on: [True | False]         
-        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]         
-        color or c: any matplotlib color         
-        contains: a callable function         
-        dash_capstyle: ['butt' | 'round' | 'projecting']         
-        dash_joinstyle: ['miter' | 'round' | 'bevel']         
-        dashes: sequence of on/off ink in points         
-        data: 2D array (rows are x, y) or two 1D arrays         
-        drawstyle: [ 'default' | 'steps' | 'steps-pre' | 'steps-mid' | 'steps-post' ]         
-        figure: a :class:`matplotlib.figure.Figure` instance         
-        fillstyle: ['full' | 'left' | 'right' | 'bottom' | 'top']         
-        gid: an id string         
-        label: any string         
-        linestyle or ls: [ ``'-'`` | ``'--'`` | ``'-.'`` | ``':'`` | ``'None'`` | ``' '`` | ``''`` ]         and any drawstyle in combination with a linestyle, e.g. ``'steps--'``.         
-        linewidth or lw: float value in points         
-        lod: [True | False]         
+        alpha: float (0.0 transparent through 1.0 opaque)
+        animated: [True | False]
+        antialiased or aa: [True | False]
+        axes: an :class:`~matplotlib.axes.Axes` instance
+        clip_box: a :class:`matplotlib.transforms.Bbox` instance
+        clip_on: [True | False]
+        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]
+        color or c: any matplotlib color
+        contains: a callable function
+        dash_capstyle: ['butt' | 'round' | 'projecting']
+        dash_joinstyle: ['miter' | 'round' | 'bevel']
+        dashes: sequence of on/off ink in points
+        data: 2D array (rows are x, y) or two 1D arrays
+        drawstyle: [ 'default' | 'steps' | 'steps-pre' | 'steps-mid' | 'steps-post' ]
+        figure: a :class:`matplotlib.figure.Figure` instance
+        fillstyle: ['full' | 'left' | 'right' | 'bottom' | 'top']
+        gid: an id string
+        label: any string
+        linestyle or ls: [ ``'-'`` | ``'--'`` | ``'-.'`` | ``':'`` | ``'None'`` | ``' '`` | ``''`` ]         and any drawstyle in combination with a linestyle, e.g. ``'steps--'``.
+        linewidth or lw: float value in points
+        lod: [True | False]
         marker: [ ``7`` | ``4`` | ``5`` | ``6`` | ``'o'`` | ``'D'`` | ``'h'`` | ``'H'`` | ``'_'`` | ``''`` | ``'None'`` | ``' '`` | ``None`` | ``'8'`` | ``'p'`` | ``','`` | ``'+'`` | ``'.'`` | ``'s'`` | ``'*'`` | ``'d'`` | ``3`` | ``0`` | ``1`` | ``2`` | ``'1'`` | ``'3'`` | ``'4'`` | ``'2'`` | ``'v'`` | ``'<'`` | ``'>'`` | ``'^'`` | ``'|'`` | ``'x'`` | ``'$...$'`` | *tuple* | *Nx2 array* ]
-        markeredgecolor or mec: any matplotlib color         
-        markeredgewidth or mew: float value in points         
-        markerfacecolor or mfc: any matplotlib color         
-        markerfacecoloralt or mfcalt: any matplotlib color         
-        markersize or ms: float         
+        markeredgecolor or mec: any matplotlib color
+        markeredgewidth or mew: float value in points
+        markerfacecolor or mfc: any matplotlib color
+        markerfacecoloralt or mfcalt: any matplotlib color
+        markersize or ms: float
         markevery: None | integer | (startind, stride)
-        picker: float distance in points or callable pick function         ``fn(artist, event)``         
-        pickradius: float distance in points         
-        rasterized: [True | False | None]         
+        picker: float distance in points or callable pick function         ``fn(artist, event)``
+        pickradius: float distance in points
+        rasterized: [True | False | None]
         snap: unknown
-        solid_capstyle: ['butt' | 'round' |  'projecting']         
-        solid_joinstyle: ['miter' | 'round' | 'bevel']         
-        transform: a :class:`matplotlib.transforms.Transform` instance         
-        url: a url string         
-        visible: [True | False]         
-        xdata: 1D array         
-        ydata: 1D array         
-        zorder: any number         
+        solid_capstyle: ['butt' | 'round' |  'projecting']
+        solid_joinstyle: ['miter' | 'round' | 'bevel']
+        transform: a :class:`matplotlib.transforms.Transform` instance
+        url: a url string
+        visible: [True | False]
+        xdata: 1D array
+        ydata: 1D array
+        zorder: any number
 
         kwargs *scalex* and *scaley*, if defined, are passed on to
         :meth:`~matplotlib.axes.Axes.autoscale_view` to determine

@@ -142,16 +142,6 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
     ymin = extent[2];
     ymax = extent[3];
 
-
-    for(i=0;i<n;i++){
-      if( (x[i] >= xmin) & (x[i] <= xmax) & 
-	  (y[i] >= ymin) & (y[i] <= ymax) ) {
-	
-	kview[idx] = i;
-	idx += 1;
-      }
-    }
-
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize)
     for(i=0;i<n;i++){
       x[i] = (x[i] - xmin) / (xmax-xmin) * xsize;
@@ -161,7 +151,7 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
   }
   // If the camera is not at the infinity, let's put it at a certain 
   // distance from the object.
-  else
+  else if(projection == 1)
     {
       float FOV = 2.0*fabsf(atanf(1.0/zoom));
       xmax = 1.0;
@@ -181,17 +171,6 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
       extent[3] = yfovmax;
 
       float zpart;
-      for(i=0;i<n;i++){
-	zpart = (z[i]-(-1.0*r));
-	if( (zpart > 0) & 
-	    (fabsf(x[i]) <= fabsf(zpart)*xmax/zoom) &
-	    (fabsf(y[i]) <= fabsf(zpart)*ymax/zoom) ) {
-	  
-	  kview[idx] = i;
-	  idx += 1;
-	}
-      }
-
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize,lbin,zoom,r,zpart)
       for(i=0;i<n;i++){
 	zpart = (z[i]-(-1.0*r))/zoom;
@@ -200,6 +179,41 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
 	hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * xsize;
       }
     }          
+  // Dome projection/Fish-eye camera
+  else if(projection == 2)
+    {
+      float xfovmax = 2.0*fabsf(atanf(1.0/zoom))/3.141592;
+      float xfovmin = -xfovmax;
+      float yfovmax = 0.5*(xfovmax-xfovmin)*ysize/xsize;
+      float yfovmin = -yfovmax;
+
+      extent[0] = xfovmin;
+      extent[1] = xfovmax;
+      extent[2] = yfovmin;
+      extent[3] = yfovmax;
+
+      
+      float zpart, radius, polar;
+#pragma omp parallel for firstprivate(n,xfovmin,xfovmax,yfovmin,yfovmax,xsize,ysize,lbin,zoom,r,zpart,radius,polar)
+      for(i=0;i<n;i++){
+	zpart = (z[i]-(-1.0*r));
+	radius = sqrtf(x[i]*x[i]+y[i]*y[i]+zpart*zpart);
+	polar = acosf(zpart/radius)/3.141592/sqrtf(x[i]*x[i]+y[i]*y[i]);
+	x[i] = (polar*x[i]-xfovmin)/(xfovmax-xfovmin)*xsize;
+	y[i] = (polar*y[i]-yfovmin)/(yfovmax-yfovmin)*ysize;
+	hsml[i] = (hsml[i]/radius)/3.141592/(xfovmax-xfovmin)*xsize;
+      }
+    }          
+
+      for(i=0;i<n;i++){
+	if( (hsml[i] > 0) &
+	    (x[i] >= -hsml[i]) & (x[i] <= xsize+hsml[i]) &
+	    (y[i] >= -hsml[i]) & (y[i] <= ysize+hsml[i]) ) { //this considers edge-particles with intersecting kernels
+	  
+	  kview[idx] = i;
+	  idx += 1;
+      }
+    }
   return idx;
 }
 

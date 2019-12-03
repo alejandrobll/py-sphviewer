@@ -42,7 +42,7 @@ def import_code(filename):
 class Render(object):
     def __init__(self, Scene):
         """
-        Produces a render of the Scene. It uses a kernel interpolation 
+        Produces a render of the Scene. It uses a kernel interpolation
         method. Its setting and getting methods are:
 
         getting methods:
@@ -61,7 +61,7 @@ class Render(object):
 
         Other methods are:
 
-        - save 
+        - save
         - histogram
 
         """
@@ -97,6 +97,12 @@ class Render(object):
     def __make_render(self, x, y, t, kview, xsize, ysize):
         from .extensions import render
 
+        if(self.Scene.Camera.get_params()['r'] == 'infinity'):
+            projection = 0
+        elif(self.Scene.Camera.get_params()['projection'] == 'fisheye'):
+            projection = 2
+        else:
+            projection = 1
         image = render.render(
             self.Scene._x,
             self.Scene._y,
@@ -104,12 +110,14 @@ class Render(object):
             self.Scene._m,
             np.int32(xsize),
             np.int32(ysize),
+            np.int32(projection),
+            np.float32(self.Scene.get_extent()),
         )
         return np.reshape(image, [ysize, xsize])
 
     def get_image(self):
         """
-        - get_image(): Returns the image, with dimension [xsize,ysize], 
+        - get_image(): Returns the image, with dimension [xsize,ysize],
         where xsize and ysize are the number of pixels of the image defined by the Camera.
         """
         extent = self.Scene.get_extent()
@@ -155,8 +163,8 @@ class Render(object):
 
     def histogram(self, axis=None, **kargs):
         """
-        - histogram(axis=None, **kargs): It computes and shows the histogram of the image. This is 
-        usefull for choosing a proper scale to the output, or for clipping some values. If 
+        - histogram(axis=None, **kargs): It computes and shows the histogram of the image. This is
+        usefull for choosing a proper scale to the output, or for clipping some values. If
         axis is None, it selects the current axis to plot the histogram.
 
         Keyword arguments:
@@ -273,33 +281,33 @@ class Render(object):
         :class:`~matplotlib.patches.Patch` instances returned by *hist*:
 
         agg_filter: unknown
-        alpha: float or None         
-        animated: [True | False]         
-        antialiased or aa: [True | False]  or None for default         
-        axes: an :class:`~matplotlib.axes.Axes` instance         
-        clip_box: a :class:`matplotlib.transforms.Bbox` instance         
-        clip_on: [True | False]         
-        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]         
+        alpha: float or None
+        animated: [True | False]
+        antialiased or aa: [True | False]  or None for default
+        axes: an :class:`~matplotlib.axes.Axes` instance
+        clip_box: a :class:`matplotlib.transforms.Bbox` instance
+        clip_on: [True | False]
+        clip_path: [ (:class:`~matplotlib.path.Path`,         :class:`~matplotlib.transforms.Transform`) |         :class:`~matplotlib.patches.Patch` | None ]
         color: matplotlib color spec
-        contains: a callable function         
-        edgecolor or ec: mpl color spec, or None for default, or 'none' for no color         
-        facecolor or fc: mpl color spec, or None for default, or 'none' for no color         
-        figure: a :class:`matplotlib.figure.Figure` instance         
-        fill: [True | False]         
-        gid: an id string         
-        hatch: [ '/' | '\\' | '|' | '-' | '+' | 'x' | 'o' | 'O' | '.' | '*' ]         
-        label: any string         
-        linestyle or ls: ['solid' | 'dashed' | 'dashdot' | 'dotted']         
-        linewidth or lw: float or None for default         
-        lod: [True | False]         
+        contains: a callable function
+        edgecolor or ec: mpl color spec, or None for default, or 'none' for no color
+        facecolor or fc: mpl color spec, or None for default, or 'none' for no color
+        figure: a :class:`matplotlib.figure.Figure` instance
+        fill: [True | False]
+        gid: an id string
+        hatch: [ '/' | '\\' | '|' | '-' | '+' | 'x' | 'o' | 'O' | '.' | '*' ]
+        label: any string
+        linestyle or ls: ['solid' | 'dashed' | 'dashdot' | 'dotted']
+        linewidth or lw: float or None for default
+        lod: [True | False]
         path_effects: unknown
-        picker: [None|float|boolean|callable]         
-        rasterized: [True | False | None]         
+        picker: [None|float|boolean|callable]
+        rasterized: [True | False | None]
         snap: unknown
-        transform: :class:`~matplotlib.transforms.Transform` instance         
-        url: a url string         
-        visible: [True | False]         
-        zorder: any number 
+        transform: :class:`~matplotlib.transforms.Transform` instance
+        url: a url string
+        visible: [True | False]
+        zorder: any number
         """
         if axis == None:
             axis = plt.gca()
@@ -307,9 +315,9 @@ class Render(object):
 
     def save(self, outputfile, **kargs):
         """
-        - Save the image in some common image formats. It uses the pyplot.save 
-        method.  
-        outputfile is a string containing a path to a filename, 
+        - Save the image in some common image formats. It uses the pyplot.save
+        method.
+        outputfile is a string containing a path to a filename,
         of a Python file-like object. If *format* is *None* and
         *fname* is a string, the output format is deduced from
         the extension of the filename.
