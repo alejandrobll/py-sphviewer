@@ -126,57 +126,62 @@ void c_render(float *x, float *y, float *t, float *mass,
       mm = mass[i];
 
       if(tt <= 1) {
-        local_image[yy*xsize+xx] += mm;
-        continue;
-      }
-      if(tt > size_lim) tt = size_lim;
-
-      int jxx,kyy;
-      float jxxrad, kyyrad, rhopix, cosd;
-      // Let's compute the convolution with the Kernel
-      for(j=-tt; j<tt+1; j++){
-        for(k=-tt; k<tt+1; k++){
-      jxx = j+xx;
-      kyy = k+yy;
-      jxxrad = ((((float)jxx)/(float)xsize)*(extent[1]-extent[0])+extent[0])*3.141592;
-      kyyrad = ((((float)kyy)/(float)ysize)*(extent[3]-extent[2])+extent[2])*3.141592;
-      rhopix = sqrt(jxxrad*jxxrad+kyyrad*kyyrad);
-  	if( (rhopix <= 3.141592) && (jxx>=0) && (jxx<xsize) && (kyy>=0) && (kyy<ysize) ){
-        cosd = (xxrad*jxxrad+yyrad*kyyrad)*sincrho*sinc(rhopix)+cosrho*cos(rhopix);
-      if(cosd>=1) cosd = 1; else if(cosd<=-1) cosd = -1;
-  	  local_image[kyy*xsize+jxx] += mm*cubic_kernel(acos(cosd), ttrad); //I should normalize here by the surface area
-  	}
+        if( (rho <= 3.141592) && ( xx >= 0) && ( xx < xsize) && ( yy >= 0) && ( yy < ysize)){
+          local_image[yy*xsize+xx] += mm;
         }
-              }
+      }
+      else{
+        if(tt > size_lim) tt = size_lim;
+
+        int jxx,kyy;
+        float jxxrad, kyyrad, rhopix, cosd;
+        // Let's compute the convolution with the Kernel
+        for(j=-tt; j<tt+1; j++){
+          for(k=-tt; k<tt+1; k++){
+            jxx = j+xx;
+            kyy = k+yy;
+            jxxrad = ((((float)jxx)/(float)xsize)*(extent[1]-extent[0])+extent[0])*3.141592;
+            kyyrad = ((((float)kyy)/(float)ysize)*(extent[3]-extent[2])+extent[2])*3.141592;
+            rhopix = sqrt(jxxrad*jxxrad+kyyrad*kyyrad);
+            if( (rhopix <= 3.141592) && (jxx>=0) && (jxx<xsize) && (kyy>=0) && (kyy<ysize) ){
+              cosd = (xxrad*jxxrad+yyrad*kyyrad)*sincrho*sinc(rhopix)+cosrho*cos(rhopix);
+              if(cosd>=1) cosd = 1; else if(cosd<=-1) cosd = -1;
+              local_image[kyy*xsize+jxx] += mm*cubic_kernel(acos(cosd), ttrad); //I should normalize here by the surface area
             }
-
           }
-          //
-          else{
-            if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
-            // Let's compute the local image
-            //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
-            for(l=0;l<ppt;l++){
-              i = thread_id+nth*l;
-              xx = (int) x[i];
-              yy = (int) y[i];
-              tt_f = t[i];
-              tt = (int)ceil(tt_f);
-              mm = mass[i];
+        }
+      }
+    }
+  }
+  //
+  else{
+    if((r-thread_id) > 0) ppt+=1; //to include the remainder particle
+    // Let's compute the local image
+    //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
+    for(l=0;l<ppt;l++){
+      i = thread_id+nth*l;
+      xx = (int) x[i];
+      yy = (int) y[i];
+      tt_f = t[i];
+      tt = (int)ceil(tt_f);
+      mm = mass[i];
 
-              if(tt <= 1) {
-                local_image[yy*xsize+xx] += mm;
-                continue;
-              }
-              if(tt > size_lim) tt = size_lim;
+      if(tt <= 1) {
+        if( ( xx >= 0) && ( xx < xsize) && ( yy >= 0) && ( yy < ysize)){
+          local_image[yy*xsize+xx] += mm;
+        }
+      }
+      else{
+        if(tt > size_lim) tt = size_lim;
 
-              // Let's compute the convolution with the Kernel
-              for(j=-tt; j<tt+1; j++){
-                for(k=-tt; k<tt+1; k++){
-          	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-          	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
-          	}
-                }
+        // Let's compute the convolution with the Kernel
+        for(j=-tt; j<tt+1; j++){
+          for(k=-tt; k<tt+1; k++){
+  	        if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >= 0) && ( (yy+k) < ysize)){
+              local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt_f);
+            }
+          }
+        }
       }
     }
   }

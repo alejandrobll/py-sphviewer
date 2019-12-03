@@ -9,6 +9,8 @@ PKG-INFO
 requires.txt
 SOURCES.txt
 top_level.txt
+build/
+dist/
 
 # Python bytecode
 *.pyc
