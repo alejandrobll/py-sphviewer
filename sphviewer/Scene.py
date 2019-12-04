@@ -111,7 +111,7 @@ class Scene(object):
                 self.Camera.set_autocamera(Particles)
                 self._camera_params = self.Camera.get_params()
 
-        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
+        self._x, self._y, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
     def set_autocamera(self, mode='density'):
@@ -135,7 +135,7 @@ class Scene(object):
         the scene. In principle this is an internal function and you don't 
         need this data. 
         """
-        return self._x, self._y, self._hsml, self._m, self._kview
+        return self._x, self._y, self._hsml_x, self._hsml_y, self._m, self._kview
 
     def get_extent(self):
         """
@@ -153,7 +153,7 @@ class Scene(object):
         the sphviewer.Camera documentation. 
         """
         self.Camera.set_params(**kargs)
-        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
+        self._x, self._y, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
     def __compute_scene(self):
@@ -188,17 +188,58 @@ class Scene(object):
                                           ymax-ycam], dtype=np.float32)
             else:
                 self.__extent = np.float32(self._camera_params['extent'])
+
+            xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
+                                         pos[:, 2], hsml,
+                                         xcam, ycam, zcam, rcam, theta, phi, roll,
+                                         zoom, self.__extent, xsize, ysize, projection)
+            hx = hh/np.sqrt(2.0)
+            hy = hh/np.sqrt(2.0)
+                
+
+        elif(self._camera_params['r'] == 'equirectangular'):
+            
+            print("Doing equirectangular projection")
+            projection = 2
+            #We first project the particles onto the sphere.
+            r_sphere = np.sqrt( (pos[:,0]-xcam)**2+
+                                (pos[:,1]-ycam)**2+
+                                (pos[:,2]-zcam)**2 )
+            
+            theta_sphere = np.arccos( (pos[:,2]-zcam)/r_sphere ) #lat
+            phi_sphere   = np.arctan2( (pos[:,1]-ycam),(pos[:,0]-xcam) ) #long
+
+            delta_phi    = 2.0*np.abs(np.arctan(hsml/r_sphere))
+            delta_theta  = delta_phi
+
+            #Now the proper projection
+            xx = phi_sphere #* np.cos(theta_sphere)
+            yy = theta_sphere
+            hx = delta_theta #* np.cos(phi_sphere) - theta_sphere * np.sin(phi_sphere) * delta_phi
+            hy = delta_phi
+
+            xx = (xx-np.min(xx))/(np.max(xx)-np.min(xx))*xsize
+            yy = (yy-np.min(yy))/(np.max(yy)-np.min(yy))*ysize
+
+            hx = hx / (2.0*np.pi) * xsize
+            hy = hy / np.pi * ysize
+            kk = np.arange(len(pos))
+            
         else:
             projection = 1
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0, 0, 0, 0], dtype=np.float32)
 
-        xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
-                                     pos[:, 2], hsml,
-                                     xcam, ycam, zcam, rcam, theta, phi, roll,
-                                     zoom, self.__extent, xsize, ysize, projection)
+            xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
+                                         pos[:, 2], hsml,
+                                         xcam, ycam, zcam, rcam, theta, phi, roll,
+                                         zoom, self.__extent, xsize, ysize, projection)
 
-        return xx, yy, hh, kk
+            hx = hh/np.sqrt(2.0)
+            hy = hh/np.sqrt(2.0)
+        
+        
+        return xx, yy, hx, hy, kk
 
     def __compute_scene_old(self):
 
