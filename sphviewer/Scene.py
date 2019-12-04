@@ -218,8 +218,11 @@ class Scene(object):
             hx = delta_theta #* np.cos(phi_sphere) - theta_sphere * np.sin(phi_sphere) * delta_phi
             hy = delta_phi
 
-            xx = (xx-np.min(xx))/(np.max(xx)-np.min(xx))*xsize
-            yy = (yy-np.min(yy))/(np.max(yy)-np.min(yy))*ysize
+            xx = (xx+np.pi) / (2.0*np.pi) * xsize
+            yy = yy / np.pi * ysize
+##            xx = (xx-np.min(xx))/(np.max(xx)-np.min(xx))*xsize
+##            yy = (yy-np.min(yy))/(np.max(yy)-np.min(yy))*ysize
+
 
             hx = hx / (2.0*np.pi) * xsize
             hy = hy / np.pi * ysize
