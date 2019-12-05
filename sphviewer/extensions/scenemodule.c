@@ -23,12 +23,8 @@
 //#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/ndarraytypes.h>
 #include <numpy/ndarrayobject.h>
-#include <omp.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
 
+#include "projections.h";
 
 void rx(float angle, float *x, float *y, float *z, int n){
   // counter-clockwise rotation matrix along x-axis  
@@ -134,73 +130,25 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
   if(p != 0) ry(p*3.141592/180.0, x, y, z, n);
   if(roll != 0) rz(roll*3.141592/180.0, x, y, z, n);
 
-  // projection == 0 places the camera at the infinity and uses extent as limits.
-  // However, the z-range in the image is preserved.
+  /* Use otographic projection */
   if(projection == 0){
-    xmin = extent[0];
-    xmax = extent[1];
-    ymin = extent[2];
-    ymax = extent[3];
-
-
-    for(i=0;i<n;i++){
-      if( (x[i] >= xmin) & (x[i] <= xmax) & 
-	  (y[i] >= ymin) & (y[i] <= ymax) ) {
-	
-	kview[idx] = i;
-	idx += 1;
-      }
-    }
-
-#pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize)
-    for(i=0;i<n;i++){
-      x[i] = (x[i] - xmin) / (xmax-xmin) * xsize;
-      y[i] = (y[i] - ymin) / (ymax-ymin) * ysize;
-      hsml[i] = hsml[i]/(xmax-xmin) * xsize;
-    }          
+    idx = ortographic_projection(x, y, z, hsml, kview, n,
+				 extent, xsize, ysize);
   }
-  // If the camera is not at the infinity, let's put it at a certain 
-  // distance from the object.
-  else
-    {
-      float FOV = 2.0*fabsf(atanf(1.0/zoom));
-      xmax = 1.0;
-      xmin = -xmax;
-      //Let's preserve the pixel aspect ration
-      ymax = 0.5*(xmax-xmin)*ysize/xsize;
-      ymin = -ymax;
-      
-      float xfovmax = FOV/2.*180.0/3.141592;
-      float xfovmin = -xfovmax;
-      float yfovmax = 0.5*(xfovmax-xfovmin)*ysize/xsize;
-      float yfovmin = -yfovmax;
+  
+  /* Use oblique projection */
+  if(projection == 1){
+    idx = oblique_projection(x, y, z, hsml, kview, n,
+			     r, zoom, extent, xsize, ysize);
+  }
 
-      extent[0] = xfovmin;
-      extent[1] = xfovmax;
-      extent[2] = yfovmin;
-      extent[3] = yfovmax;
-
-      float zpart;
-      for(i=0;i<n;i++){
-	zpart = (z[i]-(-1.0*r));
-	if( (zpart > 0) & 
-	    (fabsf(x[i]) <= fabsf(zpart)*xmax/zoom) &
-	    (fabsf(y[i]) <= fabsf(zpart)*ymax/zoom) ) {
-	  
-	  kview[idx] = i;
-	  idx += 1;
-	}
-      }
-
-#pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize,lbin,zoom,r,zpart)
-      for(i=0;i<n;i++){
-	zpart = (z[i]-(-1.0*r))/zoom;
-	x[i] = (x[i]/zpart - xmin) / (xmax-xmin) * xsize;
-	y[i] = (y[i]/zpart - ymin) / (ymax-ymin) * ysize;
-	hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * xsize;
-      }
-    }          
-  return idx;
+  if(projection == 2){
+    idx = equirectangular_projection(x, y, z, hsml, kview, n,
+				     r, zoom, extent, xsize, ysize);
+  }
+  
+  
+  return idx; 
 }
 
 
