@@ -111,7 +111,7 @@ class Scene(object):
                 self.Camera.set_autocamera(Particles)
                 self._camera_params = self.Camera.get_params()
 
-        self._x, self._y, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
     def set_autocamera(self, mode='density'):
@@ -125,7 +125,7 @@ class Scene(object):
         """
         self.Camera.set_autocamera(self._Particles, mode=mode)
         self._camera_params = self.Camera.get_params()
-        self._x, self._y, self._hsml, self._kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
     def get_scene(self):
@@ -135,7 +135,7 @@ class Scene(object):
         the scene. In principle this is an internal function and you don't 
         need this data. 
         """
-        return self._x, self._y, self._hsml_x, self._hsml_y, self._m, self._kview
+        return self._x, self._y, self._hsml, self._hsml_x, self._hsml_y, self._m, self._kview
 
     def get_extent(self):
         """
@@ -153,13 +153,13 @@ class Scene(object):
         the sphviewer.Camera documentation. 
         """
         self.Camera.set_params(**kargs)
-        self._x, self._y, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
+        self._x, self._y, self._hsml, self._hsml_x, self._hsml_y, self._kview = self.__compute_scene()
         self._m = self._Particles._mass[self._kview]
 
     def __compute_scene(self):
         from .extensions import scene
 
-        pos = self._Particles._pos
+        pos  = self._Particles._pos
         hsml = self._Particles._hsml
 
         # I recast the variables just in case
@@ -175,8 +175,9 @@ class Scene(object):
 
         if(self._camera_params['r'] == 'infinity'):
             projection = 0
+            print(projection,"infinity")
             rcam = np.float32(0)
-            if(self._camera_params['extent'] == None):
+            if(self._camera_params['extent'] is None):
                 xmin = np.min(pos[:, 0]).astype(np.float32)
                 xmax = np.max(pos[:, 0]).astype(np.float32)
                 ymin = np.min(pos[:, 1]).astype(np.float32)
@@ -188,157 +189,24 @@ class Scene(object):
                                           ymax-ycam], dtype=np.float32)
             else:
                 self.__extent = np.float32(self._camera_params['extent'])
-
-            xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
-                                         pos[:, 2], hsml,
-                                         xcam, ycam, zcam, rcam, theta, phi, roll,
-                                         zoom, self.__extent, xsize, ysize, projection)
-            hx = hh/np.sqrt(2.0)
-            hy = hh/np.sqrt(2.0)
                 
 
         elif(self._camera_params['r'] == 'equirectangular'):
-            
-            print("Doing equirectangular projection")
             projection = 2
-            #We first project the particles onto the sphere.
-            r_sphere = np.sqrt( (pos[:,0]-xcam)**2+
-                                (pos[:,1]-ycam)**2+
-                                (pos[:,2]-zcam)**2 )
-            
-            theta_sphere = np.arccos( (pos[:,2]-zcam)/r_sphere ) #lat
-            phi_sphere   = np.arctan2( (pos[:,1]-ycam),(pos[:,0]-xcam) ) #long
-
-            delta_phi    = 2.0*np.abs(np.arctan(hsml/r_sphere))
-            delta_theta  = delta_phi
-
-            #Now the proper projection
-            xx = phi_sphere #* np.cos(theta_sphere)
-            yy = theta_sphere
-            hx = delta_theta #* np.cos(phi_sphere) - theta_sphere * np.sin(phi_sphere) * delta_phi
-            hy = delta_phi
-
-            xx = (xx+np.pi) / (2.0*np.pi) * xsize
-            yy = yy / np.pi * ysize
-##            xx = (xx-np.min(xx))/(np.max(xx)-np.min(xx))*xsize
-##            yy = (yy-np.min(yy))/(np.max(yy)-np.min(yy))*ysize
-
-
-            hx = hx / (2.0*np.pi) * xsize
-            hy = hy / np.pi * ysize
-            kk = np.arange(len(pos))
+            rcam = np.float32(0)
+            self.__extent = np.array([0, 0, 0, 0], dtype=np.float32)            
             
         else:
             projection = 1
             rcam = np.float32(self._camera_params['r'])
             self.__extent = np.array([0, 0, 0, 0], dtype=np.float32)
 
-            xx, yy, hh, kk = scene.scene(pos[:, 0], pos[:, 1],
-                                         pos[:, 2], hsml,
-                                         xcam, ycam, zcam, rcam, theta, phi, roll,
-                                         zoom, self.__extent, xsize, ysize, projection)
-
-            hx = hh/np.sqrt(2.0)
-            hy = hh/np.sqrt(2.0)
-        
-        
-        return xx, yy, hx, hy, kk
-
-    def __compute_scene_old(self):
-
-        pos = (1.0*self._Particles.get_pos()).astype(np.float32)
-
-        pos[0, :] -= np.array([self._camera_params['x']])
-        pos[1, :] -= np.array([self._camera_params['y']])
-        pos[2, :] -= np.array([self._camera_params['z']])
-
-        if self._camera_params['t'] != 0:
-            pos = rotate(self._camera_params['t'], 'x', pos)
-        if self._camera_params['p'] != 0:
-            pos = rotate(self._camera_params['p'], 'y', pos)
-        if self._camera_params['roll'] != 0:
-            pos = rotate(self._camera_params['roll'], 'z', pos)
-
-        if(self._camera_params['r'] == 'infinity'):
-            try:
-                extent = self._camera_params['extent']
-                if(extent == None):
-                    xmax = np.max(pos[0, :])
-                    xmin = np.min(pos[0, :])
-                    ymax = np.max(pos[1, :])
-                    ymin = np.min(pos[1, :])
-
-                    lmax = max(xmax, ymax)
-                    lmin = min(ymax, ymin)
-
-                    xmin = ymin = lmin
-                    xmax = ymax = ymax
-                else:
-                    xmin = float(extent[0])
-                    xmax = float(extent[1])
-                    ymin = float(extent[2])
-                    ymax = float(extent[3])
-
-                self.__extent = np.array([xmin+self._camera_params['x'],
-                                          xmax+self._camera_params['x'],
-                                          ymin+self._camera_params['y'],
-                                          ymax+self._camera_params['y']])
-
-                lbin = 2*xmax/self._camera_params['xsize']
-
-                kview, = np.where((pos[0, :] > xmin) & (pos[0, :] < xmax) &
-                                  (pos[1, :] > ymin) & (pos[1, :] < ymax))
-
-                pos = pos[kview, :]
-                hsml = self._Particles.get_hsml()[kview]/lbin
-
-                pos[:, 0] = (pos[0, :]-xmin)/(xmax-xmin) * \
-                    self._camera_params['xsize']
-                pos[:, 1] = (pos[1, :]-ymin)/(ymax-ymin) * \
-                    self._camera_params['ysize']
-
-            except AttributeError:
-                print("There was an error with the extent of the Camera")
-                return
-
-            return pos[0, :], pos[1, :], hsml, kview
-
-        else:
-            pos[2, :] -= (-1.0*self._camera_params['r'])
-
-            FOV = 2.*np.abs(np.arctan(1./self._camera_params['zoom']))
-
-            xmax = self._camera_params['zoom']*np.tan(FOV/2.)
-            xmin = -xmax
-            ymax = 0.5*(xmax-xmin) * \
-                self._camera_params['ysize']/self._camera_params['xsize']
-            ymin = -ymax
-            xfovmax = FOV/2.*180./np.pi
-            xfovmin = -FOV/2.*180./np.pi
-            # in order to have symmetric y limits
-            yfovmax = 0.5*((xfovmax-xfovmin) *
-                           self._camera_params['ysize']/self._camera_params['xsize'])
-            yfovmin = -yfovmax
-            self.__extent = np.array([xfovmin, xfovmax, yfovmin, yfovmax])
-            lbin = 2*xmax/self._camera_params['xsize']
-
-            kview, = np.where((pos[2, :] > 0.) &
-                              (np.abs(pos[1, :]) <= (np.abs(pos[2, :]) *
-                                                     np.tan(FOV/2.))) &
-                              (np.abs(pos[1, :]) <= (np.abs(pos[2, :]) *
-                                                     np.tan(FOV/2.))))
-            pos = pos[kview, :]
-            hsml = self._Particles.get_hsml()[kview]
-
-            pos[:, 0] = ((pos[0, :]*self._camera_params['zoom'] /
-                          pos[2, :]-xmin)/(xmax-xmin) *
-                         (self._camera_params['xsize']-1.))
-            pos[:, 1] = ((pos[1, :]*self._camera_params['zoom'] /
-                          pos[2, :]-ymin)/(ymax-ymin) *
-                         (self._camera_params['ysize']-1.))
-            hsml = (hsml*self._camera_params['zoom']/pos[2, :]/lbin)
-
-            return pos[0, :], pos[1, :], hsml, kview
+        xx, yy, hh, hh_x, hh_y, kk = scene.scene(pos[:, 0], pos[:, 1],
+                                                 pos[:, 2], hsml, hsml, hsml,
+                                                 xcam, ycam, zcam, rcam, theta, phi, roll,
+                                                 zoom, self.__extent, xsize, ysize, projection)
+            
+        return xx, yy, hh, hh_x, hh_y, kk
 
     def plot(self, axis=None, **kargs):
         """

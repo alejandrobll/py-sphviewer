@@ -88,18 +88,20 @@ class Render(object):
 
         pixel_area = (x_extent / xsize) * (y_extent / ysize)
 
-        self.__image = self.__make_render(Scene._x, Scene._y, Scene._hsml_x, Scene._hsml_y,
+        self.__image = self.__make_render(Scene._x, Scene._y,
+                                          Scene._hsml, Scene._hsml_x, Scene._hsml_y,
                                           Scene._kview, xsize, ysize) / pixel_area
 
         # lets define some flags
         self.__logscale_flag = False
 
-    def __make_render(self, x, y, tx, ty, kview, xsize, ysize):
+    def __make_render(self, x, y, t, tx, ty, kview, xsize, ysize):
         from .extensions import render
 
         image = render.render(
             self.Scene._x,
             self.Scene._y,
+            self.Scene._hsml,
             self.Scene._hsml_x,
             self.Scene._hsml_y,
             self.Scene._m,

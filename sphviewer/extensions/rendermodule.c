@@ -59,7 +59,7 @@ float cubic_kernel(float r, float h){
 }
 
 
-void c_render(float *x, float *y, float *tx, float *ty, float *mass, 
+void c_render(float *x, float *y, float *t, float *tx, float *ty, float *mass, 
 	      int xsize, int ysize, int n, float *image){ 
   
   // C function calculating the image of the particles convolved with our kernel
@@ -105,7 +105,7 @@ void c_render(float *x, float *y, float *tx, float *ty, float *mass,
     yy = (int) y[i];
     ttx = (int) tx[i];
     tty = (int) ty[i];
-    tt  = sqrt(ttx*ttx + tty*tty);
+    tt  = (int) t[i];
     mm = mass[i];
 
     if( tt <= 1){
@@ -116,7 +116,6 @@ void c_render(float *x, float *y, float *tx, float *ty, float *mass,
     if(ttx > xsize) ttx = xsize;
     if(tty > ysize) tty = ysize;
 
-    
     // Let's compute the convolution with the Kernel
     for(j=-ttx; j<ttx+1; j++){
       for(k=-tty; k<tty+1; k++){
@@ -135,6 +134,7 @@ void c_render(float *x, float *y, float *tx, float *ty, float *mass,
     yy = (int) y[i];
     ttx = (int) tx[i];
     tty = (int) ty[i];
+    tt  = (int) t[i];
     mm = mass[i];
     
     if( (tt <= 1) ){
@@ -171,7 +171,7 @@ void c_render(float *x, float *y, float *tx, float *ty, float *mass,
 
 void test_C(){
   // This function if for testing purposes only. It writes a file called image_test.bin
-  int *x, *y, *tx, *ty;
+  int *x, *y, *t, *tx, *ty;
   float *mass;
   int xsize, ysize, n;
   float *image;
@@ -182,7 +182,8 @@ void test_C(){
   n = 10000;
 
   x = (int *)malloc( n * sizeof(int) ); 
-  y = (int *)malloc( n * sizeof(int) ); 
+  y = (int *)malloc( n * sizeof(int) );
+  t = (int *)malloc( n * sizeof(int) );
   tx = (int *)malloc( n * sizeof(int) ); 
   ty = (int *)malloc( n * sizeof(int) ); 
   mass = (float *)malloc( n * sizeof(float) ); 
@@ -198,7 +199,7 @@ void test_C(){
     mass[i] = rand() % 499;
   }
 
-  c_render(x,y,tx,ty, mass,xsize,ysize,n,image);
+  c_render(x,y,t,tx,ty,mass,xsize,ysize,n,image);
 
   FILE *output;
 
@@ -210,24 +211,25 @@ void test_C(){
 //Let's start with Python
 
 static PyObject *rendermodule(PyObject *self, PyObject *args){
-  PyArrayObject *x_obj, *y_obj, *tx_obj, *ty_obj;
+  PyArrayObject *x_obj, *y_obj, *t_obj, *tx_obj, *ty_obj;
   PyArrayObject *m_obj;
-  float *x, *y, *tx, *ty;
+  float *x, *y, *t, *tx, *ty;
   float *mass;
   int xsize, ysize;
   int n;
   float *image;
   int DOUBLE = 0;
 
-  if(!PyArg_ParseTuple(args, "OOOOOii",&x_obj, &y_obj, &tx_obj, &ty_obj, &m_obj, &xsize, &ysize))
+  if(!PyArg_ParseTuple(args, "OOOOOOii",&x_obj, &y_obj, &t_obj, &tx_obj, &ty_obj, &m_obj, &xsize, &ysize))
     return NULL;
     
   // Let's check the size of the 1-dimensions arrays.
   n = (int) m_obj->dimensions[0];
 
   // Let's point the C arrays to the numpy arrays
-  x    = (float *)x_obj->data;
-  y    = (float *)y_obj->data; 
+  x     = (float *)x_obj->data;
+  y     = (float *)y_obj->data; 
+  t     = (float *)t_obj->data; /* These are always floats, as they come from Scene */
   tx    = (float *)tx_obj->data; /* These are always floats, as they come from Scene */
   ty    = (float *)ty_obj->data; /* These are always floats, as they come from Scene */
 
@@ -255,7 +257,7 @@ static PyObject *rendermodule(PyObject *self, PyObject *args){
   }
 
   // Here we do the work
-  c_render(x,y,tx,ty,mass,xsize,ysize,n,image);
+  c_render(x,y,t,tx,ty,mass,xsize,ysize,n,image);
 
   if(DOUBLE) free(mass);
   

@@ -107,7 +107,8 @@ float *get_double_array(PyArrayObject *array_obj, int n){
 }
 
 
-long int compute_scene(float *x, float *y, float *z, float *hsml, 
+long int compute_scene(float *x, float *y, float *z,
+		       float *hsml, float *hsml_x, float *hsml_y,
 		       float *extent, int xsize, int ysize,
 		       float x0_cam, float y0_cam, float z0_cam,
 		       int n, long int *kview, float r, float t, 
@@ -132,30 +133,30 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
 
   /* Use otographic projection */
   if(projection == 0){
-    idx = ortographic_projection(x, y, z, hsml, kview, n,
+    idx = ortographic_projection(x, y, z, hsml, hsml_x, hsml_y, kview, n,
 				 extent, xsize, ysize);
   }
   
   /* Use oblique projection */
   if(projection == 1){
-    idx = oblique_projection(x, y, z, hsml, kview, n,
+    idx = oblique_projection(x, y, z, hsml, hsml_x, hsml_y, kview, n,
 			     r, zoom, extent, xsize, ysize);
   }
 
+  /* Use the equirectangular projection */
   if(projection == 2){
-    idx = equirectangular_projection(x, y, z, hsml, kview, n,
+    idx = equirectangular_projection(x, y, z, hsml, hsml_x, hsml_y, kview, n,
 				     r, zoom, extent, xsize, ysize);
-  }
-  
-  
+  } 
+
   return idx; 
 }
 
 
 static PyObject *scenemodule(PyObject *self, PyObject *args){
 
-  PyArrayObject *x_obj, *y_obj, *z_obj, *h_obj, *extent_obj;
-  float *xlocal, *ylocal, *zlocal, *hlocal, *extent;
+  PyArrayObject *x_obj, *y_obj, *z_obj, *h_obj, *h_obj_x, *h_obj_y, *extent_obj;
+  float *xlocal, *ylocal, *zlocal, *hlocal, *hlocal_x, *hlocal_y, *extent;
   int n;
   float x0_cam, y0_cam, z0_cam;
   float r,t,p,roll,zoom;
@@ -163,14 +164,15 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   int projection;
   int i;
 
-  if(!PyArg_ParseTuple(args, "OOOOffffffffOiii",
-		       &x_obj, &y_obj, &z_obj, &h_obj, 
+  if(!PyArg_ParseTuple(args, "OOOOOOffffffffOiii",
+		       &x_obj, &y_obj, &z_obj,
+		       &h_obj, &h_obj_x, &h_obj_y, 
 		       &x0_cam, &y0_cam, &z0_cam, 
 		       &r, &t, &p, &roll, &zoom, &extent_obj, 
 		       &xsize, &ysize, &projection))
     return NULL;
 
-  n = (int) h_obj->dimensions[0];
+  n = (int) h_obj_x->dimensions[0];
   
   float * (* get_array) (PyArrayObject *, int); 
 
@@ -189,8 +191,8 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   ylocal = get_array(y_obj, n);
   zlocal = get_array(z_obj, n);
 
-  /* check positions data type */
-  type = PyArray_TYPE(h_obj);
+  /* check smoothing data type */
+  type = PyArray_TYPE(h_obj_x);
   if(type == NPY_FLOAT){
     get_array = get_float_array;
   }
@@ -200,8 +202,9 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
     return NULL;
   }
 
-  hlocal = get_array(h_obj, n);
-
+  hlocal   = get_array(h_obj, n);
+  hlocal_x = get_array(h_obj_x, n);
+  hlocal_y = get_array(h_obj_y, n);
 
   extent = (float *) extent_obj->data;
 
@@ -209,7 +212,8 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   long int *klocal = (long int *)malloc( n * sizeof(long int) );
 
   //projection == 0 means r='infinity'
-  long int idx = compute_scene(xlocal, ylocal, zlocal, hlocal, 
+  long int idx = compute_scene(xlocal, ylocal, zlocal,
+			       hlocal, hlocal_x, hlocal_y,
 			       extent, xsize, ysize,
 			       x0_cam, y0_cam, z0_cam,
 			       n, klocal, r, t, p, roll,
@@ -218,6 +222,8 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   float *x_out_c    = (float *)malloc( idx * sizeof(float) );
   float *y_out_c    = (float *)malloc( idx * sizeof(float) );
   float *h_out_c    = (float *)malloc( idx * sizeof(float) );
+  float *h_out_c_x  = (float *)malloc( idx * sizeof(float) );
+  float *h_out_c_y  = (float *)malloc( idx * sizeof(float) );
   long int *k_out_c = (long int*)malloc( idx * sizeof(long int) );
 
 #pragma omp parallel for firstprivate(n,idx)
@@ -225,6 +231,8 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
     x_out_c[i] = xlocal[klocal[i]];
     y_out_c[i] = ylocal[klocal[i]];
     h_out_c[i] = hlocal[klocal[i]];
+    h_out_c_x[i] = hlocal_x[klocal[i]];
+    h_out_c_y[i] = hlocal_y[klocal[i]];
     k_out_c[i] = klocal[i];
   }
 
@@ -233,6 +241,8 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   free(ylocal);
   free(zlocal);
   free(hlocal);
+  free(hlocal_x);
+  free(hlocal_y);
   free(klocal);
 
   // Let's build a numpy array                         
@@ -246,6 +256,12 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
 
   PyArrayObject *h_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, h_out_c);
   h_out->flags = NPY_OWNDATA;
+  
+  PyArrayObject *h_out_x = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, h_out_c_x);
+  h_out_x->flags = NPY_OWNDATA;
+
+  PyArrayObject *h_out_y = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_FLOAT32, h_out_c_y);
+  h_out_y->flags = NPY_OWNDATA;
 
   PyArrayObject *k_out = (PyArrayObject *) PyArray_SimpleNewFromData(1, dims, NPY_INT64, k_out_c);
   k_out->flags = NPY_OWNDATA;
@@ -254,7 +270,7 @@ static PyObject *scenemodule(PyObject *self, PyObject *args){
   //reference, allowing the garbage collector to clean up the variables
   //If I use "OOOO" instead, I have to call Py_DECREF(x_out) 
   //Py_DECREAF(y_out) PY_DECREAF(h_out) and Py_DECREAF(k_out)
-  PyObject *out = Py_BuildValue("NNNN", x_out, y_out, h_out, k_out);
+  PyObject *out = Py_BuildValue("NNNNNN", x_out, y_out, h_out, h_out_x, h_out_y, k_out);
 
   return out;
 }

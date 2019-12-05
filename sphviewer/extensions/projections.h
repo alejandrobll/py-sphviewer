@@ -25,8 +25,12 @@
 #include <stdio.h>
 #include <time.h>
 
-long int ortographic_projection(float *x, float *y, float *z, float *hsml, long int *kview,
-				int n, float *extent, int xsize, int ysize){
+#define M_PI acos(-1.0)
+
+long int ortographic_projection(float *x, float *y, float *z,
+				float *hsml, float *hsml_x, float *hsml_y,
+				long int *kview, int n, float *extent,
+				int xsize, int ysize){
   float xmin = extent[0];
   float xmax = extent[1];
   float ymin = extent[2];
@@ -48,14 +52,17 @@ long int ortographic_projection(float *x, float *y, float *z, float *hsml, long 
   for(i=0;i<n;i++){
     x[i] = (x[i] - xmin) / (xmax-xmin) * xsize;
     y[i] = (y[i] - ymin) / (ymax-ymin) * ysize;
-    hsml[i] = hsml[i]/(xmax-xmin) * xsize;
+    hsml_x[i] = hsml_x[i]/(xmax-xmin) * xsize;
+    hsml_y[i] = hsml_y[i]/(ymax-ymin) * ysize;
   }
   
   return idx;
 }
 
-long int oblique_projection(float *x, float *y, float *z, float *hsml, long int *kview,
-			    int n, float r, float zoom, float *extent, int xsize, int ysize){
+long int oblique_projection(float *x, float *y, float *z,
+			    float *hsml, float *hsml_x, float *hsml_y,
+			    long int *kview, int n, float r, float zoom,
+			    float *extent, int xsize, int ysize){
 
   long int idx;
   
@@ -65,7 +72,7 @@ long int oblique_projection(float *x, float *y, float *z, float *hsml, long int 
   float ymax = 0.5*(xmax-xmin)*ysize/xsize;   /* Let's preserve the pixel aspect ration */
   float ymin = -ymax;
   
-  float xfovmax = FOV/2.*180.0/3.141592;
+  float xfovmax = FOV/2.*180.0/M_PI;
   float xfovmin = -xfovmax;
   float yfovmax = 0.5*(xfovmax-xfovmin)*ysize/xsize;
   float yfovmin = -yfovmax;
@@ -93,11 +100,68 @@ long int oblique_projection(float *x, float *y, float *z, float *hsml, long int 
     zpart = (z[i]-(-1.0*r))/zoom;
     x[i] = (x[i]/zpart - xmin) / (xmax-xmin) * xsize;
     y[i] = (y[i]/zpart - ymin) / (ymax-ymin) * ysize;
-    hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * xsize;
+    hsml_x[i] = (hsml_x[i]/zpart)/(xmax-xmin) * xsize;
+    hsml_y[i] = (hsml_y[i]/zpart)/(ymax-ymin) * ysize;
   }
   
   return idx;
 }
 
+void project_onto_sphere(float *x, float *y, float *z,
+			 float *hsml, int n){
+  /* this function projects the particles onto a sphere of radius 1, 
+     and replaces x and y with the spherical coordinates phi 
+     and theta, respectively */
+  
+  int i;
+  float r, theta, phi;
+  
+#pragma omp parallel for firstprivate(n,r,theta, phi)
+  for(i=0; i<n; i++){
+    r = sqrtf(x[i]*x[i]+y[i]*y[i]+z[i]*z[i]);
+    theta = acosf(z[i]/r);
+    phi =  atan2f(y[i], x[i]);
+    x[i] = phi;
+    y[i] = theta;
+    hsml[i] = 2.0 * atanf(0.5 * hsml[i]/r);
+  }
+  return;
+}
+
+
+long int equirectangular_projection(float *x, float *y, float *z,
+				    float *hsml, float *hsml_x, float *hsml_y,
+				    long int *kview, int n, float r, float zoom,
+				    float *extent, int xsize, int ysize){
+
+  /*First, project particles onto the sphere */
+  project_onto_sphere(x, y, z, hsml, n);
+  
+  /* Now calculate the actual projection */
+  
+  int i;
+  
+  float xmin = 0.0;
+  float xmax = 2*M_PI;
+  float ymax = M_PI;  
+  float ymin = 0;
     
+  extent[0] = xmin;
+  extent[1] = xmax;
+  extent[2] = ymin;
+  extent[3] = ymax;
+    
+#pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize)
+  for(i=0;i<n;i++){
+    x[i] = (x[i] + M_PI) / (2.0 * M_PI) * xsize;
+    y[i] = y[i] / M_PI *  ysize;
+    hsml_x[i] = hsml[i] / (2.0 * M_PI) * xsize; /* kernel x */
+    hsml_y[i] = hsml[i] / M_PI * ysize; /* kernel y */
+    hsml[i]   = hsml[i] / (2.0 * M_PI) * xsize; /* angular distance kernel */
+    kview[i] = i;
+  }  
+  return (long int) n;
+}
+
+
 
