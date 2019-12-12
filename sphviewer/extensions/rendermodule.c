@@ -132,17 +132,18 @@ void c_render(float *x, float *y, float *t, float *mass,
     yy = (int) y[i];
     tt = (int) t[i];
     mm = mass[i];
+
+    if(tt > size_lim) tt = size_lim;
     
     if(tt <= 1){
       local_image[yy*xsize+xx] += mm;
-    }
+    } else {
   
-    if(tt > size_lim) tt = size_lim;
-    
-    for(j=-tt; j<tt+1; j++){
-      for(k=-tt; k<tt+1; k++){
-	if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
-	  local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+      for(j=-tt; j<tt+1; j++){
+	for(k=-tt; k<tt+1; k++){
+	  if( ( (xx+j) >= 0) && ( (xx+j) < xsize) && ( (yy+k) >=0) && ( (yy+k) < ysize)){
+	    local_image[(yy+k)*xsize+(xx+j)] += mm*cubic_kernel(sqrt((float)j*(float)j+(float)k*(float)k), tt);
+	  }
 	}
       }
     }
