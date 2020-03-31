@@ -84,8 +84,9 @@ You may also use the the following BibTex:
  doi          = {10.5281/zenodo.21703},
  url          = {http://dx.doi.org/10.5281/zenodo.21703}
  }
-Some of the scientific papers that used Py-SPHViewer are listed here
 ```
+
+Some of the scientific papers that used Py-SPHViewer are listed [**here**](http://alejandrobll.github.io/py-sphviewer/content/bibliography.html)
 
 # Contributing
 
