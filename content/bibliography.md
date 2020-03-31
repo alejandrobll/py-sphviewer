@@ -2,6 +2,13 @@
 
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+
+* Aramburo Garcia et al. (2020), Effective photon mass and (dark) photon conversion in the inhomogeneous Universe: arXiv:2003.10465 [(Link)](https://arxiv.org/abs/2003.10465)
+
+* Parul et al. (2020), Orbital ingredients for cooking X-structures in edge-on galaxies: arXiv:2002.06627 [(Link)](https://arxiv.org/abs/2002.06627)
+
+* Borrow et al. (2019), Cosmological baryon transfer in the SIMBA simulations: arXiv:1910.00594 [(Link)](https://arxiv.org/abs/1910.00594)
+
 * Trayford et al. (2019), Fade to grey: systematic variation of the galaxy
 attenuation curves with galaxy properties in EAGLE, arXiv:1908.08956 [(Link)](https://arxiv.org/abs/1908.08956)
 
