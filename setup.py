@@ -100,7 +100,7 @@ setup(
     version=__version__,
     description="Py-SPHViewer is a framework for rendering particles using the smoothed particle hydrodynamics scheme.",
     author="Alejandro Benitez Llambay",
-    author_email="alejandrobll@oac.uncor.edu",
+    author_email="bllalejandro@gmail.com",
     url="https://github.com/alejandrobll/py-sphviewer",
     packages=["sphviewer", "sphviewer.extensions", "sphviewer.tools"],
     include_dirs=[np.get_include()],

@@ -23,20 +23,57 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import matplotlib.pylab as plt
 
-
 class Camera(object):
     def __init__(self, x=None, y=None, z=None, r=None,
                  t=None, p=None, zoom=None, roll=None,
                  xsize=None, ysize=None, extent=None):
+
+        """
+        The Camera class is a container that stores the camera parameters. The camera is an object that lives in the space and has spherical coordinates (r,theta,phi), centred around the location (x,y,z). Angles *theta* and *phi* are given in degrees, and enable to rotate the camera along the x-axis and y-axis, respectively. The *roll* angle induces rotations along the line-of-sight, i.e., the z-axis. 
+
+        xsize and ysize correspond to the size of the image, in pixels, that the Camera will produce once the Render class is used.
+
+        By default, the Camera will see the space using a perspective projection, with field of view defined by the zoom parameter. The relation between the field of view, FoV, and the zoom, M, is: 
+
+            tan(FoF/2) = 1/M.
+
+        Thus, the default zoom value of 1 will return the default
+        field of view of 90 degrees. 
+    
+        If the value of *r* is r='infinity', the perspective projection is
+        replaced by a parallel projection, which corresponds to a camera placed 
+        at the infinity. In this case, the field of view does not have any 
+        meaning, and it is replaced by the *extent* argument, which defines the 
+        field of view in linear (rather than angular) units, relative to the 
+        centre of the camera, (x,y). The *extent* argument must be an 
+        array of four elements, e.g., extent=[-l,l,-l,l], in which each 
+        entry indicates the extent of the final image relative to the camera centre. For this particular example, the Camera will see everything between x-l, x+l in the x-direction and everything between y-l and y+l in the y direction. 
+        
+        Special care must be taken when combining *extent* with the number of pixels of image, i.e., *xsize* and *ysize*, as this can impact the aspect ratio of the pixels.
+        """
+
         self._name = 'CAMERA'
         self.__params = {'x': x, 'y': y, 'z': z, 'r': r,
                          't': t, 'p': p, 'zoom': zoom, 'roll': roll,
                          'xsize': xsize, 'ysize': ysize, 'extent': extent}
 
     def get_params(self):
+        """
+        Use this function to get the parameters of the camera.
+        """
         return self.__params
 
     def set_params(self, **kargs):
+        """
+        Use this function set any parameter of the camera. This is useful
+        to avoid instantiating the entire Camera class from scratch. 
+        Valid parameters are: 
+         - set_params(
+             x, y, z, 
+             r, t, p, roll,zoom
+             xsize=None, ysize=None, 
+             extent=None)
+        """
         for key in kargs:
             self.__params[key] = kargs[key]
 
@@ -80,6 +117,14 @@ class Camera(object):
         axis.add_line(arrow, **kargs)
 
     def set_autocamera(self, Particles, mode='minmax'):
+        """
+        Use this function to obtain a good guess of the camera parameters
+        for the current distribution of particles sotored in the 
+        Particles class. Setting the camera of an uknown distribution of 
+        particles may be tricky. This function should help with this.
+        Current autocamera modes are: 
+            - 'minmax', 'median', 'mean', and 'density'.
+        """
         try:
             particles_name = Particles._name
         except AttributeError:
