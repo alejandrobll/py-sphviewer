@@ -64,6 +64,7 @@ void c_render(float *x, float *y, float *t, float *mass,
   
   // C function calculating the image of the particles convolved with our kernel
   int size_lim;
+  int progress = 0;
  
   if(xsize >= ysize){
     size_lim = xsize;
@@ -96,7 +97,6 @@ void c_render(float *x, float *y, float *t, float *mass,
     }
   }
   
-
   // Let's compute the local image 
   //  for(i=(thread_id*ppt); i<(thread_id+1)*ppt; i++){
   for(l=0;l<ppt;l++){
@@ -122,7 +122,13 @@ void c_render(float *x, float *y, float *t, float *mass,
 	}
       }
     }
-    
+
+  #pragma omp atomic
+    progress += 1;
+
+  if( (progress * 100 / n) % 4 == 0)
+    printf("\r[Py-SPHViewer]: Rendering progress = %d %%", progress* 100 / n);
+    fflush(stdout);
   }
   
   // Let's compute the image for the remainder particles...
@@ -147,6 +153,13 @@ void c_render(float *x, float *y, float *t, float *mass,
 	}
       }
     }
+
+  #pragma omp atomic
+    progress += 1;
+
+//  if( (progress * 100 / n ) % 5.0)
+//    printf("\r [Py-SPHViewer]: Rendering progress = %.2f", progress/n * 100);
+    
   }
   // Let's merge the local images
   
@@ -161,6 +174,9 @@ void c_render(float *x, float *y, float *t, float *mass,
     free(local_image);
   }
   }
+
+  printf("\r[Py-SPHViewer]: Rendering progress = %d %%\n", progress * 100 / n);
+  fflush(stdout);
   return;
 }
 
