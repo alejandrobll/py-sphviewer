@@ -157,9 +157,6 @@ void c_render(float *x, float *y, float *t, float *mass,
   #pragma omp atomic
     progress += 1;
 
-//  if( (progress * 100 / n ) % 5.0)
-//    printf("\r [Py-SPHViewer]: Rendering progress = %.2f", progress/n * 100);
-    
   }
   // Let's merge the local images
   
