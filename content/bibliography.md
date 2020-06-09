@@ -3,6 +3,8 @@
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
 
+* Lovell et al. (2020), First Light And Reionisation Epoch Simulations (FLARES) I: Environmental Dependence of High-Redshift Galaxy Evolution: arXiv:2004.07283 [(Link)](https://arxiv.org/abs/2004.07283)
+
 * Aramburo Garcia et al. (2020), Effective photon mass and (dark) photon conversion in the inhomogeneous Universe: arXiv:2003.10465 [(Link)](https://arxiv.org/abs/2003.10465)
 
 * Parul et al. (2020), Orbital ingredients for cooking X-structures in edge-on galaxies: arXiv:2002.06627 [(Link)](https://arxiv.org/abs/2002.06627)
