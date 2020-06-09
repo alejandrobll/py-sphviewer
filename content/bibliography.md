@@ -2,6 +2,7 @@
 
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Brown et al. (2020), Connecting the structure of dark matter haloes to the primordial power spectrum: arXiv:2005.12933 [(Link)](https://arxiv.org/abs/2005.12933)
 
 * Lovell et al. (2020), First Light And Reionisation Epoch Simulations (FLARES) I: Environmental Dependence of High-Redshift Galaxy Evolution: arXiv:2004.07283 [(Link)](https://arxiv.org/abs/2004.07283)
 
