@@ -2,6 +2,8 @@
 
 When users cite the code in their papers, we can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let us know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Wang et al. (2020), Universal structure of dark matter haloes over a mass range of 20 orders of magnitude, Nature 585, 39 [(Link)](https://www.nature.com/articles/s41586-020-2642-9)
+
 * Brown et al. (2020), Connecting the structure of dark matter haloes to the primordial power spectrum: arXiv:2005.12933 [(Link)](https://arxiv.org/abs/2005.12933)
 
 * Lovell et al. (2020), First Light And Reionisation Epoch Simulations (FLARES) I: Environmental Dependence of High-Redshift Galaxy Evolution: arXiv:2004.07283 [(Link)](https://arxiv.org/abs/2004.07283)
