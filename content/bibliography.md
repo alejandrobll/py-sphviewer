@@ -2,6 +2,9 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Arámburo-García et al. (2020), Magnetization of the intergalactic medium in the IllustrisTNG
+simulations: the importance of extended, outflow-driven bubbles, arXiv: 2011.11581 [(Link)](https://arxiv.org/abs/2011.11581)
+
 * Meneghetti et al. (2020), An excess of small-scale gravitational lenses observed in galaxy clusters, Science, 369, 6509 [(Link)](https://science.sciencemag.org/content/369/6509/1347.full)
 
 * Hernández-Aguayo et al. (2020), Galaxy formation in the brane world I: overview and first results, arXiv: 2006.15467 [(Link)](https://arxiv.org/abs/2006.15467)
