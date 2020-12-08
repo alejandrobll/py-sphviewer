@@ -2,6 +2,9 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Rost et al. (2020), The ThreeHundred: the structure and properties of cosmic
+filaments in the outskirts of galaxy clusters, arXiv: 2012:02850 [(Link)](https://arxiv.org/abs/2012.02850)
+
 * Arámburo-García et al. (2020), Magnetization of the intergalactic medium in the IllustrisTNG
 simulations: the importance of extended, outflow-driven bubbles, arXiv: 2011.11581 [(Link)](https://arxiv.org/abs/2011.11581)
 
