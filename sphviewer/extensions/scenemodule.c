@@ -154,9 +154,9 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
 
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize)
     for(i=0;i<n;i++){
-      x[i] = (x[i] - xmin) / (xmax-xmin) * xsize;
-      y[i] = (y[i] - ymin) / (ymax-ymin) * ysize;
-      hsml[i] = hsml[i]/(xmax-xmin) * xsize;
+      x[i] = (x[i] - xmin) / (xmax-xmin) * (xsize-1);
+      y[i] = (y[i] - ymin) / (ymax-ymin) * (ysize-1);
+      hsml[i] = hsml[i]/(xmax-xmin) * (xsize-1);
     }          
   }
   // If the camera is not at the infinity, let's put it at a certain 
@@ -195,9 +195,9 @@ long int compute_scene(float *x, float *y, float *z, float *hsml,
 #pragma omp parallel for firstprivate(n,xmin,xmax,ymin,ymax,xsize,ysize,lbin,zoom,r,zpart)
       for(i=0;i<n;i++){
 	zpart = (z[i]-(-1.0*r))/zoom;
-	x[i] = (x[i]/zpart - xmin) / (xmax-xmin) * xsize;
-	y[i] = (y[i]/zpart - ymin) / (ymax-ymin) * ysize;
-	hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * xsize;
+	x[i] = (x[i]/zpart - xmin) / (xmax-xmin) * (xsize-1);
+	y[i] = (y[i]/zpart - ymin) / (ymax-ymin) * (ysize-1);
+	hsml[i] = (hsml[i]/zpart)/(xmax-xmin) * (xsize-1);
       }
     }          
   return idx;
