@@ -108,10 +108,10 @@ void c_render(float *x, float *y, float *t, float *mass,
 
     if(tt <= 1) {
       local_image[yy*xsize+xx] += mm;
-	    
-#pragma omp atomic
-    progress += 1;	    
-	    
+
+  #pragma omp atomic
+    progress += 1;
+		    
       continue;
     }
     
@@ -130,12 +130,11 @@ void c_render(float *x, float *y, float *t, float *mass,
   #pragma omp atomic
     progress += 1;
 
-  if( (progress * 100 / n) % 4 == 0)
-    printf("\r[Py-SPHViewer]: Rendering progress = %d %%", progress* 100 / n);
-    fflush(stdout);
-  }  #pragma omp atomic
-    progress += 1;
-  
+    if( (progress * 100 / n) % 4 == 0){
+      printf("\r[Py-SPHViewer]: Rendering progress = %d %%", progress* 100 / n);
+      fflush(stdout);
+    }
+  }
   // Let's compute the image for the remainder particles...
   if((r-thread_id) > 0){
     i  = nth*ppt+thread_id;
