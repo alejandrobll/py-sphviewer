@@ -2,6 +2,12 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Davies et al. (2021), Quenching and morphological evolution due to circumgalactic gas
+expulsion in a simulated galaxy with a controlled assembly history, arXiv: 2006.13221 [(Link)](https://arxiv.org/abs/2006.13221)
+
+* Hill et al. (2021), The morphology of star-forming gas and its alignment with galaxies and
+dark matter haloes in the EAGLE simulations, arXiv: 2102.13603 [(Link)](https://arxiv.org/abs/2102.13603)
+
 * Rost et al. (2020), The ThreeHundred: the structure and properties of cosmic
 filaments in the outskirts of galaxy clusters, arXiv: 2012:02850 [(Link)](https://arxiv.org/abs/2012.02850)
 
