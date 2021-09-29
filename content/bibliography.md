@@ -2,11 +2,24 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Manuwal et al. (2021), Drivers of asymmetry in synthetic HI emission line profiles of galaxies in the EAGLE simulation, arXiv: 2109.11214  [(Link)](https://arxiv.org/abs/2109.11214)
+
+* Chaikin et al. (2021), Simulations of 60Fe entrained in ejecta from a near-Earth supernova: Effects of observer motion, arXiv: 2109.11242  [(Link)](https://arxiv.org/abs/2109.11242)
+
+* Benavides et al. (2021), Quiescent Ultra-diffuse galaxies in the field originating from backsplash orbits, arXiv: 2109.01677 [(Link)](https://arxiv.org/abs/2109.01677)
+
+* Robertson (2021), The galaxy-galaxy strong lensing cross-sections of simulated ΛCDM galaxy clusters, arXiv: 2101.12067 [(Link)](https://arxiv.org/abs/2109.01677)
+
+* Bondarenko et al. (2021), Account of baryonic feedback effect in the γ-ray measurements of
+intergalactic magnetic fields, arXiv: 2106.02690 [(Link)](https://arxiv.org/abs/2106.02690)
+
 * Davies et al. (2021), Quenching and morphological evolution due to circumgalactic gas
 expulsion in a simulated galaxy with a controlled assembly history, arXiv: 2006.13221 [(Link)](https://arxiv.org/abs/2006.13221)
 
 * Hill et al. (2021), The morphology of star-forming gas and its alignment with galaxies and
 dark matter haloes in the EAGLE simulations, arXiv: 2102.13603 [(Link)](https://arxiv.org/abs/2102.13603)
+
+* Haggar et al. (2021), The Three Hundred Project: Substructure in hydrodynamical and dark matter simulations of galaxy groups around clusters, arXiv: 2101.03178 [(Link)](https://arxiv.org/abs/2101.03178)
 
 * Rost et al. (2020), The ThreeHundred: the structure and properties of cosmic
 filaments in the outskirts of galaxy clusters, arXiv: 2012:02850 [(Link)](https://arxiv.org/abs/2012.02850)
