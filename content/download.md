@@ -27,7 +27,7 @@ title: Download Py-SPHViewer
      url          = {http://dx.doi.org/10.5281/zenodo.21703}
      }
 
-Some of the scientific papers that used Py-SPHViewer are listed [here](/content/bibliography.html)
+Some of the scientific papers that used Py-SPHViewer are listed [here]({{ site.baseurl }}/content/bibliography.html)
 
 
 
