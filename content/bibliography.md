@@ -2,6 +2,16 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Marioni et al. (2022), Numerical simulations of bar formation in the Local Group, arXiv: 2201.05162 [(Link)](https://arxiv.org/abs/2201.05162)
+
+* Cavanagh et al. (2022), The evolution of barred galaxies in the EAGLE simulations, arXiv: 2112.12935 [(Link)](https://arxiv.org/abs/2112.12935)
+
+* Rasera et al. (2021), The RayGalGroupSims cosmological simulation suite for the study of relativistic effects: an application to lensing-matter clustering statistics, arXiv: 2111.08745 [(Link)](https://arxiv.org/abs/2111.08745)
+
+* de Graaff et al. (2021), Observed structural parameters of EAGLE galaxies: reconciling the mass-size relation in simulations with local observations, arXiv: 2110.02235 [(Link)](https://arxiv.org/abs/2110.02235)
+
+* Gargiulo et al. (2021), High and low Sérsic index bulges in Milky Way- and M31-like galaxies: origin and connection to the bar with TNG50, arXiv: 2111.13712 [(Link)](https://arxiv.org/abs/2111.13712)
+
 * Manuwal et al. (2021), Drivers of asymmetry in synthetic HI emission line profiles of galaxies in the EAGLE simulation, arXiv: 2109.11214  [(Link)](https://arxiv.org/abs/2109.11214)
 
 * Chaikin et al. (2021), Simulations of 60Fe entrained in ejecta from a near-Earth supernova: Effects of observer motion, arXiv: 2109.11242  [(Link)](https://arxiv.org/abs/2109.11242)
