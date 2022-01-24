@@ -18,6 +18,8 @@ When users cite the code in their papers, I can keep track of the citation and k
 
 * Benavides et al. (2021), Quiescent Ultra-diffuse galaxies in the field originating from backsplash orbits, arXiv: 2109.01677 [(Link)](https://arxiv.org/abs/2109.01677)
 
+* Sawala et al. (2021), The SIBELIUS Project: E Pluribus Unum, arXiv: 2103.12073 [(Link)](https://arxiv.org/abs/2103.12073)
+
 * Robertson (2021), The galaxy-galaxy strong lensing cross-sections of simulated ΛCDM galaxy clusters, arXiv: 2101.12067 [(Link)](https://arxiv.org/abs/2109.01677)
 
 * Bondarenko et al. (2021), Account of baryonic feedback effect in the γ-ray measurements of
