@@ -9,5 +9,4 @@ Py-SPHViewer's capabilities, both in terms of features and performance, includin
 the keyboard and/or a Joystick. Check out the videos below:
 
 <p align="center">
-<iframe width="640" height="480" src="https://youtube.com/watch/A-3u6OqolFU?feature=share" frameborder="0" allowfullscreen></iframe>
-</p>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/A-3u6OqolFU" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> </p>
