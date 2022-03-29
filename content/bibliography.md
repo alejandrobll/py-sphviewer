@@ -2,6 +2,9 @@
 
 When users cite the code in their papers, I can keep track of the citation and know what is the real impact of Py-SPHViewer in the community. If your research project or paper used the code and is not listed here, please let me know so that we can add it to the list. Some of the papers that used Py-SPHViewer are listed below:
 
+* Chaikin et al. (2022), The importance of the way in which supernova energy is distributed
+around young stellar populations in simulations of galaxies, arXiv: 2203.07134 [(Link)](https://arxiv.org/abs/2203.07134)
+
 * Marioni et al. (2022), Numerical simulations of bar formation in the Local Group, arXiv: 2201.05162 [(Link)](https://arxiv.org/abs/2201.05162)
 
 * Cavanagh et al. (2022), The evolution of barred galaxies in the EAGLE simulations, arXiv: 2112.12935 [(Link)](https://arxiv.org/abs/2112.12935)
