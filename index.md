@@ -1,3 +1,7 @@
+---
+title: HomePage
+---
+
 # NEWS: Py-SPHViewer successor
 
 Although this is not publicly available yet, Py-SPHViewer has already got a successor. A GPU-powered real-time rendering tool for Python that greatly exceeds Py-SPHViewer's capabilities, both in terms of features and performance, including virtual reality and the ability to move the camera interactively using the keyboard and a Joystick. Check out the videos below:
@@ -10,10 +14,7 @@ Although this is not publicly available yet, Py-SPHViewer has already got a succ
 
 Stay tunned for the latest updates on this. In the meantime, you are welcome to keep using py-sphviewer. For news, you can follow me on Twitter, where I will keep posting updates: [https://twitter.com/bllalejandro](https://twitter.com/bllalejandro)
 
-
----
-title: HomePage
----
+# Py-SPHViewer
 
 Py-SPHViewer is a parallel Python package to visualise and explore N-body + Hydrodynamics simulations using the Smoothed Particle Hydrodynamics (SPH) scheme. The code estimates an underlying scalar field (e.g., the density field) traced by a finite number of particles, and produces not only beautiful, but also scientifically useful images. In addition, Py-SPHViewer enables the user to explore simulated volumes using different projections.
 
