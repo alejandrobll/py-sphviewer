@@ -94,4 +94,4 @@ Users are encouraged to contribute with ideas, codes or by reporting (and fixing
 
 Issues and bugs should be reported by creating issues in the main repository. If you would like to contribute with code that adds new feature, tool, or that fixes a bug, you are very welcome to do so by submitting a pull request.
 
-If you plan to work on a major improvement, or on a new feature that requires a significant effort from your side, please contact me at alejandro.b.llambay@durham.ac.uk first so that we can sort out the technical aspects prior starting the development.
+If you plan to work on a major improvement, or on a new feature that requires a significant effort from your side, please contact me at alejandro.benitezllambay@unimib.it first so that we can sort out the technical aspects prior starting the development.
