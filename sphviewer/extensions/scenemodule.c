@@ -76,7 +76,7 @@ float *get_float_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a float PyArrayObject*/
 
   /*We enfore C contiguous arrays*/
-  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, PyArray_FLOAT, 1, 3);
+  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, NPY_FLOAT, 1, 3);
 
   float *local_array = (float *)cont_obj->data;  
   float *output = (float *)malloc( n * sizeof(float) );
@@ -95,7 +95,7 @@ float *get_double_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a double PyArrayObject*/
 
   /*We enfore C contiguous arrays*/
-  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, PyArray_DOUBLE, 1, 3);
+  PyArrayObject *cont_obj = PyArray_ContiguousFromObject(array_obj, NPY_DOUBLE, 1, 3);
 
   double *local_array = (double *)cont_obj->data;  
   float *output = (float *)malloc( n * sizeof(float) );
