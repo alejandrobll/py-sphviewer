@@ -31,6 +31,9 @@
 #include <stdio.h>
 #include <time.h>
 
+/* Kernel choice */
+#include "../sph_kernel.h"
+
 float *get_double_array(PyArrayObject *array_obj, int n){
   /* This function returns the data stored in a double PyArrayObject*/
   double *local_array = (double *)array_obj->data;  
@@ -42,20 +45,6 @@ float *get_double_array(PyArrayObject *array_obj, int n){
   }
 
   return output;
-}
-
-
-float cubic_kernel(float r, float h){
-  //2D Dome-shapeed quadratic Kernel (1-R^2) (Hicks and Liebrock 2000).
-  float func;
-  float sigma;
-  
-  sigma = 15.0/(8.0*3.141592);
-  if(r/h <= 1.0)  
-    func = 4.0/3.0*h*pow(sqrt(1.0-(r/h)*(r/h)),3);
-  if(r/h > 1.0)  
-    func = 0;
-  return sigma*func/(h*h*h);
 }
 
 
