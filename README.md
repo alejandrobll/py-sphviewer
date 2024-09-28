@@ -32,7 +32,7 @@ python setup.py install
 
 To get started with Py-SPHViewer please visit the official website:
 
-[**alejandrobll.github.io/content/sphviewer**](https://alejandrobll.github.io/content/sphviewer/)
+[**alejandrobll.github.io/content/sphviewer**](https://alejandrobll.github.io/content/sphviewer/){:target="_blank"}
 
 
 # Licensing and Citation Information
