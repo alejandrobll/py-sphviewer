@@ -76,7 +76,7 @@ def get_camera_trajectory(targets, anchors):
             f_interp[key] = interp.interp1d(frames, anchors[key])
 
     camera_params = []
-    frames = np.arange(anchors['id_frames'][0], anchors['id_frames'][-1])
+    frames = np.arange(anchors['id_frames'][0], anchors['id_frames'][-1] + 1)
     camera_params = []
     keys = ['id_frames', 'sim_times', 'r', 't',
             'p', 'x', 'y', 'z', 'zoom', 'extent']
