@@ -1,3 +1,12 @@
+# NOW DEPRECATED. 
+
+Py-SPHViewer is now deprecated and has been superseded by Py-SPHViewer 2:
+
+https://github.com/alejandrobll/py-sphviewer2
+
+The new Py-SPHViewer 2 implements a novel nested-grids algorithm described in Benitez-Llambay (2025) (https://iopscience.iop.org/article/10.3847/2515-5172/addab2
+), achieving a speed-up of several orders of magnitude compared to the algorithm used in the original Py-SPHViewer.
+
 # Py-SPHViewer [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.21703.svg)](http://dx.doi.org/10.5281/zenodo.21703)
 
 
